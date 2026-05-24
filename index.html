@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+<meta charset="UTF-8"/>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
+
+<title>
+  HỆ THỐNG TRA CỨU THÀNH PHẨM AUTO
+</title>
+
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+/>
+
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin
+/>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<style>
+
+*{
+  font-family:'Be Vietnam Pro',sans-serif;
+}
+
+body{
+  background:#020617;
+  color:white;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:15px;
+  border-bottom:1px solid #1e293b;
+  text-align:left;
+  white-space:nowrap;
+}
+
+th{
+  background:#111827;
+  position:sticky;
+  top:0;
+  z-index:5;
+  font-size:14px;
+}
+
+tbody tr:hover{
+  background:#0f172a;
+}
+
+::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#475569;
+  border-radius:999px;
+}
+
+.hideBox{
+  display:none !important;
+}
+
+.flash{
+  animation:flashEffect 2s ease;
+}
+
+@keyframes flashEffect{
+
+  0%{
+    background:#facc15;
+    color:black;
+  }
+
+  100%{
+    background:transparent;
+  }
+
+}
+
+.card{
+  background:#0f172a;
+  border:1px solid #1e293b;
+  border-radius:30px;
+}
+
+.input{
+  width:100%;
+  background:#111827;
+  border:1px solid #334155;
+  border-radius:18px;
+  padding:14px;
+  outline:none;
+  transition:0.2s;
+  color: white;
+}
+
+.input:focus{
+  border-color:#8b5cf6;
+  box-shadow:0 0 0 3px rgba(139,92,246,0.2);
+}
+
+.btn{
+  padding:14px 20px;
+  border-radius:18px;
+  font-weight:700;
+  transition:0.2s;
+}
+
+</style>
+
+</head>
+
+<body class="p-5">
+
+<div id="loginSection" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4">
+  <div class="card p-8 max-w-md w-full text-center space-y-5 border-violet-500/30">
+    <div class="w-16 h-16 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-2xl">🔐</div>
+    <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">VUI LÒNG CHỌN BỘ PHẬN</h2>
+    <p class="text-slate-400 text-sm">Hệ thống sẽ tự động phân quyền giao diện phù hợp</p>
+    
+    <button onclick="selectUserRole('production')" class="btn w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-base">
+      🏭 QUẢN ĐỐC SẢN XUẤT (XƯỞNG - Vào thẳng)
+    </button>
+
+    <div class="relative flex py-2 items-center">
+        <div class="flex-grow border-t border-slate-700"></div>
+        <span class="flex-shrink mx-4 text-slate-500 text-sm">HOẶC ĐĂNG NHẬP VĂN PHÒNG</span>
+        <div class="flex-grow border-t border-slate-700"></div>
+    </div>
+
+    <div class="text-left space-y-3">
+      <div>
+        <label class="text-xs text-slate-400 pl-1">Tài khoản:</label>
+        <input type="text" id="userInput" placeholder="Nhập tài khoản..." class="input mt-1 text-sm py-3" />
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 pl-1">Mật khẩu:</label>
+        <input type="password" id="passInput" placeholder="Nhập mật khẩu..." class="input mt-1 text-sm py-3" />
+      </div>
+    </div>
+
+    <button onclick="selectUserRole('admin')" class="btn w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-base">
+      💻 CHỦ QUẢN VĂN PHÒNG (MÁY CHỦ)
+    </button>
+    <div id="loginAlert" class="text-red-400 text-sm font-semibold mt-1"></div>
+  </div>
+</div>
+
+<div class="max-w-[1900px] mx-auto space-y-5">
+
+  <div class="card p-6">
+
+    <div class="
+      flex
+      justify-between
+      items-center
+      flex-wrap
+      gap-5
+    ">
+
+      <div class="
+        flex
+        items-center
+        gap-5
+        flex-wrap
+      ">
+
+        <div class="
+          w-24
+          h-24
+          rounded-[30px]
+          bg-gradient-to-br
+          from-violet-500
+          to-fuchsia-500
+          flex
+          items-center
+          justify-center
+          text-4xl
+          font-black
+        ">
+          TP
+        </div>
+
+        <div>
+
+          <h1 class="
+            text-4xl
+            font-black
+          ">
+            📦 HỆ THỐNG TRA CỨU THÀNH PHẨM AUTO
+          </h1>
+
+          <div class="
+            flex items-center gap-3
+            text-slate-400
+            mt-2
+            text-lg
+          ">
+            <span>Bộ phận: <span id="currentRoleLabel" class="text-violet-400 font-bold">...</span></span>
+            <span id="syncStatus" class="text-sm px-3 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-semibold">🟡 Đang kết nối mạng...</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="flex gap-3">
+        <button id="btnNotifyWorkshop" class="btn bg-amber-600 hover:bg-amber-500 text-black hideBox">🔔 Báo xưởng xem dữ liệu</button>
+        <button id="btnResetStorage" class="btn bg-rose-950/60 hover:bg-rose-900 text-rose-300 hideBox" onclick="clearSystemCache()">🗑️ Xóa dữ liệu gốc đám mây</button>
+        <button onclick="switchRole()" class="btn bg-slate-700 hover:bg-slate-600">🔄 Đổi chế độ đăng xuất</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="appNoticeBox" class="card p-5 border-amber-500/30 hideBox">
+    <div class="flex justify-between items-center flex-wrap gap-4">
+      <div>
+        <div id="appNoticeTitle" class="text-xl font-black text-amber-400">🔔 THÔNG BÁO</div>
+        <div id="appNoticeMessage" class="text-slate-300 mt-1"></div>
+      </div>
+      <button id="btnDismissNotice" class="btn bg-slate-700 hover:bg-slate-600">Đã xem</button>
+    </div>
+  </div>
+
+  <div class="
+    grid
+    xl:grid-cols-4
+    md:grid-cols-2
+    gap-4
+  ">
+
+    <div class="card p-5">
+
+      <div class="text-slate-400">
+        Tổng đơn hàng
+      </div>
+
+      <div id="kpi-total-orders" class="
+        text-5xl
+        font-black
+        mt-4
+      ">
+        0
+      </div>
+
+    </div>
+
+    <div class="card p-5">
+
+      <div class="text-slate-400">
+        Đơn đủ hàng
+      </div>
+
+      <div id="kpi-ready-orders" class="
+        text-5xl
+        font-black
+        mt-4
+        text-green-400
+      ">
+        0
+      </div>
+
+    </div>
+
+    <div class="card p-5">
+
+      <div class="text-slate-400">
+        Đơn thiếu hàng
+      </div>
+
+      <div id="kpi-shortage-orders" class="
+        text-5xl
+        font-black
+        mt-4
+        text-red-400
+      ">
+        0
+      </div>
+
+    </div>
+
+    <div class="card p-5">
+
+      <div class="text-slate-400">
+        Tổng cần sản xuất
+      </div>
+
+      <div id="kpi-total-production" class="
+        text-5xl
+        font-black
+        mt-4
+        text-orange-400
+      ">
+        0T
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="section-production-permissions" class="card p-6 border-cyan-500/20 hideBox">
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+      <div>
+        <h2 class="text-2xl font-black text-cyan-400">👁️ CHỌN MỤC CHO QUẢN ĐỐC SẢN XUẤT XEM</h2>
+        <div class="text-slate-400 mt-1">Bật mục nào thì giao diện xưởng sẽ thấy mục đó ngay sau khi đồng bộ mạng</div>
+      </div>
+      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black">💾 LƯU QUYỀN XEM</button>
+    </div>
+    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
+      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permTomorrow" class="w-5 h-5 accent-cyan-500 mt-1"/>
+        <span>
+          <span class="block font-black text-yellow-400">⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT</span>
+          <span class="block text-sm text-slate-400 mt-1">Xưởng chọn và xác nhận đơn ưu tiên xuất ngày mai</span>
+        </span>
+      </label>
+      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permReady" class="w-5 h-5 accent-cyan-500 mt-1"/>
+        <span>
+          <span class="block font-black text-green-400">✅ ĐƠN HÀNG CÓ THỂ XUẤT</span>
+          <span class="block text-sm text-slate-400 mt-1">Xưởng xem danh sách đơn đủ điều kiện xuất</span>
+        </span>
+      </label>
+      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permProduction" class="w-5 h-5 accent-cyan-500 mt-1"/>
+        <span>
+          <span class="block font-black text-red-400">⚠️ THÀNH PHẨM CẦN SẢN XUẤT</span>
+          <span class="block text-sm text-slate-400 mt-1">Xưởng xem tổng hợp thiếu hụt cần sản xuất</span>
+        </span>
+      </label>
+      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permDetail" class="w-5 h-5 accent-cyan-500 mt-1"/>
+        <span>
+          <span class="block font-black text-slate-100">📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG</span>
+          <span class="block text-sm text-slate-400 mt-1">Xưởng xem toàn bộ đơn hàng trên hệ thống</span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <div id="section-import" class="card p-6 hideBox">
+
+    <div class="
+      flex
+      justify-between
+      items-center
+      flex-wrap
+      gap-4
+      mb-6
+    ">
+
+      <div>
+
+        <h2 class="
+          text-2xl
+          font-black
+        ">
+          📁 IMPORT DỮ LIỆU LÊN ĐÁM MÂY MÁY CHỦ
+        </h2>
+
+        <div class="
+          text-slate-400
+          mt-1
+        ">
+          Upload file dữ liệu mới, tất cả các máy tính của xưởng và văn phòng sẽ tự động tải dữ liệu đồng bộ
+        </div>
+
+      </div>
+
+      <button class="
+        btn
+        bg-emerald-600
+        hover:bg-emerald-500
+      " onclick="processFiles()">
+        🚀 XỬ LÝ & ĐỒNG BỘ ĐƠN HÀNG
+      </button>
+
+    </div>
+
+    <div class="
+      grid
+      grid-cols-1 lg:grid-cols-2
+      gap-5
+    ">
+
+      <div class="
+        bg-slate-800
+        rounded-[28px]
+        p-5
+      ">
+
+        <div class="
+          text-xl
+          font-bold
+          mb-4
+        ">
+          📦 FILE ĐƠN HÀNG
+        </div>
+
+        <input
+          type="file"
+          id="orderFileInput"
+          class="input"
+        />
+
+      </div>
+
+      <div class="
+        bg-slate-800
+        rounded-[28px]
+        p-5
+      ">
+
+        <div class="
+          text-xl
+          font-bold
+          mb-4
+        ">
+          🏭 FILE TỒN KHO TP
+        </div>
+
+        <input
+          type="file"
+          id="stockFileInput"
+          class="input"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="section-tomorrow" class="card p-6 border-yellow-500/20">
+
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+      <div>
+        <h2 class="text-2xl font-black text-yellow-400">
+          ⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT
+          <span class="bg-yellow-500 text-black text-sm px-3 py-1 rounded-full ml-2">
+            0
+          </span>
+        </h2>
+        <div class="text-slate-400 mt-1">
+          Đơn thiếu TP nhưng đã được xác nhận từ sản xuất
+        </div>
+      </div>
+    </div>
+
+    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4 mb-5">
+      <div>
+        <div class="text-slate-400 mb-2">Chọn ngày giao</div>
+        <select id="tomorrowDateSelect" class="input" onchange="refreshAll()">
+          <option value="ALL">ALL</option>
+        </select>
+      </div>
+
+      <div class="flex items-end">
+        <button onclick="refreshAll()" class="btn w-full bg-yellow-500 hover:bg-yellow-400 text-black">
+          🔍 XỔ DANH SÁCH
+        </button>
+      </div>
+
+      <div id="btn-wrap-confirm-workshop" class="flex items-end hideBox">
+        <button id="btnWorkshopConfirm" class="btn w-full bg-emerald-600 hover:bg-emerald-500">
+          ✅ HOÀN THÀNH
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-slate-800 rounded-[28px] overflow-auto max-h-[450px] mb-5">
+      <table id="tomorrowCandidateTable">
+        <thead>
+          <tr>
+            <th>Chọn</th>
+            <th>Đơn hàng</th>
+            <th>Khách hàng</th>
+            <th>Tên đơn hàng</th>
+            <th>SL đơn</th>
+            <th>Tồn TP</th>
+            <th>Thiếu</th>
+            <th>Ngày giao</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có dữ liệu đám mây</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bg-yellow-500/10 border border-yellow-500 rounded-[28px] overflow-auto">
+      <div class="p-5 text-xl font-black text-yellow-400">
+        ✅ ĐÃ XÁC NHẬN “MAI CÓ THỂ XUẤT”
+      </div>
+      <table id="tomorrowConfirmedTable">
+        <thead>
+          <tr>
+            <th>Đơn hàng</th>
+            <th>Tên đơn hàng</th>
+            <th>Thiếu</th>
+            <th>Ngày giao</th>
+            <th>Trạng thái</th>
+            <th>Xóa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="6" class="text-center text-slate-500 py-8">Chưa có dữ liệu điều phối</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="section-ready" class="card p-6 border-green-500/20 hideBox">
+
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+      <div>
+        <h2 class="text-2xl font-black text-green-400">
+          ✅ ĐƠN HÀNG CÓ THỂ XUẤT
+          <span class="bg-green-500 text-black text-sm px-3 py-1 rounded-full ml-2">
+            0
+          </span>
+        </h2>
+        <div class="text-slate-400 mt-1">
+          Luôn hiển thị ALL toàn bộ đơn có thể xuất
+        </div>
+      </div>
+    </div>
+
+    <div class="
+      bg-violet-500/10
+      border
+      border-violet-500
+      rounded-[28px]
+      p-5
+      mb-5
+    ">
+
+      <div class="
+        text-2xl
+        font-black
+        text-violet-400
+        mb-5
+      ">
+        📅 BỘ LỌC EXPORT KẾ HOẠCH DƯỚI ĐÁM MÂY
+      </div>
+
+      <div class="
+        grid
+        xl:grid-cols-5
+        md:grid-cols-2
+        gap-4
+        mb-4
+      ">
+
+        <div>
+
+          <div class="
+            text-slate-400
+            mb-2
+          ">
+            Chế độ export
+          </div>
+
+          <select id="readyExportMode" class="input">
+
+            <option value="ALL">ALL</option>
+            <option value="1 ngày">1 ngày</option>
+            <option value="Khoảng ngày">Khoảng ngày</option>
+
+          </select>
+
+        </div>
+
+        <div>
+
+          <div class="
+            text-slate-400
+            mb-2
+          ">
+            Từ ngày
+          </div>
+
+          <input
+            type="date"
+            id="readyFromDate"
+            class="input"
+          />
+
+        </div>
+
+        <div>
+
+          <div class="
+            text-slate-400
+            mb-2
+          ">
+            Đến ngày
+          </div>
+
+          <input
+            type="date"
+            id="readyToDate"
+            class="input"
+          />
+
+        </div>
+
+        <div class="
+          flex
+          items-end
+        ">
+
+          <button id="btnPreviewReady" class="
+            btn
+            w-full
+            bg-blue-600
+            hover:bg-blue-500
+          ">
+            🔍 XEM TRƯỚC EXPORT
+          </button>
+
+        </div>
+
+        <div class="
+          flex
+          items-end
+        ">
+
+          <button id="btnConfirmReady" class="
+            btn
+            w-full
+            bg-violet-600
+            hover:bg-violet-500
+          ">
+            📥 XÁC NHẬN EXPORT EXCEL
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="
+      bg-slate-800
+      rounded-[28px]
+      overflow-auto
+      mb-5
+    " id="exportPreviewContainer">
+
+      <div class="
+        p-5
+        flex
+        justify-between
+        items-center
+        flex-wrap
+        gap-4
+      ">
+
+        <div>
+
+          <div class="
+            text-2xl
+            font-black
+          ">
+            📦 XEM TRƯỚC FILE EXPORT
+          </div>
+
+          <div class="
+            text-slate-400
+            mt-1
+          ">
+            Hiển thị chính xác bảng dữ liệu kế hoạch sắp tải về
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="
+        p-10
+        text-center
+        text-slate-500
+      ">
+        PREVIEW FORMAT EXCEL KẾ HOẠCH XUẤT HÀNG
+      </div>
+
+    </div>
+
+    <div class="
+      bg-slate-800
+      rounded-[28px]
+      overflow-hidden
+    ">
+
+      <div class="
+        p-5
+        flex
+        justify-between
+        items-center
+        flex-wrap
+        gap-4
+        border-b
+        border-slate-700
+      ">
+
+        <div>
+
+          <div class="
+            text-2xl
+            font-black
+          ">
+            📋 DANH SÁCH TOÀN BỘ ĐƠN CÓ THỂ XUẤT
+          </div>
+
+          <div class="
+            text-slate-400
+            mt-1
+          ">
+            Hiển thị tất cả đơn hàng đủ điều kiện giao của hệ thống
+          </div>
+
+        </div>
+
+        <button
+          onclick="document.getElementById('fullExportTable').classList.toggle('hideBox')"
+          class="
+            btn
+            bg-slate-700
+            hover:bg-slate-600
+          "
+        >
+          Thu gọn / Mở rộng
+        </button>
+
+      </div>
+
+      <div
+        id="fullExportTable"
+        class="
+          overflow-auto
+          max-h-[600px]
+        "
+      >
+        </div>
+
+    </div>
+
+  </div>
+
+  <div id="section-production" class="
+    card
+    p-6
+    border-red-500/20
+    hideBox
+  ">
+
+    <div class="
+      flex
+      justify-between
+      items-center
+      flex-wrap
+      gap-4
+      mb-5
+    ">
+
+      <div>
+
+        <h2 class="
+          text-2xl
+          font-black
+          text-red-400
+        ">
+          ⚠️ THÀNH PHẨM CẦN SẢN XUẤT
+        </h2>
+
+        <div class="
+          text-slate-400
+          mt-1
+        ">
+          Tổng hợp khối lượng thành phẩm còn thiếu hụt dưới kho cần chạy lò gấp
+        </div>
+
+      </div>
+
+      <button
+        onclick="document.getElementById('tpSanXuatBox').classList.toggle('hideBox')"
+        class="
+          btn
+          bg-slate-700
+          hover:bg-slate-600
+        "
+      >
+        Thu gọn / Mở rộng
+      </button>
+
+    </div>
+
+    <div
+      id="tpSanXuatBox"
+      class="space-y-5"
+    >
+
+      <div class="
+        bg-slate-800
+        rounded-[28px]
+        p-5
+      ">
+
+        <div class="
+          grid
+          xl:grid-cols-4
+          md:grid-cols-2
+          gap-4
+        ">
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Chế độ hiển thị
+            </div>
+
+            <select id="prodDisplayMode" class="input">
+              <option value="ALL">ALL</option>
+              <option value="1 ngày">1 ngày</option>
+              <option value="Khoảng ngày">Khoảng ngày</option>
+            </select>
+
+          </div>
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Từ ngày
+            </div>
+
+            <input
+              type="date"
+              id="prodFromDate"
+              class="input"
+            />
+
+          </div>
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Đến ngày
+            </div>
+
+            <input
+              type="date"
+              id="prodToDate"
+              class="input"
+            />
+
+          </div>
+
+          <div class="
+            flex
+            items-end
+          ">
+
+            <button id="btnFilterProd" class="
+              btn
+              w-full
+              bg-red-600
+              hover:bg-red-500
+            ">
+              🔍 LỌC DỮ LIỆU SẢN XUẤT
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="
+        bg-slate-800
+        rounded-[28px]
+        overflow-auto
+        max-h-[550px]
+      ">
+
+        <table id="productionNeedTable">
+
+          <thead>
+
+            <tr>
+
+              <th>Tên đơn hàng</th>
+              <th>Tổng nhu cầu</th>
+              <th>Tồn TP</th>
+              <th>Thiếu</th>
+              <th>Cần SX</th>
+              <th>Số đơn</th>
+              <th>Ngày giao gần nhất</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+             <tr><td colspan="7" class="text-center text-slate-500 py-8">Chưa có dữ liệu phân tích</td></tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="section-detail" class="
+    card
+    p-6
+    hideBox
+  ">
+
+    <div class="
+      flex
+      justify-between
+      items-center
+      flex-wrap
+      gap-4
+      mb-5
+    ">
+
+      <div>
+
+        <h2 class="
+          text-2xl
+          font-black
+        ">
+          📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG TRÊN HỆ THỐNG
+        </h2>
+
+        <div class="
+          text-slate-400
+          mt-1
+        ">
+          Theo dõi tổng quan dữ liệu toàn bộ danh sách đơn hàng đã nhập
+        </div>
+
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          onclick="document.getElementById('chiTietDonHangBox').classList.toggle('hideBox')"
+          class="
+            btn
+            bg-slate-700
+            hover:bg-slate-600
+          "
+        >
+          Thu gọn / Mở rộng
+        </button>
+
+        <button
+          id="captureDetailBtn"
+          class="
+            btn
+            bg-blue-600
+            hover:bg-blue-500
+          "
+        >
+          📸 Chụp ảnh màn hình gửi Zalo
+        </button>
+      </div>
+
+    </div>
+
+    <div
+      id="chiTietDonHangBox"
+      class="space-y-5"
+    >
+
+      <div class="
+        bg-slate-800
+        rounded-[28px]
+        p-5
+      ">
+
+        <div class="
+          grid
+          xl:grid-cols-5
+          md:grid-cols-2
+          gap-4
+        ">
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Chế độ hiển thị
+            </div>
+
+            <select id="detailDisplayMode" class="input">
+              <option value="ALL">ALL</option>
+              <option value="1 ngày">1 ngày</option>
+              <option value="Khoảng ngày">Khoảng ngày</option>
+            </select>
+
+          </div>
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Từ ngày
+            </div>
+
+            <input
+              type="date"
+              id="detailFromDate"
+              class="input"
+            />
+
+          </div>
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Đến ngày
+            </div>
+
+            <input
+              type="date"
+              id="detailToDate"
+              class="input"
+            />
+
+          </div>
+
+          <div>
+
+            <div class="
+              text-slate-400
+              mb-2
+            ">
+              Tìm kiếm nhanh
+            </div>
+
+            <input
+              type="text"
+              id="detailSearchInput"
+              placeholder="Nhập mã đơn hàng / tên khách..."
+              class="input"
+            />
+
+          </div>
+
+          <div class="
+            flex
+            items-end
+          ">
+
+            <button id="btnSearchDetail" class="
+              btn
+              w-full
+              bg-slate-700
+              hover:bg-slate-600
+            ">
+              🔍 BẮT ĐẦU TÌM
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="
+        bg-slate-800
+        rounded-[28px]
+        overflow-auto
+        max-h-[650px]
+      ">
+
+        <table id="detailAllOrdersTable">
+
+          <thead>
+
+            <tr>
+
+              <th>Đơn hàng</th>
+              <th>Khách hàng</th>
+              <th>Tên đơn hàng</th>
+              <th>SL đơn</th>
+              <th>Tồn TP</th>
+              <th>Thiếu</th>
+              <th>Ngày giao</th>
+              <th>Trạng thái</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+             <tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp</td></tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB9F9oHqiyQHS3-5r1IsQiGvl1nbAClNY4",
+  authDomain: "hethongthanhpham.firebaseapp.com",
+  projectId: "hethongthanhpham",
+  storageBucket: "hethongthanhpham.firebasestorage.app",
+  messagingSenderId: "522347739695",
+  appId: "1:522347739695:web:a743523d3c67fb5a3964da",
+  measurementId: "G-MEKJL605EF",
+  databaseURL: "https://hethongthanhpham-default-rtdb.firebaseio.com/"
+};
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  var database = firebase.database();
+} catch (e) {
+  console.error("Lỗi cấu hình Firebase, kiểm tra lại tài khoản:", e);
+}
+
+const appState = {
+  orders: [],
+  details: [],
+  production: [],
+  confirmedTomorrow: [],
+  exportPreview: [],
+  stockMap: new Map(),
+  productionView: {
+    tomorrow: true,
+    ready: false,
+    production: false,
+    detail: false
+  },
+  latestNotice: null
+};
+
+const SECURITY_ACC = "omotobike";
+const SECURITY_PSW = "hoilamchi";
+
+function selectUserRole(role) {
+  if (role === 'admin') {
+    const user = document.getElementById('userInput').value.trim();
+    const pass = document.getElementById('passInput').value.trim();
+    if (user === SECURITY_ACC && pass === SECURITY_PSW) {
+      localStorage.setItem('tp_user_role', 'admin');
+      applyRoleView('admin');
+    } else {
+      document.getElementById('loginAlert').textContent = "Sai tài khoản hoặc mật khẩu máy chủ!";
+      return;
+    }
+  } else {
+    localStorage.setItem('tp_user_role', 'production');
+    applyRoleView('production');
+  }
+}
+
+function applyRoleView(role) {
+  document.getElementById('loginSection').classList.add('hideBox');
+  if (role === 'admin') {
+    document.getElementById('currentRoleLabel').textContent = "💻 CHỦ QUẢN VĂN PHÒNG (MÁY CHỦ)";
+    document.getElementById('section-tomorrow').classList.remove('hideBox');
+    document.getElementById('section-production-permissions').classList.remove('hideBox');
+    document.getElementById('section-import').classList.remove('hideBox');
+    document.getElementById('section-ready').classList.remove('hideBox');
+    document.getElementById('section-production').classList.remove('hideBox');
+    document.getElementById('section-detail').classList.remove('hideBox');
+    document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
+    document.getElementById('btnResetStorage').classList.remove('hideBox');
+    document.getElementById('btn-wrap-confirm-workshop').classList.add('hideBox'); 
+  } else {
+    document.getElementById('currentRoleLabel').textContent = "🏭 QUẢN ĐỐC SẢN XUẤT (XƯỞNG)";
+    document.getElementById('section-production-permissions').classList.add('hideBox');
+    document.getElementById('section-import').classList.add('hideBox');
+    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
+    document.getElementById('btnResetStorage').classList.add('hideBox');
+    applyProductionViewSettings();
+  }
+  renderProductionViewSettings();
+  renderLatestNotice();
+  refreshAll();
+}
+
+function switchRole() {
+  localStorage.removeItem('tp_user_role');
+  location.reload();
+}
+
+function currentRole(){
+  return localStorage.getItem('tp_user_role') || 'production';
+}
+
+function applyProductionViewSettings(){
+  const role = currentRole();
+  if(role === 'admin') return;
+  const view = appState.productionView || {};
+  const showTomorrow = view.tomorrow !== false;
+
+  document.getElementById('section-tomorrow').classList.toggle('hideBox', !showTomorrow);
+  document.getElementById('section-ready').classList.toggle('hideBox', !view.ready);
+  document.getElementById('section-production').classList.toggle('hideBox', !view.production);
+  document.getElementById('section-detail').classList.toggle('hideBox', !view.detail);
+  document.getElementById('btn-wrap-confirm-workshop').classList.toggle('hideBox', !showTomorrow);
+}
+
+function renderProductionViewSettings(){
+  const view = appState.productionView || {};
+  const controls = {
+    permTomorrow: view.tomorrow !== false,
+    permReady: !!view.ready,
+    permProduction: !!view.production,
+    permDetail: !!view.detail
+  };
+
+  Object.entries(controls).forEach(([id, checked])=>{
+    const el = document.getElementById(id);
+    if(el) el.checked = checked;
+  });
+}
+
+function saveProductionViewSettings(){
+  appState.productionView = {
+    tomorrow: document.getElementById('permTomorrow')?.checked !== false,
+    ready: !!document.getElementById('permReady')?.checked,
+    production: !!document.getElementById('permProduction')?.checked,
+    detail: !!document.getElementById('permDetail')?.checked
+  };
+  if(database) database.ref("thanhpham_system/production_view").set(appState.productionView);
+  renderProductionViewSettings();
+  alert('Đã lưu quyền xem cho giao diện quản đốc sản xuất.');
+}
+
+function sendAppNotice(targetRole, message){
+  if(!database) return alert('Chưa kết nối được Firebase nên chưa gửi thông báo được.');
+  const notice = {
+    id: Date.now(),
+    targetRole,
+    message,
+    createdAt: new Date().toLocaleString('vi-VN'),
+    fromRole: currentRole()
+  };
+  database.ref("thanhpham_system/notices/latest").set(notice);
+}
+
+function renderLatestNotice(){
+  const box = document.getElementById('appNoticeBox');
+  const notice = appState.latestNotice;
+  if(!box || !notice || notice.targetRole !== currentRole()){
+    box?.classList.add('hideBox');
+    return;
+  }
+
+  const seenId = localStorage.getItem(`tp_notice_seen_${currentRole()}`);
+  if(String(notice.id) === seenId){
+    box.classList.add('hideBox');
+    return;
+  }
+
+  document.getElementById('appNoticeMessage').textContent = `${notice.message} (${notice.createdAt || ''})`;
+  box.classList.remove('hideBox');
+}
+
+function dismissLatestNotice(){
+  if(appState.latestNotice?.id){
+    localStorage.setItem(`tp_notice_seen_${currentRole()}`, String(appState.latestNotice.id));
+  }
+  renderLatestNotice();
+}
+
+function setupFirebaseListeners() {
+  if (!database) return;
+  
+  database.ref(".info/connected").on("value", function(snap) {
+    const statusEl = document.getElementById("syncStatus");
+    if (snap.val() === true) {
+      statusEl.textContent = "🟢 Đồng bộ đám mây tự động";
+      statusEl.className = "text-sm px-3 py-0.5 rounded-full bg-emerald-500/20 text-green-400 border border-green-500/30 font-semibold";
+    } else {
+      statusEl.textContent = "🟡 Đang kết nối mạng...";
+      statusEl.className = "text-sm px-3 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-semibold";
+    }
+  });
+
+  database.ref("thanhpham_system/cloud_data").on("value", function(snapshot) {
+    const data = snapshot.val();
+    if (data) {
+      appState.orders = data.orders || [];
+      if (data.stockMapArray) {
+        appState.stockMap = new Map(data.stockMapArray);
+      } else {
+        appState.stockMap = new Map();
+      }
+      
+      processAllocation();
+      fillAllDateSelects();
+      refreshAll();
+    } else {
+      resetAppState();
+      refreshAll();
+    }
+  });
+
+  database.ref("thanhpham_system/confirmed_tomorrow").on("value", function(snapshot) {
+    appState.confirmedTomorrow = snapshot.val() || [];
+    if (appState.orders.length > 0) {
+      processAllocation();
+    }
+    refreshAll();
+  });
+
+  database.ref("thanhpham_system/production_view").on("value", function(snapshot) {
+    appState.productionView = {
+      tomorrow: true,
+      ready: false,
+      production: false,
+      detail: false,
+      ...(snapshot.val() || {})
+    };
+    renderProductionViewSettings();
+    applyProductionViewSettings();
+    refreshAll();
+  });
+
+  database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
+    appState.latestNotice = snapshot.val();
+    renderLatestNotice();
+  });
+}
+
+function resetAppState() {
+  appState.orders = [];
+  appState.details = [];
+  appState.production = [];
+  appState.confirmedTomorrow = [];
+  appState.stockMap = new Map();
+}
+
+function uploadDataToFirebase() {
+  if (!database) return;
+  database.ref("thanhpham_system/cloud_data").set({
+    orders: appState.orders,
+    stockMapArray: Array.from(appState.stockMap.entries())
+  });
+}
+
+function uploadConfirmedToFirebase() {
+  if (!database) return;
+  database.ref("thanhpham_system/confirmed_tomorrow").set(appState.confirmedTomorrow);
+}
+
+function clearSystemCache() {
+  if (confirm("Bạn có chắc chắn muốn XÓA SẠCH toàn bộ dữ liệu trên ĐÁM MÂY MÁY CHỦ không? Tất cả các máy tính của xưởng và văn phòng cũng sẽ trống dữ liệu.")) {
+    if (database) {
+      database.ref("thanhpham_system").remove().then(() => {
+        alert("Đã xóa sạch dữ liệu trung tâm thành công.");
+        location.reload();
+      });
+    }
+  }
+}
+
+function textOf(value){
+  return String(value ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeText(value){
+  return textOf(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toUpperCase();
+}
+
+function normalizeCode(value){
+  return normalizeText(value)
+    .replace(/\s+/g, '')
+    .replace(/[–—]/g, '-')
+    .replace(/KG/g, 'KG');
+}
+
+function baseProductCode(value){
+  const clean = normalizeCode(value);
+  const match = clean.match(/[A-Z]+\d+[A-Z]*/);
+  return match ? match[0] : clean.split('-')[0];
+}
+
+function parseNumber(value){
+  if(value === null || value === undefined || value === '') return 0;
+  if(typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const raw = String(value).trim();
+  if(/^\([\d\s,.-]+\)$/.test(raw)) return 0;
+  const text = raw.replace(/\s/g, '').replace(/,/g, '.');
+  const match = text.match(/-?\d+(\.\d+)?/);
+  return match ? Number(match[0]) : 0;
+}
+
+function toExcelDate(value){
+  if(value instanceof Date && !Number.isNaN(value.getTime())) return value;
+  if(typeof value === 'number'){
+    const date = new Date(Math.round((value - 25569) * 86400 * 1000));
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const raw = textOf(value);
+  if(!raw) return null;
+
+  const slash = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if(slash){
+    const day = Number(slash[1]);
+    const month = Number(slash[2]);
+    const year = Number(slash[3].length === 2 ? '20' + slash[3] : slash[3]);
+    const date = new Date(year, month - 1, day);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function dateKey(value){
+  const date = toExcelDate(value);
+  if(!date) return '';
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function displayDate(value){
+  const key = dateKey(value);
+  if(!key) return '';
+  const [year, month, day] = key.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+function formatNumber(value, digits = 2){
+  const number = Number(value) || 0;
+  return number.toLocaleString('vi-VN', { maximumFractionDigits: digits });
+}
+
+function escapeHtml(value){
+  return textOf(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function readExcel(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = (event)=>{
+      try{
+        const workbook = XLSX.read(new Uint8Array(event.target.result), { type:'array', cellDates:true });
+        const result = { SheetNames: workbook.SheetNames };
+        workbook.SheetNames.forEach((sheetName)=>{
+          result[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+            header:1,
+            defval:'',
+            raw:true
+          });
+        });
+        resolve(result);
+      }catch(error){
+        reject(error);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function findSheet(workbook, words){
+  return workbook.SheetNames.find((sheetName)=>{
+    const normalized = normalizeText(sheetName);
+    return words.every((word)=>normalized.includes(word));
+  });
+}
+
+function findHeaderIndex(rows, requiredHeaders){
+  return rows.findIndex((row)=>{
+    const normalized = row.map(normalizeText);
+    return requiredHeaders.every((header)=>normalized.includes(normalizeText(header)));
+  });
+}
+
+function columnMap(headerRow){
+  const map = {};
+  headerRow.forEach((cell, index)=>{
+    map[normalizeText(cell)] = index;
+  });
+  return map;
+}
+
+function getByHeader(row, map, names){
+  for(const name of names){
+    const index = map[normalizeText(name)];
+    if(index !== undefined) return row[index];
+  }
+  return '';
+}
+
+function parseOrders(orderRows){
+  const headerIndex = findHeaderIndex(orderRows, ['DonHang', 'MaBao']);
+  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề dữ liệu mẫu Excel đơn hàng');
+  const map = columnMap(orderRows[headerIndex]);
+
+  return orderRows.slice(headerIndex + 1).map((row, index)=>{
+    const donHang = textOf(getByHeader(row, map, ['DonHang', 'Đơn hàng', 'Don Hang']));
+    const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang', 'Tên đơn hàng', 'Ten Don Hang', 'Khách hàng', 'Khach Hang']));
+    const maBao = textOf(getByHeader(row, map, ['MaBao', 'Mã Bao', 'Mã TP', 'Ma TP']));
+    if(!donHang || !maBao) return null;
+
+    const soCont = parseNumber(getByHeader(row, map, ['So Cont', 'Số Cont', 'SoCont'])) || 0;
+    const tanCont = parseNumber(getByHeader(row, map, ['Tan/cont', 'Tấn/cont', 'Tan Cont'])) || 0;
+    const soLuongKg = parseNumber(getByHeader(row, map, ['SoLuongKg', 'Số lượng Kg']));
+    const quyCachBao = parseNumber(getByHeader(row, map, ['QuyCachBao', 'Quy Cách Bao']));
+    const hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển', 'Hang Van Chuyen', 'Hãng VC', 'Hang VC']));
+    const ghiChu = textOf(getByHeader(row, map, ['GhiChu', 'Ghi chú', 'Ghi Chu']));
+    const ngayRaw = getByHeader(row, map, ['Ngay', 'Ngày', 'Ngày giao']);
+
+    return {
+      id: `${donHang}__${index}`,
+      donHang,
+      tenDonHang,
+      maBao,
+      code: maBao,
+      stockKey: normalizeCode(maBao),
+      baseCode: baseProductCode(maBao),
+      soCont,
+      tanCont,
+      needTon: soCont * tanCont,
+      soLuongKg,
+      quyCachBao,
+      hangVanChuyen,
+      ghiChu,
+      ngayKey: dateKey(ngayRaw),
+      ngay: displayDate(ngayRaw)
+    };
+  }).filter(Boolean);
+}
+
+function parseTpStock(stockWorkbook){
+  const tpSheetName = findSheet(stockWorkbook, ['TON', 'KHO', 'TP']);
+  if(!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO TP');
+
+  const stockMap = new Map();
+  stockWorkbook[tpSheetName].forEach((row)=>{
+    const productName = textOf(row[2]);
+    const stockTon = Math.max(0, parseNumber(row[12]));
+    const exactKey = normalizeCode(productName);
+    const baseKey = 'BASE:' + baseProductCode(productName);
+
+    if(!productName || !exactKey || normalizeText(productName).includes('TEN THANH PHAM')) return;
+    if(!textOf(row[3]) && stockTon === 0) return;
+
+    stockMap.set(exactKey, (stockMap.get(exactKey) || 0) + stockTon);
+    stockMap.set(baseKey, (stockMap.get(baseKey) || 0) + stockTon);
+  });
+
+  return stockMap;
+}
+
+function processAllocation(){
+  if (!appState.stockMap) return;
+  const remaining = new Map(appState.stockMap);
+  const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
+
+  appState.details = appState.orders.map((order)=>{
+    const lookupKey = remaining.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
+    const stockBefore = remaining.get(lookupKey) || 0;
+    const canExportTon = Math.min(stockBefore, order.needTon);
+    const shortage = Math.max(0, order.needTon - stockBefore);
+    const stockAfter = stockBefore - canExportTon;
+    remaining.set(lookupKey, stockAfter);
+
+    let status = shortage > 0 ? 'THIẾU TP' : 'ĐỦ XUẤT';
+    if (confirmedIds.has(order.id)) {
+      status = 'MAI CÓ THỂ XUẤT';
+    }
+
+    return {
+      ...order,
+      stockBefore,
+      stockAfter,
+      canExportTon,
+      shortage,
+      status
+    };
+  });
+
+  buildProductionSummary();
+}
+
+function buildProductionSummary(){
+  const map = new Map();
+  appState.details.filter((item)=>item.status === 'THIẾU TP').forEach((item)=>{
+    const current = map.get(item.code) || {
+      code:item.code,
+      demand:0,
+      stock:0,
+      shortage:0,
+      orders:0,
+      nearestKey:item.ngayKey,
+      nearest:item.ngay
+    };
+
+    current.demand += item.needTon;
+    current.stock += Math.max(0, item.stockBefore);
+    current.shortage += item.shortage;
+    current.orders += 1;
+    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
+      current.nearestKey = item.ngayKey;
+      current.nearest = item.ngay;
+    }
+    map.set(item.code, current);
+  });
+
+  appState.production = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
+}
+
+function setBadgeCount(card, count){
+  const badge = card?.querySelector('h2 span');
+  if(badge) badge.textContent = count;
+}
+
+function setTable(card, headers, rowsHtml, tableIndex = 0){
+  const table = card?.querySelectorAll('table')[tableIndex];
+  if(!table) return;
+
+  table.innerHTML = `
+    <thead>
+      <tr>${headers.map((header)=>`<th>${header}</th>`).join('')}</tr>
+    </thead>
+    <tbody>${rowsHtml || `<tr><td colspan="${headers.length}" class="text-center text-slate-500 py-8">Chưa có dữ liệu</td></tr>`}</tbody>`;
+}
+
+function rowsByDateMode(rows, mode, from, to){
+  if(mode === 'ALL') return rows;
+  if(mode === '1 ngày') return rows.filter((row)=>row.ngayKey === from);
+  if(mode === 'Khoảng ngày') return rows.filter((row)=>row.ngayKey && (!from || row.ngayKey >= from) && (!to || row.ngayKey <= to));
+  return rows;
+}
+
+function getFilterControls(card){
+  const select = card?.querySelector('select');
+  const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
+  return {
+    mode: select?.value || 'ALL',
+    from: dates[0]?.value || '',
+    to: dates[1]?.value || dates[0]?.value || ''
+  };
+}
+
+function fillDateSelect(select){
+  if(!select) return;
+  const dates = Array.from(new Set(appState.orders.map((order)=>order.ngayKey).filter(Boolean))).sort();
+  select.innerHTML = '<option value="ALL">ALL</option>' + dates.map((key)=>`<option value="${key}">${displayDate(key)}</option>`).join('');
+}
+
+function fillAllDateSelects() {
+  fillDateSelect(document.getElementById('tomorrowDateSelect'));
+}
+
+function statusBadge(status){
+  const isOk = status === 'ĐỦ XUẤT';
+  const isOverride = status === 'MAI CÓ THỂ XUẤT';
+  const cls = isOk ? 'bg-green-600' : isOverride ? 'bg-yellow-500 text-black' : 'bg-red-500';
+  const textLabel = isOverride ? 'OVERRIDE' : status;
+  return `<span class="${cls} px-3 py-1 rounded-full font-bold">${textLabel}</span>`;
+}
+
+function tomorrowDate(){
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date;
+}
+
+function planDateKey(){ return dateKey(tomorrowDate()); }
+function planDateDisplay(){ return displayDate(tomorrowDate()); }
+function shortPlanDate(){
+  const date = tomorrowDate();
+  return `${date.getDate()}/${date.getMonth() + 1}`;
+}
+
+function shortOrderDate(item){
+  if(item?.ngayKey){
+    const [, month, day] = item.ngayKey.split('-');
+    return `${Number(day)}/${Number(month)}`;
+  }
+  return shortPlanDate();
+}
+
+function isManualLoading(item){
+  const bag = item.quyCachBao || parseNumber((normalizeText(item.maBao).match(/(\d+)\s*KG/) || [])[1]);
+  return bag >= 25 && bag <= 50;
+}
+
+function formatPlanTime(slot){
+  const prefix = slot.period === 'morning' ? 'SÁNG' : 'CHIỀU';
+  const hour = slot.hour;
+  const minute = slot.minute;
+  return `${prefix} ${hour}g${minute ? String(minute).padStart(2, '0') : ''}`;
+}
+
+function buildSlots(startHour, startMinute, count){
+  const slots = [];
+  let hour = startHour;
+  let minute = startMinute;
+  for(let index = 0; index < count; index += 1){
+    slots.push({ hour, minute });
+    minute += 30;
+    if(minute >= 60){
+      hour += 1;
+      minute -= 60;
+    }
+  }
+  return slots;
+}
+
+function assignPlanTimes(rows){
+  const manualSlots = [
+    { period:'morning', hour:6, minute:15 },
+    { period:'morning', hour:6, minute:15 },
+    { period:'morning', hour:7, minute:0 },
+    { period:'morning', hour:7, minute:30 },
+    { period:'morning', hour:8, minute:0 },
+    ...buildSlots(13, 0, 40).map((slot)=>({ ...slot, period:'afternoon' }))
+  ];
+  const otherSlots = buildSlots(13, 0, 60).map((slot)=>({ ...slot, period:'afternoon' }));
+  let manualIndex = 0;
+  let otherIndex = 0;
+
+  return rows.map((item)=>{
+    const manual = isManualLoading(item);
+    const slot = manual
+      ? (manualSlots[manualIndex++] || otherSlots[otherIndex++])
+      : (otherSlots[otherIndex++] || manualSlots[manualIndex++]);
+    return {
+      ...item,
+      planDate: planDateDisplay(),
+      planDateKey: planDateKey(),
+      planTime: formatPlanTime(slot || { period:'afternoon', hour:13, minute:0 })
+    };
+  });
+}
+
+function planNote(item){
+  const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : '';
+  const date = shortOrderDate(item);
+  if(isManualLoading(item)){
+    return `BỐC TAY tàu${ship} ngày ${date}`;
+  }
+  const handling = item.ghiChu || 'bốc hầm chồng đôi không pallet';
+  return `${handling} + tàu${ship} ngày ${date}`;
+}
+
+function getReadyOrders(){
+  return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT' || item.status === 'MAI CÓ THỂ XUẤT');
+}
+
+function planRows(){
+  const ready = getReadyOrders();
+  const manual = ready.filter(isManualLoading);
+  const other = ready.filter((item)=>!isManualLoading(item));
+  return assignPlanTimes([...manual, ...other]);
+}
+
+function planTableHtml(rows){
+  const totalCont = rows.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
+  const totalOrder = rows.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
+  return `
+    <table class="w-full bg-slate-900 rounded-2xl">
+      <thead>
+        <tr>
+          <th>Ngày xuất</th>
+          <th>Khách hàng</th>
+          <th>Loại hàng</th>
+          <th>Số lượng (cont)</th>
+          <th>số lượng tấn /cont</th>
+          <th>SL đơn hàng</th>
+          <th>Hãng VC</th>
+          <th>Thời Gian</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((item, index)=>`
+          <tr>
+            <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td>
+            <td>${escapeHtml(item.donHang)}</td>
+            <td>${escapeHtml(item.tenDonHang)}</td>
+            <td class="text-center font-bold">${formatNumber(item.soCont, 0)}</td>
+            <td class="text-center">${formatNumber(item.tanCont)}</td>
+            <td class="text-center font-bold">${formatNumber(item.tanCont)}</td>
+            <td class="text-center font-bold">${escapeHtml(item.hangVanChuyen)}</td>
+            <td class="text-center font-black">${escapeHtml(item.planTime)}</td>
+            <td class="font-bold">${escapeHtml(planNote(item))}</td>
+          </tr>`).join('') || '<tr><td colspan="9" class="text-center text-slate-500 py-8">Không có dữ liệu kế hoạch xuất</td></tr>'}
+        <tr>
+          <td colspan="3" class="text-right font-black">TỔNG</td>
+          <td class="text-center font-black">${formatNumber(totalCont, 0)}</td>
+          <td></td>
+          <td class="text-center font-black">${formatNumber(totalOrder)}</td>
+          <td colspan="3"></td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+async function processFiles(){
+  const orderFile = document.getElementById('orderFileInput').files[0];
+  const stockFile = document.getElementById('stockFileInput').files[0];
+  if(!orderFile || !stockFile) return alert('Hãy chọn đầy đủ cả 2 File Đơn Hàng và File Tồn Kho TP trước!');
+
+  try{
+    const orderWb = await readExcel(orderFile);
+    const stockWb = await readExcel(stockFile);
+
+    const sheetOrderName = findSheet(orderWb, ['KE', 'HOACH', 'GIAO', 'HANG']) || orderWb.SheetNames[0];
+    appState.orders = parseOrders(orderWb[sheetOrderName]);
+    appState.stockMap = parseTpStock(stockWb);
+
+    uploadDataToFirebase();
+    alert('Đã import và đồng bộ hóa đám mây thành công! Tất cả các máy tính khác đã nhận được dữ liệu.');
+  }catch(error){
+    alert('Có lỗi định dạng Excel: ' + error.message);
+  }
+}
+
+function refreshAll(){
+  const role = currentRole();
+  applyProductionViewSettings();
+  
+  const allReadyOrders = getReadyOrders();
+  const allShortageOrders = appState.details.filter((item)=>item.status === 'THIẾU TP');
+  const confirmedIds = new Set(appState.confirmedTomorrow.map((c)=>c.id));
+
+  const totalProductionTon = appState.production.reduce((sum, item)=>sum + item.shortage, 0);
+
+  document.getElementById('kpi-total-orders').textContent = formatNumber(appState.orders.length, 0);
+  document.getElementById('kpi-ready-orders').textContent = formatNumber(allReadyOrders.length, 0);
+  document.getElementById('kpi-shortage-orders').textContent = formatNumber(allShortageOrders.length, 0);
+  document.getElementById('kpi-total-production').textContent = formatNumber(totalProductionTon, 1) + 'T';
+
+  // --- 1. RENDER GIAO DIỆN KHU VỰC "MAI CÓ THỂ XUẤT" ---
+  const tomorrowCard = document.getElementById('section-tomorrow');
+  const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
+  
+  let candidates = allShortageOrders;
+  if(tomSelectVal !== 'ALL') candidates = candidates.filter((item)=>item.ngayKey === tomSelectVal);
+
+  const candHtml = candidates.map((item)=>`
+    <tr>
+      <td><input type="checkbox" data-candidate-id="${item.id}" class="w-5 h-5 accent-yellow-500 cursor-pointer"/></td>
+      <td class="font-bold text-yellow-400">${escapeHtml(item.donHang)}</td>
+      <td>${escapeHtml(item.tenDonHang)}</td>
+      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td>
+      <td>${formatNumber(item.needTon, 1)}T</td>
+      <td>${formatNumber(item.stockBefore, 1)}T</td>
+      <td class="text-red-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
+      <td>${escapeHtml(item.ngay)}</td>
+    </tr>`).join('');
+  setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
+
+  const confHtml = appState.confirmedTomorrow.map((item)=>`
+    <tr class="flash">
+      <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td>
+      <td>${escapeHtml(item.maBao)}</td>
+      <td class="text-yellow-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
+      <td>${escapeHtml(item.ngay)}</td>
+      <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
+      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500 hover:bg-red-400 px-4 py-2 rounded-xl font-bold">Xóa</button></td>
+    </tr>`).join('');
+  setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Xóa'], confHtml, 1);
+  setBadgeCount(tomorrowCard, appState.confirmedTomorrow.length);
+
+  // --- 2. GIAO DIỆN CHỦ QUẢN VĂN PHÒNG ---
+  const readyCard = document.getElementById('section-ready');
+  if (readyCard) {
+    const rows = planRows();
+    setBadgeCount(readyCard, rows.length);
+    const fullTableEl = document.getElementById('fullExportTable');
+    if (fullTableEl) fullTableEl.innerHTML = planTableHtml(rows);
+    renderExportPreview();
+  }
+
+  renderProduction();
+  renderDetails();
+}
+
+function renderExportPreview(){
+  const card = document.getElementById('section-ready');
+  if(!card) return;
+  const { mode, from, to } = getFilterControls(card);
+  const ready = getReadyOrders();
+  const filtered = rowsByDateMode(ready, mode, from, to);
+  appState.exportPreview = assignPlanTimes(filtered.filter(isManualLoading).concat(filtered.filter((item)=>!isManualLoading(item))));
+  const container = document.getElementById('exportPreviewContainer');
+  if(!container) return;
+  container.innerHTML = `
+    <div class="p-5 flex justify-between items-center flex-wrap gap-4">
+      <div>
+        <div class="text-2xl font-black">📦 XEM TRƯỚC FILE EXPORT</div>
+        <div class="text-slate-400 mt-1">${appState.exportPreview.length} đơn sẽ được export khi xác nhận • Ngày xuất ${planDateDisplay()}</div>
+      </div>
+    </div>
+    <div class="overflow-auto max-h-[520px]">
+      ${planTableHtml(appState.exportPreview)}
+    </div>`;
+}
+
+function exportExcel(){
+  renderExportPreview();
+  if(!appState.exportPreview.length) return alert('Không có dữ liệu phù hợp để xuất file Excel!');
+  const totalCont = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
+  const totalOrder = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
+  const rows = [
+    ['KẾ HOẠCH XUẤT HÀNG'],
+    [],
+    ['Ngày xuất','Khách hàng','Loại hàng','Số lượng (cont)','số lượng tấn /cont','SL đơn hàng','Hãng VC','Thời Gian','Ghi chú'],
+    ...appState.exportPreview.map((item, index)=>[
+      index === 0 ? item.planDate : '',
+      item.donHang,
+      item.tenDonHang,
+      item.soCont,
+      item.tanCont,
+      item.tanCont,
+      item.hangVanChuyen,
+      item.planTime,
+      planNote(item)
+    ]),
+    ['TỔNG','','',totalCont,'',totalOrder,'','','']
+  ];
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!merges'] = [{ s:{ r:0, c:0 }, e:{ r:0, c:8 } }];
+  ws['!cols'] = [
+    { wch:12 }, { wch:28 }, { wch:32 }, { wch:14 }, { wch:16 },
+    { wch:12 }, { wch:12 }, { wch:14 }, { wch:42 }
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, "KE HOACH XUAT HANG");
+  XLSX.writeFile(wb, "KE_HOACH_XUAT_HANG.xlsx");
+}
+
+function renderProduction(){
+  const productionCard = document.getElementById('section-production');
+  const tableBody = document.querySelector('#productionNeedTable tbody');
+  if (!tableBody || !productionCard) return;
+  
+  const { mode, from, to } = getFilterControls(productionCard);
+  const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.status === 'THIẾU TP'), mode, from, to);
+  
+  const map = new Map();
+  filteredOrders.forEach((item)=>{
+    const productionKey = item.tenDonHang || item.code;
+    const current = map.get(productionKey) || { code:productionKey, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
+    current.demand += item.needTon;
+    current.stock += Math.max(0, item.stockBefore);
+    current.shortage += item.shortage;
+    current.orders += 1;
+    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
+      current.nearestKey = item.ngayKey;
+      current.nearest = item.ngay;
+    }
+    map.set(productionKey, current);
+  });
+
+  const prodList = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
+
+  tableBody.innerHTML = prodList.map((item)=>`
+    <tr>
+      <td class="font-bold text-orange-400">${escapeHtml(item.code)}</td>
+      <td>${formatNumber(item.demand, 1)}T</td>
+      <td>${formatNumber(item.stock, 1)}T</td>
+      <td class="text-red-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-yellow-400 font-black text-lg">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-center font-bold text-slate-300">${item.orders}</td>
+      <td><span class="bg-slate-900 px-3 py-1 rounded-xl text-sm border border-slate-700">${escapeHtml(item.nearest)}</span></td>
+    </tr>`).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">Không có thành phẩm cần sản xuất</td></tr>';
+}
+
+function renderDetails(){
+  const detailCard = document.getElementById('section-detail');
+  const tableBody = document.querySelector('#detailAllOrdersTable tbody');
+  if (!tableBody || !detailCard) return;
+
+  const { mode, from, to } = getFilterControls(detailCard);
+  const searchInputEl = document.getElementById('detailSearchInput');
+  const searchTxt = searchInputEl ? normalizeText(searchInputEl.value) : '';
+
+  let filtered = rowsByDateMode(appState.details, mode, from, to);
+  if(searchTxt){
+    filtered = filtered.filter((item)=>
+      normalizeText(item.donHang).includes(searchTxt) || 
+      normalizeText(item.tenDonHang).includes(searchTxt) || 
+      normalizeText(item.maBao).includes(searchTxt)
+    );
+  }
+
+  tableBody.innerHTML = filtered.map((item)=>`
+    <tr>
+      <td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td>
+      <td>${escapeHtml(item.tenDonHang)}</td>
+      <td>${formatNumber(item.soCont, 0)}</td>
+      <td>${formatNumber(item.tanCont)}T</td>
+      <td class="text-blue-400 font-bold">${formatNumber(item.stockBefore)}T</td>
+      <td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-bold">${formatNumber(item.shortage)}T</td>
+      <td>${escapeHtml(item.ngay)}</td>
+      <td>${statusBadge(item.status)}</td>
+    </tr>`).join('') || '<tr><td colspan="8" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
+}
+
+function captureDetailImage(){
+  const btn = document.getElementById('captureDetailBtn');
+  const box = document.getElementById('chiTietDonHangBox');
+  btn.textContent = '📸 ĐANG CHỤP...';
+  btn.disabled = true;
+
+  const originalMaxHeight = box.style.maxHeight;
+  box.style.maxHeight = 'none'; 
+
+  html2canvas(document.getElementById('section-detail'), {
+    backgroundColor: '#020617',
+    scale: 2,
+    logging: false,
+    useCORS: true
+  }).then((canvas)=>{
+    box.style.maxHeight = originalMaxHeight;
+    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+    btn.disabled = false;
+
+    canvas.toBlob((blob)=>{
+      if(!blob) return alert('Lỗi xuất ảnh!');
+      try{
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        alert('🎉 Đã chụp xong bảng chi tiết và lưu vào bộ nhớ tạm! Bạn chỉ cần vào Zalo và nhấn nút Ctrl + V là gửi được ngay.');
+      }catch(err){
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `CHI_TIET_DON_HANG_${dateKey(new Date())}.png`;
+        a.click();
+      }
+    }, 'image/png');
+  }).catch(()=>{
+    box.style.maxHeight = originalMaxHeight;
+    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+    btn.disabled = false;
+    alert('Lỗi chụp màn hình!');
+  });
+}
+
+function bindEvents(){
+  document.getElementById('btnWorkshopConfirm')?.addEventListener('click', ()=>{
+    const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked');
+    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một đơn hàng cần ưu tiên xuất ngày mai!');
+
+    const candidateIds = Array.from(checkedBoxes).map((cb)=>cb.dataset.candidateId);
+    const selectedItems = appState.details.filter((item)=>candidateIds.includes(item.id));
+
+    selectedItems.forEach((item)=>{
+      const exists = appState.confirmedTomorrow.some((c)=>c.id === item.id);
+      if(!exists){
+        appState.confirmedTomorrow.push({
+          id: item.id,
+          donHang: item.donHang,
+          maBao: item.maBao,
+          shortage: item.shortage,
+          ngay: item.ngay,
+          ngayKey: item.ngayKey
+        });
+      }
+    });
+
+    uploadConfirmedToFirebase();
+    sendAppNotice('admin', 'Quản đốc sản xuất đã cập nhật xong danh sách đơn hàng mai có thể xuất.');
+    alert('Đã xác nhận danh sách ưu tiên. Toàn bộ máy tính văn phòng đã nhận được số liệu đồng bộ mạng!');
+  });
+
+  document.getElementById('tomorrowConfirmedTable').addEventListener('click', (e)=>{
+    const button = e.target.closest('[data-remove-tomorrow]');
+    if(!button) return;
+    if(!confirm('Bạn muốn xóa đơn này khỏi danh sách "Mai có thể xuất"? Đơn sẽ quay lại danh sách chờ điều phối.')) return;
+    
+    appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== button.dataset.removeTomorrow);
+    uploadConfirmedToFirebase();
+  });
+
+  document.getElementById('tomorrowDateSelect').addEventListener('change', refreshAll);
+  document.getElementById('btnPreviewReady')?.addEventListener('click', renderExportPreview);
+  document.getElementById('btnConfirmReady')?.addEventListener('click', exportExcel);
+  document.getElementById('readyExportMode')?.addEventListener('change', renderExportPreview);
+  document.getElementById('readyFromDate')?.addEventListener('change', renderExportPreview);
+  document.getElementById('readyToDate')?.addEventListener('change', renderExportPreview);
+
+  document.getElementById('btnFilterProd')?.addEventListener('click', renderProduction);
+  document.getElementById('prodDisplayMode')?.addEventListener('change', renderProduction);
+  document.getElementById('prodFromDate')?.addEventListener('change', renderProduction);
+  document.getElementById('prodToDate')?.addEventListener('change', renderProduction);
+
+  document.getElementById('btnSearchDetail')?.addEventListener('click', renderDetails);
+  document.getElementById('detailSearchInput')?.addEventListener('input', renderDetails);
+  document.getElementById('detailDisplayMode')?.addEventListener('change', renderDetails);
+  document.getElementById('detailFromDate')?.addEventListener('change', renderDetails);
+  document.getElementById('detailToDate')?.addEventListener('change', renderDetails);
+  
+  document.getElementById('captureDetailBtn')?.addEventListener('click', captureDetailImage);
+  document.getElementById('btnSaveProductionView')?.addEventListener('click', saveProductionViewSettings);
+  document.getElementById('btnNotifyWorkshop')?.addEventListener('click', ()=>{
+    sendAppNotice('production', 'Văn phòng đã cập nhật dữ liệu đơn hàng. Vui lòng vào xem và chọn đơn mai có thể xuất.');
+    alert('Đã gửi thông báo trong ứng dụng cho quản đốc sản xuất.');
+  });
+  document.getElementById('btnDismissNotice')?.addEventListener('click', dismissLatestNotice);
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const savedRole = localStorage.getItem('tp_user_role');
+  if(savedRole){
+    applyRoleView(savedRole);
+  }
+  
+  setupFirebaseListeners();
+  bindEvents();
+});
+
+</script>
+
+</body>
+</html>
