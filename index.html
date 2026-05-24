@@ -26,7 +26,7 @@
 />
 
 <link
-  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700;800;900&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
   rel="stylesheet"
 />
 
@@ -333,7 +333,7 @@ tbody tr:hover{
         <h2 class="text-2xl font-black text-cyan-400">👁️ CHỌN MỤC CHO QUẢN ĐỐC SẢN XUẤT XEM</h2>
         <div class="text-slate-400 mt-1">Bật mục nào thì giao diện xưởng sẽ thấy mục đó ngay sau khi đồng bộ mạng</div>
       </div>
-      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black">💾 LƯU QUYỀW XEM</button>
+      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black">💾 LƯU QUYỀN XEM</button>
     </div>
     <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
       <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
@@ -460,47 +460,132 @@ tbody tr:hover{
 
   </div>
 
-  <div id="section-tomorrow" class="card p-6 border-yellow-500/20">
+  <div id="section-tomorrow" class="
+    card
+    p-6
+    border-yellow-500/20
+  ">
 
-    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+    <div class="
+      flex
+      justify-between
+      items-center
+      flex-wrap
+      gap-4
+      mb-5
+    ">
+
       <div>
-        <h2 class="text-2xl font-black text-yellow-400">
+
+        <h2 class="
+          text-2xl
+          font-black
+          text-yellow-400
+        ">
           ⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT
-          <span class="bg-yellow-500 text-black text-sm px-3 py-1 rounded-full ml-2">
+
+          <span class="
+            bg-yellow-500
+            text-black
+            text-sm
+            px-3
+            py-1
+            rounded-full
+            ml-2
+          ">
             0
           </span>
+
         </h2>
-        <div class="text-slate-400 mt-1">
-          Đơn thiếu TP nhưng đã được xác nhận từ sản xuất
+
+        <div class="
+          text-slate-400
+          mt-1
+        ">
+          Đơn thiếu TP nhưng đã được xác nhận điều phối ưu tiên xuất hàng từ xưởng sản xuất
         </div>
+
       </div>
+
     </div>
 
-    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4 mb-5">
+    <div class="
+      grid
+      xl:grid-cols-5
+      md:grid-cols-2
+      gap-4
+      mb-5
+    ">
+
       <div>
-        <div class="text-slate-400 mb-2">Chọn ngày giao</div>
+
+        <div class="
+          text-slate-400
+          mb-2
+        ">
+          Chọn ngày giao
+        </div>
+
         <select id="tomorrowDateSelect" class="input" onchange="refreshAll()">
-          <option value="ALL">ALL</option>
+
+          <option value="ALL">
+            ALL
+          </option>
+
         </select>
+
       </div>
 
-      <div class="flex items-end">
-        <button onclick="refreshAll()" class="btn w-full bg-yellow-500 hover:bg-yellow-400 text-black">
+      <div class="
+        flex
+        items-end
+      ">
+
+        <button onclick="refreshAll()" class="
+          btn
+          w-full
+          bg-yellow-500
+          hover:bg-yellow-400
+          text-black
+        ">
           🔍 XỔ DANH SÁCH
         </button>
+
       </div>
 
-      <div id="btn-wrap-confirm-workshop" class="flex items-end hideBox">
-        <button id="btnWorkshopConfirm" class="btn w-full bg-emerald-600 hover:bg-emerald-500">
-          ✅ HOÀN THÀNH
+      <div id="btn-wrap-confirm-workshop" class="
+        flex
+        items-end
+        hideBox
+      ">
+
+        <button id="btnWorkshopConfirm" class="
+          btn
+          w-full
+          bg-emerald-600
+          hover:bg-emerald-500
+        ">
+          ✅ HOÀN THÀNH XÁC NHẬN
         </button>
+
       </div>
+
     </div>
 
-    <div class="bg-slate-800 rounded-[28px] overflow-auto max-h-[450px] mb-5">
+    <div class="
+      bg-slate-800
+      rounded-[28px]
+      overflow-auto
+      max-h-[450px]
+      mb-5
+    ">
+
       <table id="tomorrowCandidateTable">
+
         <thead>
+
           <tr>
+
             <th>Chọn</th>
             <th>Đơn hàng</th>
             <th>Khách hàng</th>
@@ -509,51 +594,111 @@ tbody tr:hover{
             <th>Tồn TP</th>
             <th>Thiếu</th>
             <th>Ngày giao</th>
+
           </tr>
+
         </thead>
+
         <tbody>
           <tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có dữ liệu đám mây</td></tr>
         </tbody>
+
       </table>
+
     </div>
 
-    <div class="bg-yellow-500/10 border border-yellow-500 rounded-[28px] overflow-auto">
-      <div class="p-5 text-xl font-black text-yellow-400">
-        ✅ ĐÃ XÁC NHẬN “MAI CÓ THỂ XUẤT”
+    <div class="
+      bg-yellow-500/10
+      border
+      border-yellow-500
+      rounded-[28px]
+      overflow-auto
+    ">
+
+      <div class="
+        p-5
+        text-xl
+        font-black
+        text-yellow-400
+      ">
+        ✅ ĐÃ XÁC NHẬN ĐỒNG BỘ MẠNG: “MAI CÓ THỂ XUẤT”
       </div>
+
       <table id="tomorrowConfirmedTable">
+
         <thead>
+
           <tr>
+
             <th>Đơn hàng</th>
             <th>Tên đơn hàng</th>
             <th>Thiếu</th>
             <th>Ngày giao</th>
             <th>Trạng thái</th>
-            <th>Xóa</th>
+            <th class="col-hide-workshop">Xóa</th>
+
           </tr>
+
         </thead>
+
         <tbody>
           <tr><td colspan="6" class="text-center text-slate-500 py-8">Chưa có dữ liệu điều phối</td></tr>
         </tbody>
+
       </table>
+
     </div>
 
   </div>
 
-  <div id="section-ready" class="card p-6 border-green-500/20 hideBox">
+  <div id="section-ready" class="
+    card
+    p-6
+    border-green-500/20
+    hideBox
+  ">
 
-    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+    <div class="
+      flex
+      justify-between
+      items-center
+      flex-wrap
+      gap-4
+      mb-5
+    ">
+
       <div>
-        <h2 class="text-2xl font-black text-green-400">
+
+        <h2 class="
+          text-2xl
+          font-black
+          text-green-400
+        ">
           ✅ ĐƠN HÀNG CÓ THỂ XUẤT
-          <span class="bg-green-500 text-black text-sm px-3 py-1 rounded-full ml-2">
+
+          <span class="
+            bg-green-500
+            text-black
+            text-sm
+            px-3
+            py-1
+            rounded-full
+            ml-2
+          ">
             0
           </span>
+
         </h2>
-        <div class="text-slate-400 mt-1">
-          Luôn hiển thị ALL toàn bộ đơn có thể xuất
+
+        <div class="
+          text-slate-400
+          mt-1
+        ">
+          Luôn hiển thị ALL toàn bộ đơn có thể xuất (Đủ hàng + Đơn được xưởng duyệt ưu tiên)
         </div>
+
       </div>
+
     </div>
 
     <div class="
@@ -1160,6 +1305,7 @@ tbody tr:hover{
 
 
 <script>
+// --- ĐÃ ĐỒNG BỘ ĐỊA CHỈ REALTIME DATABASE CHÍNH XÁC CỦA LỘC ---
 const firebaseConfig = {
   apiKey: "AIzaSyB9F9oHqiyQHS3-5r1IsQiGvl1nbAClNY4",
   authDomain: "hethongthanhpham.firebaseapp.com",
@@ -1171,6 +1317,7 @@ const firebaseConfig = {
   databaseURL: "https://hethongthanhpham-default-rtdb.firebaseio.com/"
 };
 
+// Khởi tạo kết nối đám mây Firebase
 try {
   firebase.initializeApp(firebaseConfig);
   var database = firebase.database();
@@ -1227,6 +1374,7 @@ function applyRoleView(role) {
     document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
     document.getElementById('btnResetStorage').classList.remove('hideBox');
     document.getElementById('btn-wrap-confirm-workshop').classList.add('hideBox'); 
+    document.querySelectorAll('.col-hide-workshop').forEach(el => el.classList.remove('hideBox'));
   } else {
     document.getElementById('currentRoleLabel').textContent = "🏭 QUẢN ĐỐC SẢN XUẤT (XƯỞNG)";
     document.getElementById('section-production-permissions').classList.add('hideBox');
@@ -1245,7 +1393,7 @@ function switchRole() {
   location.reload();
 }
 
-function currentRole()){
+function currentRole(){
   return localStorage.getItem('tp_user_role') || 'production';
 }
 
@@ -1260,6 +1408,7 @@ function applyProductionViewSettings(){
   document.getElementById('section-production').classList.toggle('hideBox', !view.production);
   document.getElementById('section-detail').classList.toggle('hideBox', !view.detail);
   document.getElementById('btn-wrap-confirm-workshop').classList.toggle('hideBox', !showTomorrow);
+  document.querySelectorAll('.col-hide-workshop').forEach(el => el.classList.remove('hideBox'));
 }
 
 function renderProductionViewSettings(){
@@ -1326,9 +1475,11 @@ function dismissLatestNotice(){
   renderLatestNotice();
 }
 
+// Lắng nghe trạng thái và dữ liệu đồng bộ đám mây Realtime Firebase
 function setupFirebaseListeners() {
   if (!database) return;
   
+  // Kiểm tra trạng thái mạng internet
   database.ref(".info/connected").on("value", function(snap) {
     const statusEl = document.getElementById("syncStatus");
     if (snap.val() === true) {
@@ -1340,6 +1491,7 @@ function setupFirebaseListeners() {
     }
   });
 
+  // Tự động kéo dữ liệu đơn hàng và tồn kho từ Cloud về máy khi có thay đổi
   database.ref("thanhpham_system/cloud_data").on("value", function(snapshot) {
     const data = snapshot.val();
     if (data) {
@@ -1359,11 +1511,9 @@ function setupFirebaseListeners() {
     }
   });
 
+  // Tự động kéo danh sách duyệt "Mai có thể xuất" từ Xưởng lên Văn phòng
   database.ref("thanhpham_system/confirmed_tomorrow").on("value", function(snapshot) {
     appState.confirmedTomorrow = snapshot.val() || [];
-    if (appState.orders.length > 0) {
-      processAllocation();
-    }
     refreshAll();
   });
 
@@ -1625,7 +1775,6 @@ function parseTpStock(stockWorkbook){
 function processAllocation(){
   if (!appState.stockMap) return;
   const remaining = new Map(appState.stockMap);
-  const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
 
   appState.details = appState.orders.map((order)=>{
     const lookupKey = remaining.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
@@ -1635,18 +1784,13 @@ function processAllocation(){
     const stockAfter = stockBefore - canExportTon;
     remaining.set(lookupKey, stockAfter);
 
-    let status = shortage > 0 ? 'THIẾU TP' : 'ĐỦ XUẤT';
-    if (confirmedIds.has(order.id)) {
-      status = 'MAI CÓ THỂ XUẤT';
-    }
-
     return {
       ...order,
       stockBefore,
       stockAfter,
       canExportTon,
       shortage,
-      status
+      status: shortage > 0 ? 'THIẾU TP' : 'ĐỦ XUẤT'
     };
   });
 
@@ -1655,7 +1799,7 @@ function processAllocation(){
 
 function buildProductionSummary(){
   const map = new Map();
-  appState.details.filter((item)=>item.status === 'THIẾU TP').forEach((item)=>{
+  appState.details.filter((item)=>item.shortage > 0).forEach((item)=>{
     const current = map.get(item.code) || {
       code:item.code,
       demand:0,
@@ -1678,6 +1822,10 @@ function buildProductionSummary(){
   });
 
   appState.production = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
+}
+
+function sectionByTitle(title){
+  return Array.from(document.querySelectorAll('.card')).find((card)=>card.textContent.includes(title));
 }
 
 function setBadgeCount(card, count){
@@ -1723,12 +1871,19 @@ function fillAllDateSelects() {
   fillDateSelect(document.getElementById('tomorrowDateSelect'));
 }
 
+// ĐÃ FIX LỖI CHỤP ẢNH: Sử dụng Inline CSS thuần để html2canvas kết xuất màu nền chuẩn xác 100%
 function statusBadge(status){
   const isOk = status === 'ĐỦ XUẤT';
   const isOverride = status === 'MAI CÓ THỂ XUẤT';
-  const cls = isOk ? 'bg-green-600' : isOverride ? 'bg-yellow-500 text-black' : 'bg-red-500';
-  const textLabel = isOverride ? 'OVERRIDE' : status;
-  return `<span class="${cls} px-3 py-1 rounded-full font-bold">${textLabel}</span>`;
+  
+  let bgStyle = "background-color: #ef4444; color: #ffffff;"; // Mặc định Đỏ cho THIẾU TP
+  if (isOk) {
+    bgStyle = "background-color: #16a34a; color: #ffffff;"; // Xanh lá cho ĐỦ XUẤT
+  } else if (isOverride) {
+    bgStyle = "background-color: #eab308; color: #000000;"; // Vàng cho MAI CÓ THỂ XUẤT
+  }
+  
+  return `<span style="${bgStyle} display: inline-block; padding: 4px 12px; border-radius: 9999px; font-weight: 700; text-align: center; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${status}</span>`;
 }
 
 function tomorrowDate(){
@@ -1817,7 +1972,13 @@ function planNote(item){
 }
 
 function getReadyOrders(){
-  return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT' || item.status === 'MAI CÓ THỂ XUẤT');
+  const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
+  return appState.details
+    .filter((item)=>item.shortage <= 0 || confirmedIds.has(item.id))
+    .map((item)=>({
+      ...item,
+      status: item.shortage <= 0 ? 'ĐỦ XUẤT' : 'MAI CÓ THỂ XUẤT'
+    }));
 }
 
 function planRows(){
@@ -1882,6 +2043,7 @@ async function processFiles(){
     appState.orders = parseOrders(orderWb[sheetOrderName]);
     appState.stockMap = parseTpStock(stockWb);
 
+    // Đẩy dữ liệu vừa import lên Đám mây trung tâm Firebase
     uploadDataToFirebase();
     alert('Đã import và đồng bộ hóa đám mây thành công! Tất cả các máy tính khác đã nhận được dữ liệu.');
   }catch(error){
@@ -1905,10 +2067,10 @@ function refreshAll(){
   document.getElementById('kpi-total-production').textContent = formatNumber(totalProductionTon, 1) + 'T';
 
   // --- 1. RENDER GIAO DIỆN KHU VỰC "MAI CÓ THỂ XUẤT" ---
-  const tomorrowCard = document.getElementById('section-tomorrow');
+  const tomorrowCard = sectionByTitle('⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT');
   const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
   
-  let candidates = allShortageOrders;
+  let candidates = allShortageOrders.filter((item)=>!confirmedIds.has(item.id));
   if(tomSelectVal !== 'ALL') candidates = candidates.filter((item)=>item.ngayKey === tomSelectVal);
 
   const candHtml = candidates.map((item)=>`
@@ -1925,19 +2087,19 @@ function refreshAll(){
   setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
 
   const confHtml = appState.confirmedTomorrow.map((item)=>`
-    <tr class="flash">
+    <tr>
       <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td>
       <td>${escapeHtml(item.maBao)}</td>
-      <td class="text-yellow-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-red-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
       <td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
-      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500 hover:bg-red-400 px-4 py-2 rounded-xl font-bold">Xóa</button></td>
+      <td><button data-remove-tomorrow="${item.id}" class="bg-rose-950/60 text-rose-400 hover:bg-rose-900 px-3 py-1 rounded-xl font-bold">🗑️ Xóa</button></td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Xóa'], confHtml, 1);
   setBadgeCount(tomorrowCard, appState.confirmedTomorrow.length);
 
   // --- 2. GIAO DIỆN CHỦ QUẢN VĂN PHÒNG ---
-  const readyCard = document.getElementById('section-ready');
+  const readyCard = sectionByTitle('✅ ĐƠN HÀNG CÓ THỂ XUẤT');
   if (readyCard) {
     const rows = planRows();
     setBadgeCount(readyCard, rows.length);
@@ -1946,13 +2108,13 @@ function refreshAll(){
     renderExportPreview();
   }
 
+  // Luôn kích hoạt nạp dữ liệu nội bộ không phụ thuộc phân quyền
   renderProduction();
   renderDetails();
 }
 
 function renderExportPreview(){
-  const card = document.getElementById('section-ready');
-  if(!card) return;
+  const card = sectionByTitle('✅ ĐƠN HÀNG CÓ THỂ XUẤT');
   const { mode, from, to } = getFilterControls(card);
   const ready = getReadyOrders();
   const filtered = rowsByDateMode(ready, mode, from, to);
@@ -2011,7 +2173,7 @@ function renderProduction(){
   if (!tableBody || !productionCard) return;
   
   const { mode, from, to } = getFilterControls(productionCard);
-  const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.status === 'THIẾU TP'), mode, from, to);
+  const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.shortage > 0), mode, from, to);
   
   const map = new Map();
   filteredOrders.forEach((item)=>{
@@ -2073,76 +2235,50 @@ function renderDetails(){
     </tr>`).join('') || '<tr><td colspan="8" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
 }
 
+// TỐI ƯU HÀM CHỤP ẢNH: Tăng độ phân giải lên scale: 3 giúp ảnh chụp gửi Zalo rõ nét sắc sảo, không bị vỡ chữ hay lỗi bo góc
 function captureDetailImage(){
   const btn = document.getElementById('captureDetailBtn');
-  const tableScrollBox = document.querySelector('#detailAllOrdersTable').parentElement;
-  const targetSection = document.getElementById('section-detail');
-  const actualTable = document.getElementById('detailAllOrdersTable');
-  
-  if (!tableScrollBox || !actualTable) return alert('Lỗi: Không tìm thấy khung bảng dữ liệu!');
-  
-  btn.textContent = '📸 ĐANG CHỤP NÉT CAO...';
+  const box = document.getElementById('chiTietDonHangBox');
+  btn.textContent = '📸 ĐANG CHỤP...';
   btn.disabled = true;
 
-  // LƯU TRẠNG THÁI GIAO DIỆN CŨ CỦA APP
-  const originalMaxHeight = tableScrollBox.style.maxHeight;
-  const originalOverflow = tableScrollBox.style.overflow;
-  const originalTableWidth = actualTable.style.width;
+  const originalMaxHeight = box.style.maxHeight;
+  box.style.maxHeight = 'none'; 
 
-  // 👉 ÉP ĐỘ RỘNG BẢNG RỘNG RÃI 100% VÀ MỞ TOÀN BỘ KHUNG CUỘN CHỐNG CO CHỮ LÀM DỒN KHUNG
-  tableScrollBox.style.maxHeight = 'none';
-  tableScrollBox.style.overflow = 'visible';
-  actualTable.style.width = '100%';
-  actualTable.style.tableLayout = 'fixed'; // Khóa dòng ép các cột chia đều khoảng cách đều tăm tắp
+  html2canvas(document.getElementById('section-detail'), {
+    backgroundColor: '#020617',
+    scale: 3, // Nâng chất lượng ảnh lên siêu nét
+    logging: false,
+    useCORS: true
+  }).then((canvas)=>{
+    box.style.maxHeight = originalMaxHeight;
+    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+    btn.disabled = false;
 
-  // Chờ 200 mili-giây để trình duyệt vẽ lại giao diện hoàn hảo rồi mới bấm máy chụp
-  setTimeout(() => {
-    html2canvas(targetSection, {
-      backgroundColor: '#020617', // Ép cứng nền tối sang trọng chống lóa chữ
-      scale: 2.2,                 // Độ phân giải siêu nét HD gấp 2.2 lần để gửi Zalo không vỡ hạt
-      logging: false,
-      useCORS: true,
-      windowWidth: targetSection.scrollWidth,
-      windowHeight: targetSection.scrollHeight
-    }).then((canvas)=>{
-      // CHỤP XONG LẬP TỨC TRẢ LẠI TRẠNG THÁI BAN ĐẦU CHO ỨNG DỤNG
-      tableScrollBox.style.maxHeight = originalMaxHeight;
-      tableScrollBox.style.overflow = originalOverflow;
-      actualTable.style.width = originalTableWidth;
-      actualTable.style.tableLayout = 'auto';
-      
-      btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
-      btn.disabled = false;
-
-      canvas.toBlob((blob)=>{
-        if(!blob) return alert('Lỗi xuất dữ liệu hình ảnh!');
-        try{
-          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-          alert('🎉 ĐÃ CHỤP XONG TOÀN BỘ BẢNG DỮ LIỆU NÉT CAO!\n\nẢnh đã nằm trong bộ nhớ tạm. Bạn chỉ cần sang Zalo, nhấn (Ctrl + V) hoặc Chuột phải -> Dán là gửi được ngay, bảng rộng rãi thẳng hàng tăm tắp không mất dòng nào nhé!');
-        }catch(err){
-          // Tự động tải file ảnh về máy nếu thiết bị chặn tính năng ghi bộ nhớ tạm
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          const today = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
-          a.href = url;
-          a.download = `Chi_Tiet_Don_Hang_Net_Cao_${today}.png`;
-          a.click();
-        }
-      }, 'image/png');
-    }).catch((err)=>{
-      // TRẢ LẠI GIAO DIỆN NẾU GẶP LỖI
-      tableScrollBox.style.maxHeight = originalMaxHeight;
-      tableScrollBox.style.overflow = originalOverflow;
-      actualTable.style.width = originalTableWidth;
-      actualTable.style.tableLayout = 'auto';
-      btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
-      btn.disabled = false;
-      alert('Có lỗi xảy ra khi tạo ảnh: ' + err);
-    });
-  }, 200);
+    canvas.toBlob((blob)=>{
+      if(!blob) return alert('Lỗi xuất ảnh!');
+      try{
+        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        alert('🎉 Đã chụp xong bảng chi tiết và lưu vào bộ nhớ tạm! Bạn chỉ cần vào Zalo và nhấn nút Ctrl + V là gửi được ngay.');
+      }catch(err){
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `CHI_TIET_DON_HANG_${dateKey(new Date())}.png`;
+        a.click();
+      }
+    }, 'image/png');
+  }).catch(()=>{
+    box.style.maxHeight = originalMaxHeight;
+    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+    btn.disabled = false;
+    alert('Lỗi chụp màn hình!');
+  });
 }
 
+// Lắng nghe sự kiện click nút bấm thủ công
 function bindEvents(){
+  // Xử lý nút hoàn thành của Quản đốc xưởng
   document.getElementById('btnWorkshopConfirm')?.addEventListener('click', ()=>{
     const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked');
     if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một đơn hàng cần ưu tiên xuất ngày mai!');
@@ -2164,20 +2300,24 @@ function bindEvents(){
       }
     });
 
+    // Đồng bộ ngay mảng ưu tiên lên mạng đám mây Firebase
     uploadConfirmedToFirebase();
     sendAppNotice('admin', 'Quản đốc sản xuất đã cập nhật xong danh sách đơn hàng mai có thể xuất.');
     alert('Đã xác nhận danh sách ưu tiên. Toàn bộ máy tính văn phòng đã nhận được số liệu đồng bộ mạng!');
   });
 
+  // Sự kiện xóa đơn ưu tiên trên lưới
   document.getElementById('tomorrowConfirmedTable').addEventListener('click', (e)=>{
     const button = e.target.closest('[data-remove-tomorrow]');
     if(!button) return;
-    if(!confirm('Bạn muốn xóa đơn này khỏi danh sách "Mai có thể xuất"? Đơn sẽ quay lại danh sách chờ điều phối.')) return;
-    
+    if(!confirm('Bạn muốn xóa đơn này khỏi danh sách "Mai có thể xuất"? Đơn vẫn còn trong danh sách sổ/tổng đơn hàng.')) return;
     appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== button.dataset.removeTomorrow);
+    
+    // Đồng bộ lại mảng đã xóa lên Firebase
     uploadConfirmedToFirebase();
   });
 
+  // Lắng nghe thay đổi bộ lọc
   document.getElementById('tomorrowDateSelect').addEventListener('change', refreshAll);
   document.getElementById('btnPreviewReady')?.addEventListener('click', renderExportPreview);
   document.getElementById('btnConfirmReady')?.addEventListener('click', exportExcel);
@@ -2211,6 +2351,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     applyRoleView(savedRole);
   }
   
+  // Chạy hệ thống lắng nghe đám mây trực tuyến
   setupFirebaseListeners();
   bindEvents();
 });
