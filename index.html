@@ -333,7 +333,7 @@ tbody tr:hover{
         <h2 class="text-2xl font-black text-cyan-400">👁️ CHỌN MỤC CHO QUẢN ĐỐC SẢN XUẤT XEM</h2>
         <div class="text-slate-400 mt-1">Bật mục nào thì giao diện xưởng sẽ thấy mục đó ngay sau khi đồng bộ mạng</div>
       </div>
-      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black">💾 LƯU QUYỀN XEM</button>
+      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black">💾 LƯU QUYỀW XEM</button>
     </div>
     <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
       <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
@@ -1245,7 +1245,7 @@ function switchRole() {
   location.reload();
 }
 
-function currentRole(){
+function currentRole()){
   return localStorage.getItem('tp_user_role') || 'production';
 }
 
@@ -2075,42 +2075,71 @@ function renderDetails(){
 
 function captureDetailImage(){
   const btn = document.getElementById('captureDetailBtn');
-  const box = document.getElementById('chiTietDonHangBox');
-  btn.textContent = '📸 ĐANG CHỤP...';
+  const tableScrollBox = document.querySelector('#detailAllOrdersTable').parentElement;
+  const targetSection = document.getElementById('section-detail');
+  const actualTable = document.getElementById('detailAllOrdersTable');
+  
+  if (!tableScrollBox || !actualTable) return alert('Lỗi: Không tìm thấy khung bảng dữ liệu!');
+  
+  btn.textContent = '📸 ĐANG CHỤP NÉT CAO...';
   btn.disabled = true;
 
-  const originalMaxHeight = box.style.maxHeight;
-  box.style.maxHeight = 'none'; 
+  // LƯU TRẠNG THÁI GIAO DIỆN CŨ CỦA APP
+  const originalMaxHeight = tableScrollBox.style.maxHeight;
+  const originalOverflow = tableScrollBox.style.overflow;
+  const originalTableWidth = actualTable.style.width;
 
-  html2canvas(document.getElementById('section-detail'), {
-    backgroundColor: '#020617',
-    scale: 2,
-    logging: false,
-    useCORS: true
-  }).then((canvas)=>{
-    box.style.maxHeight = originalMaxHeight;
-    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
-    btn.disabled = false;
+  // 👉 ÉP ĐỘ RỘNG BẢNG RỘNG RÃI 100% VÀ MỞ TOÀN BỘ KHUNG CUỘN CHỐNG CO CHỮ LÀM DỒN KHUNG
+  tableScrollBox.style.maxHeight = 'none';
+  tableScrollBox.style.overflow = 'visible';
+  actualTable.style.width = '100%';
+  actualTable.style.tableLayout = 'fixed'; // Khóa dòng ép các cột chia đều khoảng cách đều tăm tắp
 
-    canvas.toBlob((blob)=>{
-      if(!blob) return alert('Lỗi xuất ảnh!');
-      try{
-        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-        alert('🎉 Đã chụp xong bảng chi tiết và lưu vào bộ nhớ tạm! Bạn chỉ cần vào Zalo và nhấn nút Ctrl + V là gửi được ngay.');
-      }catch(err){
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `CHI_TIET_DON_HANG_${dateKey(new Date())}.png`;
-        a.click();
-      }
-    }, 'image/png');
-  }).catch(()=>{
-    box.style.maxHeight = originalMaxHeight;
-    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
-    btn.disabled = false;
-    alert('Lỗi chụp màn hình!');
-  });
+  // Chờ 200 mili-giây để trình duyệt vẽ lại giao diện hoàn hảo rồi mới bấm máy chụp
+  setTimeout(() => {
+    html2canvas(targetSection, {
+      backgroundColor: '#020617', // Ép cứng nền tối sang trọng chống lóa chữ
+      scale: 2.2,                 // Độ phân giải siêu nét HD gấp 2.2 lần để gửi Zalo không vỡ hạt
+      logging: false,
+      useCORS: true,
+      windowWidth: targetSection.scrollWidth,
+      windowHeight: targetSection.scrollHeight
+    }).then((canvas)=>{
+      // CHỤP XONG LẬP TỨC TRẢ LẠI TRẠNG THÁI BAN ĐẦU CHO ỨNG DỤNG
+      tableScrollBox.style.maxHeight = originalMaxHeight;
+      tableScrollBox.style.overflow = originalOverflow;
+      actualTable.style.width = originalTableWidth;
+      actualTable.style.tableLayout = 'auto';
+      
+      btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+      btn.disabled = false;
+
+      canvas.toBlob((blob)=>{
+        if(!blob) return alert('Lỗi xuất dữ liệu hình ảnh!');
+        try{
+          navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+          alert('🎉 ĐÃ CHỤP XONG TOÀN BỘ BẢNG DỮ LIỆU NÉT CAO!\n\nẢnh đã nằm trong bộ nhớ tạm. Bạn chỉ cần sang Zalo, nhấn (Ctrl + V) hoặc Chuột phải -> Dán là gửi được ngay, bảng rộng rãi thẳng hàng tăm tắp không mất dòng nào nhé!');
+        }catch(err){
+          // Tự động tải file ảnh về máy nếu thiết bị chặn tính năng ghi bộ nhớ tạm
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          const today = new Date().toLocaleDateString('vi-VN').replace(/\//g, '-');
+          a.href = url;
+          a.download = `Chi_Tiet_Don_Hang_Net_Cao_${today}.png`;
+          a.click();
+        }
+      }, 'image/png');
+    }).catch((err)=>{
+      // TRẢ LẠI GIAO DIỆN NẾU GẶP LỖI
+      tableScrollBox.style.maxHeight = originalMaxHeight;
+      tableScrollBox.style.overflow = originalOverflow;
+      actualTable.style.width = originalTableWidth;
+      actualTable.style.tableLayout = 'auto';
+      btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+      btn.disabled = false;
+      alert('Có lỗi xảy ra khi tạo ảnh: ' + err);
+    });
+  }, 200);
 }
 
 function bindEvents(){
