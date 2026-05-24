@@ -55,11 +55,11 @@ table{
 }
 
 th,td{
-  padding:16px 18px;
+  padding:14px 16px;
   border-bottom:1px solid #1e293b;
   text-align:left;
   white-space:nowrap;
-  font-size:16px;
+  font-size:15px;
 }
 
 th{
@@ -172,7 +172,7 @@ tbody tr:hover{
   </div>
 </div>
 
-<div class="max-w-[1900px] mx-auto space-y-5">
+<div id="mainContentApp" class="max-w-[1900px] mx-auto space-y-5 hideBox">
 
   <div class="card p-6">
     <div class="flex justify-between items-center flex-wrap gap-5">
@@ -597,7 +597,15 @@ function selectUserRole(role) {
 }
 
 function applyRoleView(role) {
+  if (!role) {
+    document.getElementById('loginSection').classList.remove('hideBox');
+    document.getElementById('mainContentApp').classList.add('hideBox');
+    return;
+  }
+
   document.getElementById('loginSection').classList.add('hideBox');
+  document.getElementById('mainContentApp').classList.remove('hideBox');
+
   if (role === 'admin') {
     document.getElementById('currentRoleLabel').textContent = "💻 Chủ quản văn phòng (Máy chủ)";
     document.getElementById('section-tomorrow').classList.remove('hideBox');
@@ -627,12 +635,12 @@ function switchRole() {
 }
 
 function currentRole(){
-  return localStorage.getItem('tp_user_role') || 'production';
+  return localStorage.getItem('tp_user_role') || '';
 }
 
 function applyProductionViewSettings(){
   const role = currentRole();
-  if(role === 'admin') return;
+  if(!role || role === 'admin') return;
   const view = appState.productionView || {};
   const showTomorrow = view.tomorrow !== false;
 
@@ -756,7 +764,7 @@ function setupFirebaseListeners() {
       ...(snapshot.val() || {})
     };
     renderProductionViewSettings();
-    applyRoleView(currentRole());
+    if (currentRole()) applyRoleView(currentRole());
   });
 
   database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
@@ -1558,6 +1566,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const savedRole = localStorage.getItem('tp_user_role');
   if(savedRole){
     applyRoleView(savedRole);
+  } else {
+    applyRoleView('');
   }
   
   setupFirebaseListeners();
