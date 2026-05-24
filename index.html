@@ -11,7 +11,7 @@
 />
 
 <title>
-  HỆ THỐNG TRA CỨU THÀNH PHẨM AUTO
+  HỆ THỐNG TRA CỨU THÀNH PHẨM TỰ ĐỘNG
 </title>
 
 <link
@@ -26,7 +26,7 @@
 />
 
 <link
-  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700;800;900&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700&display=swap"
   rel="stylesheet"
 />
 
@@ -46,7 +46,7 @@
 
 body{
   background:#020617;
-  color:white;
+  color:#f8fafc;
 }
 
 table{
@@ -55,18 +55,20 @@ table{
 }
 
 th,td{
-  padding:15px;
+  padding:14px 16px;
   border-bottom:1px solid #1e293b;
   text-align:left;
   white-space:nowrap;
+  font-size:14px;
 }
 
 th{
-  background:#111827;
+  background:#0f172a;
   position:sticky;
   top:0;
   z-index:5;
-  font-size:14px;
+  font-weight:600;
+  color:#94a3b8;
 }
 
 tbody tr:hover{
@@ -74,12 +76,12 @@ tbody tr:hover{
 }
 
 ::-webkit-scrollbar{
-  width:10px;
-  height:10px;
+  width:8px;
+  height:8px;
 }
 
 ::-webkit-scrollbar-thumb{
-  background:#475569;
+  background:#334155;
   border-radius:999px;
 }
 
@@ -92,30 +94,27 @@ tbody tr:hover{
 }
 
 @keyframes flashEffect{
-
   0%{
     background:#facc15;
     color:black;
   }
-
   100%{
     background:transparent;
   }
-
 }
 
 .card{
   background:#0f172a;
   border:1px solid #1e293b;
-  border-radius:30px;
+  border-radius:16px;
 }
 
 .input{
   width:100%;
   background:#111827;
   border:1px solid #334155;
-  border-radius:18px;
-  padding:14px;
+  border-radius:10px;
+  padding:12px;
   outline:none;
   transition:0.2s;
   color: white;
@@ -127,9 +126,9 @@ tbody tr:hover{
 }
 
 .btn{
-  padding:14px 20px;
-  border-radius:18px;
-  font-weight:700;
+  padding:12px 20px;
+  border-radius:10px;
+  font-weight:600;
   transition:0.2s;
 }
 
@@ -141,33 +140,33 @@ tbody tr:hover{
 
 <div id="loginSection" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4">
   <div class="card p-8 max-w-md w-full text-center space-y-5 border-violet-500/30">
-    <div class="w-16 h-16 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-2xl">🔐</div>
-    <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">VUI LÒNG CHỌN BỘ PHẬN</h2>
+    <div class="w-14 h-14 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-xl">🔐</div>
+    <h2 class="text-xl font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">VUI LÒNG CHỌN BỘ PHẬN</h2>
     <p class="text-slate-400 text-sm">Hệ thống sẽ tự động phân quyền giao diện phù hợp</p>
     
-    <button onclick="selectUserRole('production')" class="btn w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-base">
-      🏭 QUẢN ĐỐC SẢN XUẤT (XƯỞNG - Vào thẳng)
+    <button onclick="selectUserRole('production')" class="btn w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-sm">
+      🏭 Quản đốc sản xuất (Xưởng - Vào thẳng)
     </button>
 
     <div class="relative flex py-2 items-center">
         <div class="flex-grow border-t border-slate-700"></div>
-        <span class="flex-shrink mx-4 text-slate-500 text-sm">HOẶC ĐĂNG NHẬP VĂN PHÒNG</span>
+        <span class="flex-shrink mx-4 text-slate-500 text-xs tracking-wider">HOẶC ĐĂNG NHẬP VĂN PHÒNG</span>
         <div class="flex-grow border-t border-slate-700"></div>
     </div>
 
     <div class="text-left space-y-3">
       <div>
         <label class="text-xs text-slate-400 pl-1">Tài khoản:</label>
-        <input type="text" id="userInput" placeholder="Nhập tài khoản..." class="input mt-1 text-sm py-3" />
+        <input type="text" id="userInput" placeholder="Nhập tài khoản..." class="input mt-1 text-sm py-2.5" />
       </div>
       <div>
         <label class="text-xs text-slate-400 pl-1">Mật khẩu:</label>
-        <input type="password" id="passInput" placeholder="Nhập mật khẩu..." class="input mt-1 text-sm py-3" />
+        <input type="password" id="passInput" placeholder="Nhập mật khẩu..." class="input mt-1 text-sm py-2.5" />
       </div>
     </div>
 
-    <button onclick="selectUserRole('admin')" class="btn w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-base">
-      💻 CHỦ QUẢN VĂN PHÒNG (MÁY CHỦ)
+    <button onclick="selectUserRole('admin')" class="btn w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
+      💻 Chủ quản văn phòng (Máy chủ)
     </button>
     <div id="loginAlert" class="text-red-400 text-sm font-semibold mt-1"></div>
   </div>
@@ -176,328 +175,152 @@ tbody tr:hover{
 <div class="max-w-[1900px] mx-auto space-y-5">
 
   <div class="card p-6">
-
-    <div class="
-      flex
-      justify-between
-      items-center
-      flex-wrap
-      gap-5
-    ">
-
-      <div class="
-        flex
-        items-center
-        gap-5
-        flex-wrap
-      ">
-
-        <div class="
-          w-24
-          h-24
-          rounded-[30px]
-          bg-gradient-to-br
-          from-violet-500
-          to-fuchsia-500
-          flex
-          items-center
-          justify-center
-          text-4xl
-          font-black
-        ">
+    <div class="flex justify-between items-center flex-wrap gap-5">
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-2xl font-bold">
           TP
         </div>
-
         <div>
-
-          <h1 class="
-            text-4xl
-            font-black
-          ">
-            📦 HỆ THỐNG TRA CỨU THÀNH PHẨM AUTO
+          <h1 class="text-2xl font-bold tracking-tight uppercase">
+            📦 HỆ THỐNG TRA CỨU THÀNH PHẨM TỰ ĐỘNG
           </h1>
-
-          <div class="
-            flex items-center gap-3
-            text-slate-400
-            mt-2
-            text-lg
-          ">
-            <span>Bộ phận: <span id="currentRoleLabel" class="text-violet-400 font-bold">...</span></span>
-            <span id="syncStatus" class="text-sm px-3 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-semibold">🟡 Đang kết nối mạng...</span>
+          <div class="flex items-center gap-3 text-slate-400 mt-1 text-sm">
+            <span>Bộ phận: <span id="currentRoleLabel" class="text-violet-400 font-semibold">...</span></span>
+            <span id="syncStatus" class="text-xs px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-medium">🟡 Đang kết nối mạng...</span>
           </div>
-
         </div>
-
       </div>
 
-      <div class="flex gap-3">
+      <div class="flex gap-3 text-sm">
         <button id="btnNotifyWorkshop" class="btn bg-amber-600 hover:bg-amber-500 text-black hideBox">🔔 Báo xưởng xem dữ liệu</button>
         <button id="btnResetStorage" class="btn bg-rose-950/60 hover:bg-rose-900 text-rose-300 hideBox" onclick="clearSystemCache()">🗑️ Xóa dữ liệu gốc đám mây</button>
-        <button onclick="switchRole()" class="btn bg-slate-700 hover:bg-slate-600">🔄 Đổi chế độ đăng xuất</button>
+        <button onclick="switchRole()" class="btn bg-slate-700 hover:bg-slate-600">🔄 Đăng xuất</button>
       </div>
-
     </div>
-
   </div>
 
   <div id="appNoticeBox" class="card p-5 border-amber-500/30 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4">
       <div>
-        <div id="appNoticeTitle" class="text-xl font-black text-amber-400">🔔 THÔNG BÁO</div>
-        <div id="appNoticeMessage" class="text-slate-300 mt-1"></div>
+        <div id="appNoticeTitle" class="text-lg font-bold text-amber-400 uppercase">🔔 THÔNG BÁO</div>
+        <div id="appNoticeMessage" class="text-slate-300 mt-1 text-sm"></div>
       </div>
-      <button id="btnDismissNotice" class="btn bg-slate-700 hover:bg-slate-600">Đã xem</button>
+      <button id="btnDismissNotice" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Đã xem</button>
     </div>
   </div>
 
-  <div class="
-    grid
-    xl:grid-cols-4
-    md:grid-cols-2
-    gap-4
-  ">
-
+  <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
     <div class="card p-5">
-
-      <div class="text-slate-400">
-        Tổng đơn hàng
-      </div>
-
-      <div id="kpi-total-orders" class="
-        text-5xl
-        font-black
-        mt-4
-      ">
-        0
-      </div>
-
+      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">TỔNG ĐƠN HÀNG</div>
+      <div id="kpi-total-orders" class="text-4xl font-bold mt-2">0</div>
     </div>
-
     <div class="card p-5">
-
-      <div class="text-slate-400">
-        Đơn đủ hàng
-      </div>
-
-      <div id="kpi-ready-orders" class="
-        text-5xl
-        font-black
-        mt-4
-        text-green-400
-      ">
-        0
-      </div>
-
+      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">ĐƠN ĐỦ HÀNG</div>
+      <div id="kpi-ready-orders" class="text-4xl font-bold mt-2 text-green-400">0</div>
     </div>
-
     <div class="card p-5">
-
-      <div class="text-slate-400">
-        Đơn thiếu hàng
-      </div>
-
-      <div id="kpi-shortage-orders" class="
-        text-5xl
-        font-black
-        mt-4
-        text-red-400
-      ">
-        0
-      </div>
-
+      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">ĐƠN THIẾU HÀNG</div>
+      <div id="kpi-shortage-orders" class="text-4xl font-bold mt-2 text-red-400">0</div>
     </div>
-
     <div class="card p-5">
-
-      <div class="text-slate-400">
-        Tổng cần sản xuất
-      </div>
-
-      <div id="kpi-total-production" class="
-        text-5xl
-        font-black
-        mt-4
-        text-orange-400
-      ">
-        0T
-      </div>
-
+      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">TỔNG CẦN SẢN XUẤT</div>
+      <div id="kpi-total-production" class="text-4xl font-bold mt-2 text-orange-400">0T</div>
     </div>
-
   </div>
 
   <div id="section-production-permissions" class="card p-6 border-cyan-500/20 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-        <h2 class="text-2xl font-black text-cyan-400">👁️ CHỌN MỤC CHO QUẢN ĐỐC SẢN XUẤT XEM</h2>
-        <div class="text-slate-400 mt-1">Bật mục nào thì giao diện xưởng sẽ thấy mục đó ngay sau khi đồng bộ mạng</div>
+        <h2 class="text-xl font-bold text-cyan-400 uppercase">👁️ CHỌN MỤC CHO QUẢN ĐỐC SẢN XUẤT XEM</h2>
+        <div class="text-slate-400 text-sm mt-1">Bật mục nào thì giao diện xưởng sẽ thấy mục đó ngay sau khi đồng bộ mạng</div>
       </div>
-      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black">💾 LƯU QUYỀN XEM</button>
+      <button id="btnSaveProductionView" class="btn bg-cyan-600 hover:bg-cyan-500 text-black text-sm">💾 Lưu quyền xem</button>
     </div>
-    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
-      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
-        <input type="checkbox" id="permTomorrow" class="w-5 h-5 accent-cyan-500 mt-1"/>
+    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4 text-sm">
+      <label class="bg-slate-800 border border-slate-700 rounded-xl p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permTomorrow" class="w-5 h-5 accent-cyan-500 mt-0.5"/>
         <span>
-          <span class="block font-black text-yellow-400">⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT</span>
-          <span class="block text-sm text-slate-400 mt-1">Xưởng chọn và xác nhận đơn ưu tiên xuất ngày mai</span>
+          <span class="block font-bold text-yellow-400 uppercase">⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT</span>
+          <span class="block text-xs text-slate-400 mt-1">Xưởng chọn và xác nhận đơn ưu tiên xuất ngày mai</span>
         </span>
       </label>
-      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
-        <input type="checkbox" id="permReady" class="w-5 h-5 accent-cyan-500 mt-1"/>
+      <label class="bg-slate-800 border border-slate-700 rounded-xl p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permReady" class="w-5 h-5 accent-cyan-500 mt-0.5"/>
         <span>
-          <span class="block font-black text-green-400">✅ ĐƠN HÀNG CÓ THỂ XUẤT</span>
-          <span class="block text-sm text-slate-400 mt-1">Xưởng xem danh sách đơn đủ điều kiện xuất</span>
+          <span class="block font-bold text-green-400 uppercase">✅ ĐƠN HÀNG CÓ THỂ XUẤT</span>
+          <span class="block text-xs text-slate-400 mt-1">Xưởng xem danh sách đơn đủ điều kiện xuất</span>
         </span>
       </label>
-      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
-        <input type="checkbox" id="permProduction" class="w-5 h-5 accent-cyan-500 mt-1"/>
+      <label class="bg-slate-800 border border-slate-700 rounded-xl p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permProduction" class="w-5 h-5 accent-cyan-500 mt-0.5"/>
         <span>
-          <span class="block font-black text-red-400">⚠️ THÀNH PHẨM CẦN SẢN XUẤT</span>
-          <span class="block text-sm text-slate-400 mt-1">Xưởng xem tổng hợp thiếu hụt cần sản xuất</span>
+          <span class="block font-bold text-red-400 uppercase">⚠️ THÀNH PHẨM CẦN SẢN XUẤT</span>
+          <span class="block text-xs text-slate-400 mt-1">Xưởng xem tổng hợp thiếu hụt cần sản xuất</span>
         </span>
       </label>
-      <label class="bg-slate-800 border border-slate-700 rounded-[18px] p-4 cursor-pointer flex gap-3 items-start">
-        <input type="checkbox" id="permDetail" class="w-5 h-5 accent-cyan-500 mt-1"/>
+      <label class="bg-slate-800 border border-slate-700 rounded-xl p-4 cursor-pointer flex gap-3 items-start">
+        <input type="checkbox" id="permDetail" class="w-5 h-5 accent-cyan-500 mt-0.5"/>
         <span>
-          <span class="block font-black text-slate-100">📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG</span>
-          <span class="block text-sm text-slate-400 mt-1">Xưởng xem toàn bộ đơn hàng trên hệ thống</span>
+          <span class="block font-bold text-slate-100 uppercase">📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG</span>
+          <span class="block text-xs text-slate-400 mt-1">Xưởng xem toàn bộ đơn hàng trên hệ thống</span>
         </span>
       </label>
     </div>
   </div>
 
   <div id="section-import" class="card p-6 hideBox">
-
-    <div class="
-      flex
-      justify-between
-      items-center
-      flex-wrap
-      gap-4
-      mb-6
-    ">
-
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
       <div>
-
-        <h2 class="
-          text-2xl
-          font-black
-        ">
-          📁 IMPORT DỮ LIỆU LÊN ĐÁM MÂY MÁY CHỦ
-        </h2>
-
-        <div class="
-          text-slate-400
-          mt-1
-        ">
-          Upload file dữ liệu mới, tất cả các máy tính của xưởng và văn phòng sẽ tự động tải dữ liệu đồng bộ
-        </div>
-
+        <h2 class="text-xl font-bold uppercase">📁 IMPORT DỮ LIỆU LÊN ĐÁM MÂY MÁY CHỦ</h2>
+        <div class="text-slate-400 text-sm mt-1">Upload file dữ liệu mới, tất cả các máy tính của xưởng và văn phòng sẽ tự động tải dữ liệu đồng bộ</div>
       </div>
-
-      <button class="
-        btn
-        bg-emerald-600
-        hover:bg-emerald-500
-      " onclick="processFiles()">
-        🚀 XỬ LÝ & ĐỒNG BỘ ĐƠN HÀNG
+      <button class="btn bg-emerald-600 hover:bg-emerald-500 text-sm" onclick="processFiles()">
+        🚀 Xử lý & Đồng bộ đơn hàng
       </button>
-
     </div>
-
-    <div class="
-      grid
-      grid-cols-1 lg:grid-cols-2
-      gap-5
-    ">
-
-      <div class="
-        bg-slate-800
-        rounded-[28px]
-        p-5
-      ">
-
-        <div class="
-          text-xl
-          font-bold
-          mb-4
-        ">
-          📦 FILE ĐƠN HÀNG
-        </div>
-
-        <input
-          type="file"
-          id="orderFileInput"
-          class="input"
-        />
-
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-sm">
+      <div class="bg-slate-800 rounded-xl p-5">
+        <div class="text-base font-bold mb-3 uppercase text-slate-300">📦 FILE ĐƠN HÀNG</div>
+        <input type="file" id="orderFileInput" class="input" />
       </div>
-
-      <div class="
-        bg-slate-800
-        rounded-[28px]
-        p-5
-      ">
-
-        <div class="
-          text-xl
-          font-bold
-          mb-4
-        ">
-          🏭 FILE TỒN KHO TP
-        </div>
-
-        <input
-          type="file"
-          id="stockFileInput"
-          class="input"
-        />
-
+      <div class="bg-slate-800 rounded-xl p-5">
+        <div class="text-base font-bold mb-3 uppercase text-slate-300">🏭 FILE TỒN KHO THÀNH PHẨM</div>
+        <input type="file" id="stockFileInput" class="input" />
       </div>
-
     </div>
-
   </div>
 
   <div id="section-tomorrow" class="card p-6 border-yellow-500/20">
-
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-        <h2 class="text-2xl font-black text-yellow-400">
+        <h2 class="text-xl font-bold text-yellow-400 uppercase">
           ⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT
-          <span class="bg-yellow-500 text-black text-sm px-3 py-1 rounded-full ml-2">
-            0
-          </span>
+          <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span>
         </h2>
-        <div class="text-slate-400 mt-1">
-          Đơn thiếu TP nhưng đã được xác nhận từ sản xuất
-        </div>
+        <div class="text-slate-400 text-sm mt-1">Đơn thiếu thành phẩm nhưng đã được xác nhận từ sản xuất hoặc điều phối</div>
       </div>
     </div>
 
-    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4 mb-5">
+    <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4 mb-5 text-sm">
       <div>
         <div class="text-slate-400 mb-2">Chọn ngày giao</div>
         <select id="tomorrowDateSelect" class="input" onchange="refreshAll()">
           <option value="ALL">ALL</option>
         </select>
       </div>
-
       <div class="flex items-end">
         <button onclick="refreshAll()" class="btn w-full bg-yellow-500 hover:bg-yellow-400 text-black">
-          🔍 XỔ DANH SÁCH
+          🔍 Xổ danh sách
         </button>
       </div>
-
-      <div id="btn-wrap-confirm-workshop" class="flex items-end hideBox">
-        <button id="btnWorkshopConfirm" class="btn w-full bg-emerald-600 hover:bg-emerald-500">
-          ✅ HOÀN THÀNH
+      <div id="btn-wrap-confirm-workshop" class="flex items-end">
+        <button id="btnWorkshopConfirm" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white">
+          ✅ Hoàn thành chọn đơn
         </button>
       </div>
     </div>
 
-    <div class="bg-slate-800 rounded-[28px] overflow-auto max-h-[450px] mb-5">
+    <div class="bg-slate-800 rounded-xl overflow-auto max-h-[450px] mb-5">
       <table id="tomorrowCandidateTable">
         <thead>
           <tr>
@@ -517,9 +340,9 @@ tbody tr:hover{
       </table>
     </div>
 
-    <div class="bg-yellow-500/10 border border-yellow-500 rounded-[28px] overflow-auto">
-      <div class="p-5 text-xl font-black text-yellow-400">
-        ✅ ĐÃ XÁC NHẬN “MAI CÓ THỂ XUẤT”
+    <div class="bg-yellow-500/5 border border-yellow-500/20 rounded-xl overflow-auto">
+      <div class="p-4 text-base font-bold text-yellow-400 border-b border-yellow-500/10 uppercase">
+        ✅ ĐÃ XÁC NHẬN "MAI CÓ THỂ XUẤT"
       </div>
       <table id="tomorrowConfirmedTable">
         <thead>
@@ -537,397 +360,105 @@ tbody tr:hover{
         </tbody>
       </table>
     </div>
-
   </div>
 
   <div id="section-ready" class="card p-6 border-green-500/20 hideBox">
-
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-        <h2 class="text-2xl font-black text-green-400">
+        <h2 class="text-xl font-bold text-green-400 uppercase">
           ✅ ĐƠN HÀNG CÓ THỂ XUẤT
-          <span class="bg-green-500 text-black text-sm px-3 py-1 rounded-full ml-2">
-            0
-          </span>
+          <span class="bg-green-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span>
         </h2>
-        <div class="text-slate-400 mt-1">
-          Luôn hiển thị ALL toàn bộ đơn có thể xuất
-        </div>
+        <div class="text-slate-400 text-sm mt-1">Luôn hiển thị ALL toàn bộ đơn có thể xuất</div>
       </div>
     </div>
 
-    <div class="
-      bg-violet-500/10
-      border
-      border-violet-500
-      rounded-[28px]
-      p-5
-      mb-5
-    ">
-
-      <div class="
-        text-2xl
-        font-black
-        text-violet-400
-        mb-5
-      ">
-        📅 BỘ LỌC EXPORT KẾ HOẠCH DƯỚI ĐÁM MÂY
-      </div>
-
-      <div class="
-        grid
-        xl:grid-cols-5
-        md:grid-cols-2
-        gap-4
-        mb-4
-      ">
-
+    <div class="bg-violet-500/5 border border-violet-500/20 rounded-xl p-5 mb-5 text-sm">
+      <div class="text-lg font-bold text-violet-400 mb-4 uppercase">📅 BỘ LỌC XUẤT DỮ LIỆU KẾ HOẠCH</div>
+      <div class="grid xl:grid-cols-5 md:grid-cols-2 gap-4 mb-4">
         <div>
-
-          <div class="
-            text-slate-400
-            mb-2
-          ">
-            Chế độ export
-          </div>
-
+          <div class="text-slate-400 mb-2">Chế độ export</div>
           <select id="readyExportMode" class="input">
-
             <option value="ALL">ALL</option>
             <option value="1 ngày">1 ngày</option>
             <option value="Khoảng ngày">Khoảng ngày</option>
-
           </select>
-
         </div>
-
         <div>
-
-          <div class="
-            text-slate-400
-            mb-2
-          ">
-            Từ ngày
-          </div>
-
-          <input
-            type="date"
-            id="readyFromDate"
-            class="input"
-          />
-
+          <div class="text-slate-400 mb-2">Từ ngày</div>
+          <input type="date" id="readyFromDate" class="input" />
         </div>
-
         <div>
-
-          <div class="
-            text-slate-400
-            mb-2
-          ">
-            Đến ngày
-          </div>
-
-          <input
-            type="date"
-            id="readyToDate"
-            class="input"
-          />
-
+          <div class="text-slate-400 mb-2">Đến ngày</div>
+          <input type="date" id="readyToDate" class="input" />
         </div>
-
-        <div class="
-          flex
-          items-end
-        ">
-
-          <button id="btnPreviewReady" class="
-            btn
-            w-full
-            bg-blue-600
-            hover:bg-blue-500
-          ">
-            🔍 XEM TRƯỚC EXPORT
-          </button>
-
+        <div class="flex items-end">
+          <button id="btnPreviewReady" class="btn w-full bg-blue-600 hover:bg-blue-500 text-white">🔍 Xem trước xuất</button>
         </div>
-
-        <div class="
-          flex
-          items-end
-        ">
-
-          <button id="btnConfirmReady" class="
-            btn
-            w-full
-            bg-violet-600
-            hover:bg-violet-500
-          ">
-            📥 XÁC NHẬN EXPORT EXCEL
-          </button>
-
+        <div class="flex items-end">
+          <button id="btnConfirmReady" class="btn w-full bg-violet-600 hover:bg-violet-500 text-white">📥 Xác nhận xuất Excel</button>
         </div>
-
       </div>
-
     </div>
 
-    <div class="
-      bg-slate-800
-      rounded-[28px]
-      overflow-auto
-      mb-5
-    " id="exportPreviewContainer">
-
-      <div class="
-        p-5
-        flex
-        justify-between
-        items-center
-        flex-wrap
-        gap-4
-      ">
-
-        <div>
-
-          <div class="
-            text-2xl
-            font-black
-          ">
-            📦 XEM TRƯỚC FILE EXPORT
-          </div>
-
-          <div class="
-            text-slate-400
-            mt-1
-          ">
-            Hiển thị chính xác bảng dữ liệu kế hoạch sắp tải về
-          </div>
-
-        </div>
-
+    <div class="bg-slate-800 rounded-xl overflow-auto mb-5" id="exportPreviewContainer">
+      <div class="p-5">
+        <div class="text-lg font-bold uppercase">📦 XEM TRƯỚC FILE XUẤT HÀNG</div>
+        <div class="text-slate-400 text-sm mt-1">Hiển thị chính xác bảng dữ liệu kế hoạch sắp tải về</div>
       </div>
-
-      <div class="
-        p-10
-        text-center
-        text-slate-500
-      ">
-        PREVIEW FORMAT EXCEL KẾ HOẠCH XUẤT HÀNG
-      </div>
-
+      <div class="p-10 text-center text-slate-500 text-sm">Format Excel kế hoạch xuất hàng</div>
     </div>
 
-    <div class="
-      bg-slate-800
-      rounded-[28px]
-      overflow-hidden
-    ">
-
-      <div class="
-        p-5
-        flex
-        justify-between
-        items-center
-        flex-wrap
-        gap-4
-        border-b
-        border-slate-700
-      ">
-
+    <div class="bg-slate-800 rounded-xl overflow-hidden">
+      <div class="p-5 flex justify-between items-center flex-wrap gap-4 border-b border-slate-700">
         <div>
-
-          <div class="
-            text-2xl
-            font-black
-          ">
-            📋 DANH SÁCH TOÀN BỘ ĐƠN CÓ THỂ XUẤT
-          </div>
-
-          <div class="
-            text-slate-400
-            mt-1
-          ">
-            Hiển thị tất cả đơn hàng đủ điều kiện giao của hệ thống
-          </div>
-
+          <div class="text-lg font-bold uppercase">📋 DANH SÁCH TOÀN BỘ ĐƠN CÓ THỂ XUẤT</div>
+          <div class="text-slate-400 text-sm mt-1">Hiển thị tất cả đơn hàng đủ điều kiện giao của hệ thống</div>
         </div>
-
-        <button
-          onclick="document.getElementById('fullExportTable').classList.toggle('hideBox')"
-          class="
-            btn
-            bg-slate-700
-            hover:bg-slate-600
-          "
-        >
-          Thu gọn / Mở rộng
-        </button>
-
+        <button onclick="document.getElementById('fullExportTable').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Thu gọn / Mở rộng</button>
       </div>
-
-      <div
-        id="fullExportTable"
-        class="
-          overflow-auto
-          max-h-[600px]
-        "
-      >
-        </div>
-
+      <div id="fullExportTable" class="overflow-auto max-h-[600px]"></div>
     </div>
-
   </div>
 
-  <div id="section-production" class="
-    card
-    p-6
-    border-red-500/20
-    hideBox
-  ">
-
-    <div class="
-      flex
-      justify-between
-      items-center
-      flex-wrap
-      gap-4
-      mb-5
-    ">
-
+  <div id="section-production" class="card p-6 border-red-500/20 hideBox">
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-
-        <h2 class="
-          text-2xl
-          font-black
-          text-red-400
-        ">
-          ⚠️ THÀNH PHẨM CẦN SẢN XUẤT
-        </h2>
-
-        <div class="
-          text-slate-400
-          mt-1
-        ">
-          Tổng hợp khối lượng thành phẩm còn thiếu hụt dưới kho cần chạy lò gấp
-        </div>
-
+        <h2 class="text-xl font-bold text-red-400 uppercase">⚠️ THÀNH PHẨM CẦN SẢN XUẤT</h2>
+        <div class="text-slate-400 text-sm mt-1">Tổng hợp khối lượng thành phẩm còn thiếu hụt dưới kho cần chạy lò gấp</div>
       </div>
-
-      <button
-        onclick="document.getElementById('tpSanXuatBox').classList.toggle('hideBox')"
-        class="
-          btn
-          bg-slate-700
-          hover:bg-slate-600
-        "
-      >
-        Thu gọn / Mở rộng
-      </button>
-
+      <button onclick="document.getElementById('tpSanXuatBox').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Thu gọn / Mở rộng</button>
     </div>
 
-    <div
-      id="tpSanXuatBox"
-      class="space-y-5"
-    >
-
-      <div class="
-        bg-slate-800
-        rounded-[28px]
-        p-5
-      ">
-
-        <div class="
-          grid
-          xl:grid-cols-4
-          md:grid-cols-2
-          gap-4
-        ">
-
+    <div id="tpSanXuatBox" class="space-y-5">
+      <div class="bg-slate-800 rounded-xl p-5 text-sm">
+        <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Chế độ hiển thị
-            </div>
-
+            <div class="text-slate-400 mb-2">Chế độ hiển thị</div>
             <select id="prodDisplayMode" class="input">
               <option value="ALL">ALL</option>
               <option value="1 ngày">1 ngày</option>
               <option value="Khoảng ngày">Khoảng ngày</option>
             </select>
-
           </div>
-
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Từ ngày
-            </div>
-
-            <input
-              type="date"
-              id="prodFromDate"
-              class="input"
-            />
-
+            <div class="text-slate-400 mb-2">Từ ngày</div>
+            <input type="date" id="prodFromDate" class="input" />
           </div>
-
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Đến ngày
-            </div>
-
-            <input
-              type="date"
-              id="prodToDate"
-              class="input"
-            />
-
+            <div class="text-slate-400 mb-2">Đến ngày</div>
+            <input type="date" id="prodToDate" class="input" />
           </div>
-
-          <div class="
-            flex
-            items-end
-          ">
-
-            <button id="btnFilterProd" class="
-              btn
-              w-full
-              bg-red-600
-              hover:bg-red-500
-            ">
-              🔍 LỌC DỮ LIỆU SẢN XUẤT
-            </button>
-
+          <div class="flex items-end">
+            <button id="btnFilterProd" class="btn w-full bg-red-600 hover:bg-red-500 text-white">🔍 Lọc dữ liệu sản xuất</button>
           </div>
-
         </div>
-
       </div>
 
-      <div class="
-        bg-slate-800
-        rounded-[28px]
-        overflow-auto
-        max-h-[550px]
-      ">
-
+      <div class="bg-slate-800 rounded-xl overflow-auto max-h-[550px]">
         <table id="productionNeedTable">
-
           <thead>
-
             <tr>
-
               <th>Tên đơn hàng</th>
               <th>Tổng nhu cầu</th>
               <th>Tồn TP</th>
@@ -935,202 +466,61 @@ tbody tr:hover{
               <th>Cần SX</th>
               <th>Số đơn</th>
               <th>Ngày giao gần nhất</th>
-
             </tr>
-
           </thead>
-
           <tbody>
              <tr><td colspan="7" class="text-center text-slate-500 py-8">Chưa có dữ liệu phân tích</td></tr>
           </tbody>
-
         </table>
-
       </div>
-
     </div>
-
   </div>
 
-  <div id="section-detail" class="
-    card
-    p-6
-    hideBox
-  ">
-
-    <div class="
-      flex
-      justify-between
-      items-center
-      flex-wrap
-      gap-4
-      mb-5
-    ">
-
+  <div id="section-detail" class="card p-6 hideBox">
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-
-        <h2 class="
-          text-2xl
-          font-black
-        ">
-          📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG TRÊN HỆ THỐNG
-        </h2>
-
-        <div class="
-          text-slate-400
-          mt-1
-        ">
-          Theo dõi tổng quan dữ liệu toàn bộ danh sách đơn hàng đã nhập
-        </div>
-
+        <h2 class="text-xl font-bold uppercase">📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG TRÊN HỆ THỐNG</h2>
+        <div class="text-slate-400 text-sm mt-1">Theo dõi tổng quan dữ liệu toàn bộ danh sách đơn hàng đã nhập</div>
       </div>
-
-      <div class="flex gap-3">
-        <button
-          onclick="document.getElementById('chiTietDonHangBox').classList.toggle('hideBox')"
-          class="
-            btn
-            bg-slate-700
-            hover:bg-slate-600
-          "
-        >
-          Thu gọn / Mở rộng
-        </button>
-
-        <button
-          id="captureDetailBtn"
-          class="
-            btn
-            bg-blue-600
-            hover:bg-blue-500
-          "
-        >
-          📸 Chụp ảnh màn hình gửi Zalo
-        </button>
+      <div class="flex gap-3 text-sm">
+        <button onclick="document.getElementById('chiTietDonHangBox').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600">Thu gọn / Mở rộng</button>
+        <button id="captureDetailBtn" class="btn bg-blue-600 hover:bg-blue-500 text-white">📸 Chụp màn hình gửi Zalo</button>
       </div>
-
     </div>
 
-    <div
-      id="chiTietDonHangBox"
-      class="space-y-5"
-    >
-
-      <div class="
-        bg-slate-800
-        rounded-[28px]
-        p-5
-      ">
-
-        <div class="
-          grid
-          xl:grid-cols-5
-          md:grid-cols-2
-          gap-4
-        ">
-
+    <div id="chiTietDonHangBox" class="space-y-5">
+      <div class="bg-slate-800 rounded-xl p-5 text-sm">
+        <div class="grid xl:grid-cols-5 md:grid-cols-2 gap-4">
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Chế độ hiển thị
-            </div>
-
+            <div class="text-slate-400 mb-2">Chế độ hiển thị</div>
             <select id="detailDisplayMode" class="input">
               <option value="ALL">ALL</option>
               <option value="1 ngày">1 ngày</option>
               <option value="Khoảng ngày">Khoảng ngày</option>
             </select>
-
           </div>
-
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Từ ngày
-            </div>
-
-            <input
-              type="date"
-              id="detailFromDate"
-              class="input"
-            />
-
+            <div class="text-slate-400 mb-2">Từ ngày</div>
+            <input type="date" id="detailFromDate" class="input" />
           </div>
-
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Đến ngày
-            </div>
-
-            <input
-              type="date"
-              id="detailToDate"
-              class="input"
-            />
-
+            <div class="text-slate-400 mb-2">Đến ngày</div>
+            <input type="date" id="detailToDate" class="input" />
           </div>
-
           <div>
-
-            <div class="
-              text-slate-400
-              mb-2
-            ">
-              Tìm kiếm nhanh
-            </div>
-
-            <input
-              type="text"
-              id="detailSearchInput"
-              placeholder="Nhập mã đơn hàng / tên khách..."
-              class="input"
-            />
-
+            <div class="text-slate-400 mb-2">Tìm kiếm nhanh</div>
+            <input type="text" id="detailSearchInput" placeholder="Nhập mã đơn / tên khách..." class="input" />
           </div>
-
-          <div class="
-            flex
-            items-end
-          ">
-
-            <button id="btnSearchDetail" class="
-              btn
-              w-full
-              bg-slate-700
-              hover:bg-slate-600
-            ">
-              🔍 BẮT ĐẦU TÌM
-            </button>
-
+          <div class="flex items-end">
+            <button id="btnSearchDetail" class="btn w-full bg-slate-700 hover:bg-slate-600">🔍 Bắt đầu tìm</button>
           </div>
-
         </div>
-
       </div>
 
-      <div class="
-        bg-slate-800
-        rounded-[28px]
-        overflow-auto
-        max-h-[650px]
-      ">
-
+      <div class="bg-slate-800 rounded-xl overflow-auto max-h-[650px]">
         <table id="detailAllOrdersTable">
-
           <thead>
-
             <tr>
-
               <th>Đơn hàng</th>
               <th>Khách hàng</th>
               <th>Tên đơn hàng</th>
@@ -1139,25 +529,17 @@ tbody tr:hover{
               <th>Thiếu</th>
               <th>Ngày giao</th>
               <th>Trạng thái</th>
-
             </tr>
-
           </thead>
-
           <tbody>
              <tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp</td></tr>
           </tbody>
-
         </table>
-
       </div>
-
     </div>
-
   </div>
 
 </div>
-
 
 <script>
 const firebaseConfig = {
@@ -1175,7 +557,7 @@ try {
   firebase.initializeApp(firebaseConfig);
   var database = firebase.database();
 } catch (e) {
-  console.error("Lỗi cấu hình Firebase, kiểm tra lại tài khoản:", e);
+  console.error("Lỗi kết nối mạng gốc:", e);
 }
 
 const appState = {
@@ -1217,7 +599,7 @@ function selectUserRole(role) {
 function applyRoleView(role) {
   document.getElementById('loginSection').classList.add('hideBox');
   if (role === 'admin') {
-    document.getElementById('currentRoleLabel').textContent = "💻 CHỦ QUẢN VĂN PHÒNG (MÁY CHỦ)";
+    document.getElementById('currentRoleLabel').textContent = "💻 Chủ quản văn phòng (Máy chủ)";
     document.getElementById('section-tomorrow').classList.remove('hideBox');
     document.getElementById('section-production-permissions').classList.remove('hideBox');
     document.getElementById('section-import').classList.remove('hideBox');
@@ -1226,9 +608,8 @@ function applyRoleView(role) {
     document.getElementById('section-detail').classList.remove('hideBox');
     document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
     document.getElementById('btnResetStorage').classList.remove('hideBox');
-    document.getElementById('btn-wrap-confirm-workshop').classList.add('hideBox'); 
   } else {
-    document.getElementById('currentRoleLabel').textContent = "🏭 QUẢN ĐỐC SẢN XUẤT (XƯỞNG)";
+    document.getElementById('currentRoleLabel').textContent = "🏭 Quản đốc sản xuất (Xưởng)";
     document.getElementById('section-production-permissions').classList.add('hideBox');
     document.getElementById('section-import').classList.add('hideBox');
     document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
@@ -1259,7 +640,6 @@ function applyProductionViewSettings(){
   document.getElementById('section-ready').classList.toggle('hideBox', !view.ready);
   document.getElementById('section-production').classList.toggle('hideBox', !view.production);
   document.getElementById('section-detail').classList.toggle('hideBox', !view.detail);
-  document.getElementById('btn-wrap-confirm-workshop').classList.toggle('hideBox', !showTomorrow);
 }
 
 function renderProductionViewSettings(){
@@ -1271,7 +651,7 @@ function renderProductionViewSettings(){
     permDetail: !!view.detail
   };
 
-  Object.entries(controls).forEach(([id, checked])=>{
+  Object.entries(controls).forEach(([id, checked]) => {
     const el = document.getElementById(id);
     if(el) el.checked = checked;
   });
@@ -1286,11 +666,11 @@ function saveProductionViewSettings(){
   };
   if(database) database.ref("thanhpham_system/production_view").set(appState.productionView);
   renderProductionViewSettings();
-  alert('Đã lưu quyền xem cho giao diện quản đốc sản xuất.');
+  alert('Đã lưu quyền xem thành công.');
 }
 
 function sendAppNotice(targetRole, message){
-  if(!database) return alert('Chưa kết nối được Firebase nên chưa gửi thông báo được.');
+  if(!database) return alert('Chưa kết nối đám mây.');
   const notice = {
     id: Date.now(),
     targetRole,
@@ -1333,10 +713,10 @@ function setupFirebaseListeners() {
     const statusEl = document.getElementById("syncStatus");
     if (snap.val() === true) {
       statusEl.textContent = "🟢 Đồng bộ đám mây tự động";
-      statusEl.className = "text-sm px-3 py-0.5 rounded-full bg-emerald-500/20 text-green-400 border border-green-500/30 font-semibold";
+      statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-green-400 border border-green-500/30 font-medium";
     } else {
       statusEl.textContent = "🟡 Đang kết nối mạng...";
-      statusEl.className = "text-sm px-3 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-semibold";
+      statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-medium";
     }
   });
 
@@ -1376,8 +756,7 @@ function setupFirebaseListeners() {
       ...(snapshot.val() || {})
     };
     renderProductionViewSettings();
-    applyProductionViewSettings();
-    refreshAll();
+    applyRoleView(currentRole());
   });
 
   database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
@@ -1408,10 +787,10 @@ function uploadConfirmedToFirebase() {
 }
 
 function clearSystemCache() {
-  if (confirm("Bạn có chắc chắn muốn XÓA SẠCH toàn bộ dữ liệu trên ĐÁM MÂY MÁY CHỦ không? Tất cả các máy tính của xưởng và văn phòng cũng sẽ trống dữ liệu.")) {
+  if (confirm("Xóa toàn bộ dữ liệu trên hệ thống đám mây trung tâm?")) {
     if (database) {
       database.ref("thanhpham_system").remove().then(() => {
-        alert("Đã xóa sạch dữ liệu trung tâm thành công.");
+        alert("Đã làm trống trung tâm thành công.");
         location.reload();
       });
     }
@@ -1726,9 +1105,9 @@ function fillAllDateSelects() {
 function statusBadge(status){
   const isOk = status === 'ĐỦ XUẤT';
   const isOverride = status === 'MAI CÓ THỂ XUẤT';
-  const cls = isOk ? 'bg-green-600' : isOverride ? 'bg-yellow-500 text-black' : 'bg-red-500';
-  const textLabel = isOverride ? 'OVERRIDE' : status;
-  return `<span class="${cls} px-3 py-1 rounded-full font-bold">${textLabel}</span>`;
+  const cls = isOk ? 'bg-green-600 text-white' : isOverride ? 'bg-yellow-500 text-black' : 'bg-red-500 text-white';
+  const textLabel = isOverride ? 'ƯU TIÊN' : status;
+  return `<span class="${cls} px-2.5 py-0.5 rounded-full text-xs font-semibold">${textLabel}</span>`;
 }
 
 function tomorrowDate(){
@@ -1758,10 +1137,10 @@ function isManualLoading(item){
 }
 
 function formatPlanTime(slot){
-  const prefix = slot.period === 'morning' ? 'SÁNG' : 'CHIỀU';
+  const prefix = slot.period === 'morning' ? 'Sáng' : 'Chiều';
   const hour = slot.hour;
   const minute = slot.minute;
-  return `${prefix} ${hour}g${minute ? String(minute).padStart(2, '0') : ''}`;
+  return `${prefix} ${hour}h${minute ? String(minute).padStart(2, '0') : ''}`;
 }
 
 function buildSlots(startHour, startMinute, count){
@@ -1810,7 +1189,7 @@ function planNote(item){
   const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : '';
   const date = shortOrderDate(item);
   if(isManualLoading(item)){
-    return `BỐC TAY tàu${ship} ngày ${date}`;
+    return `Bốc tay tàu${ship} ngày ${date}`;
   }
   const handling = item.ghiChu || 'bốc hầm chồng đôi không pallet';
   return `${handling} + tàu${ship} ngày ${date}`;
@@ -1831,17 +1210,17 @@ function planTableHtml(rows){
   const totalCont = rows.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
   const totalOrder = rows.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
   return `
-    <table class="w-full bg-slate-900 rounded-2xl">
+    <table class="w-full bg-slate-900 rounded-xl">
       <thead>
         <tr>
           <th>Ngày xuất</th>
           <th>Khách hàng</th>
           <th>Loại hàng</th>
           <th>Số lượng (cont)</th>
-          <th>số lượng tấn /cont</th>
+          <th>Số lượng tấn/cont</th>
           <th>SL đơn hàng</th>
           <th>Hãng VC</th>
-          <th>Thời Gian</th>
+          <th>Thời gian</th>
           <th>Ghi chú</th>
         </tr>
       </thead>
@@ -1851,18 +1230,18 @@ function planTableHtml(rows){
             <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td>
             <td>${escapeHtml(item.donHang)}</td>
             <td>${escapeHtml(item.tenDonHang)}</td>
-            <td class="text-center font-bold">${formatNumber(item.soCont, 0)}</td>
+            <td class="text-center font-semibold">${formatNumber(item.soCont, 0)}</td>
             <td class="text-center">${formatNumber(item.tanCont)}</td>
-            <td class="text-center font-bold">${formatNumber(item.tanCont)}</td>
-            <td class="text-center font-bold">${escapeHtml(item.hangVanChuyen)}</td>
-            <td class="text-center font-black">${escapeHtml(item.planTime)}</td>
-            <td class="font-bold">${escapeHtml(planNote(item))}</td>
+            <td class="text-center font-semibold">${formatNumber(item.tanCont)}</td>
+            <td class="text-center font-semibold">${escapeHtml(item.hangVanChuyen)}</td>
+            <td class="text-center font-bold text-violet-400">${escapeHtml(item.planTime)}</td>
+            <td class="font-medium">${escapeHtml(planNote(item))}</td>
           </tr>`).join('') || '<tr><td colspan="9" class="text-center text-slate-500 py-8">Không có dữ liệu kế hoạch xuất</td></tr>'}
-        <tr>
-          <td colspan="3" class="text-right font-black">TỔNG</td>
-          <td class="text-center font-black">${formatNumber(totalCont, 0)}</td>
+        <tr class="bg-slate-950 font-bold">
+          <td colspan="3" class="text-right">Tổng cộng</td>
+          <td class="text-center text-green-400">${formatNumber(totalCont, 0)}</td>
           <td></td>
-          <td class="text-center font-black">${formatNumber(totalOrder)}</td>
+          <td class="text-center text-green-400">${formatNumber(totalOrder)}</td>
           <td colspan="3"></td>
         </tr>
       </tbody>
@@ -1872,7 +1251,7 @@ function planTableHtml(rows){
 async function processFiles(){
   const orderFile = document.getElementById('orderFileInput').files[0];
   const stockFile = document.getElementById('stockFileInput').files[0];
-  if(!orderFile || !stockFile) return alert('Hãy chọn đầy đủ cả 2 File Đơn Hàng và File Tồn Kho TP trước!');
+  if(!orderFile || !stockFile) return alert('Hãy chọn đầy đủ cả 2 file đơn hàng và file tồn kho!');
 
   try{
     const orderWb = await readExcel(orderFile);
@@ -1883,20 +1262,17 @@ async function processFiles(){
     appState.stockMap = parseTpStock(stockWb);
 
     uploadDataToFirebase();
-    alert('Đã import và đồng bộ hóa đám mây thành công! Tất cả các máy tính khác đã nhận được dữ liệu.');
+    alert('Đã import và đồng bộ hóa đám mây thành công!');
   }catch(error){
     alert('Có lỗi định dạng Excel: ' + error.message);
   }
 }
 
 function refreshAll(){
-  const role = currentRole();
   applyProductionViewSettings();
   
   const allReadyOrders = getReadyOrders();
   const allShortageOrders = appState.details.filter((item)=>item.status === 'THIẾU TP');
-  const confirmedIds = new Set(appState.confirmedTomorrow.map((c)=>c.id));
-
   const totalProductionTon = appState.production.reduce((sum, item)=>sum + item.shortage, 0);
 
   document.getElementById('kpi-total-orders').textContent = formatNumber(appState.orders.length, 0);
@@ -1904,7 +1280,6 @@ function refreshAll(){
   document.getElementById('kpi-shortage-orders').textContent = formatNumber(allShortageOrders.length, 0);
   document.getElementById('kpi-total-production').textContent = formatNumber(totalProductionTon, 1) + 'T';
 
-  // --- 1. RENDER GIAO DIỆN KHU VỰC "MAI CÓ THỂ XUẤT" ---
   const tomorrowCard = document.getElementById('section-tomorrow');
   const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
   
@@ -1919,7 +1294,7 @@ function refreshAll(){
       <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td>
       <td>${formatNumber(item.needTon, 1)}T</td>
       <td>${formatNumber(item.stockBefore, 1)}T</td>
-      <td class="text-red-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
       <td>${escapeHtml(item.ngay)}</td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
@@ -1928,15 +1303,14 @@ function refreshAll(){
     <tr class="flash">
       <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td>
       <td>${escapeHtml(item.maBao)}</td>
-      <td class="text-yellow-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-yellow-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
       <td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
-      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500 hover:bg-red-400 px-4 py-2 rounded-xl font-bold">Xóa</button></td>
+      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-3 py-1 rounded-lg text-xs font-semibold transition">Xóa</button></td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Xóa'], confHtml, 1);
   setBadgeCount(tomorrowCard, appState.confirmedTomorrow.length);
 
-  // --- 2. GIAO DIỆN CHỦ QUẢN VĂN PHÒNG ---
   const readyCard = document.getElementById('section-ready');
   if (readyCard) {
     const rows = planRows();
@@ -1962,8 +1336,8 @@ function renderExportPreview(){
   container.innerHTML = `
     <div class="p-5 flex justify-between items-center flex-wrap gap-4">
       <div>
-        <div class="text-2xl font-black">📦 XEM TRƯỚC FILE EXPORT</div>
-        <div class="text-slate-400 mt-1">${appState.exportPreview.length} đơn sẽ được export khi xác nhận • Ngày xuất ${planDateDisplay()}</div>
+        <div class="text-lg font-bold uppercase">📦 XEM TRƯỚC FILE XUẤT HÀNG</div>
+        <div class="text-slate-400 text-sm mt-1">${appState.exportPreview.length} đơn sẽ được xuất hàng khi xác nhận • Ngày xuất ${planDateDisplay()}</div>
       </div>
     </div>
     <div class="overflow-auto max-h-[520px]">
@@ -2035,10 +1409,10 @@ function renderProduction(){
       <td class="font-bold text-orange-400">${escapeHtml(item.code)}</td>
       <td>${formatNumber(item.demand, 1)}T</td>
       <td>${formatNumber(item.stock, 1)}T</td>
-      <td class="text-red-400 font-bold">${formatNumber(item.shortage, 1)}T</td>
-      <td class="text-yellow-400 font-black text-lg">${formatNumber(item.shortage, 1)}T</td>
-      <td class="text-center font-bold text-slate-300">${item.orders}</td>
-      <td><span class="bg-slate-900 px-3 py-1 rounded-xl text-sm border border-slate-700">${escapeHtml(item.nearest)}</span></td>
+      <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-yellow-400 font-bold text-base">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-center font-semibold text-slate-300">${item.orders}</td>
+      <td><span class="bg-slate-900 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${escapeHtml(item.nearest)}</span></td>
     </tr>`).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">Không có thành phẩm cần sản xuất</td></tr>';
 }
 
@@ -2066,8 +1440,8 @@ function renderDetails(){
       <td>${escapeHtml(item.tenDonHang)}</td>
       <td>${formatNumber(item.soCont, 0)}</td>
       <td>${formatNumber(item.tanCont)}T</td>
-      <td class="text-blue-400 font-bold">${formatNumber(item.stockBefore)}T</td>
-      <td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-bold">${formatNumber(item.shortage)}T</td>
+      <td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td>
+      <td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td>
       <td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge(item.status)}</td>
     </tr>`).join('') || '<tr><td colspan="8" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
@@ -2076,7 +1450,7 @@ function renderDetails(){
 function captureDetailImage(){
   const btn = document.getElementById('captureDetailBtn');
   const box = document.getElementById('chiTietDonHangBox');
-  btn.textContent = '📸 ĐANG CHỤP...';
+  btn.textContent = '📸 Đang chụp...';
   btn.disabled = true;
 
   const originalMaxHeight = box.style.maxHeight;
@@ -2089,14 +1463,14 @@ function captureDetailImage(){
     useCORS: true
   }).then((canvas)=>{
     box.style.maxHeight = originalMaxHeight;
-    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+    btn.textContent = '📸 Chụp màn hình gửi Zalo';
     btn.disabled = false;
 
     canvas.toBlob((blob)=>{
       if(!blob) return alert('Lỗi xuất ảnh!');
       try{
         navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-        alert('🎉 Đã chụp xong bảng chi tiết và lưu vào bộ nhớ tạm! Bạn chỉ cần vào Zalo và nhấn nút Ctrl + V là gửi được ngay.');
+        alert('🎉 Đã chụp xong bảng chi tiết và lưu vào bộ nhớ tạm! Bạn chỉ cần vào Zalo và nhấn Ctrl + V là gửi được ngay.');
       }catch(err){
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -2107,7 +1481,7 @@ function captureDetailImage(){
     }, 'image/png');
   }).catch(()=>{
     box.style.maxHeight = originalMaxHeight;
-    btn.textContent = '📸 Chụp ảnh màn hình gửi Zalo';
+    btn.textContent = '📸 Chụp màn hình gửi Zalo';
     btn.disabled = false;
     alert('Lỗi chụp màn hình!');
   });
@@ -2116,7 +1490,7 @@ function captureDetailImage(){
 function bindEvents(){
   document.getElementById('btnWorkshopConfirm')?.addEventListener('click', ()=>{
     const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked');
-    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một đơn hàng cần ưu tiên xuất ngày mai!');
+    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một đơn hàng!');
 
     const candidateIds = Array.from(checkedBoxes).map((cb)=>cb.dataset.candidateId);
     const selectedItems = appState.details.filter((item)=>candidateIds.includes(item.id));
@@ -2136,14 +1510,18 @@ function bindEvents(){
     });
 
     uploadConfirmedToFirebase();
-    sendAppNotice('admin', 'Quản đốc sản xuất đã cập nhật xong danh sách đơn hàng mai có thể xuất.');
-    alert('Đã xác nhận danh sách ưu tiên. Toàn bộ máy tính văn phòng đã nhận được số liệu đồng bộ mạng!');
+    
+    const nextRole = currentRole() === 'admin' ? 'production' : 'admin';
+    const sourceLabel = currentRole() === 'admin' ? 'Văn phòng' : 'Quản đốc sản xuất';
+    sendAppNotice(nextRole, `${sourceLabel} đã cập nhật danh sách đơn hàng mai có thể xuất.`);
+    
+    alert('Đã xác nhận và đồng bộ danh sách ưu tiên thành công lên hệ thống mạng đám mây!');
   });
 
   document.getElementById('tomorrowConfirmedTable').addEventListener('click', (e)=>{
     const button = e.target.closest('[data-remove-tomorrow]');
     if(!button) return;
-    if(!confirm('Bạn muốn xóa đơn này khỏi danh sách "Mai có thể xuất"? Đơn sẽ quay lại danh sách chờ điều phối.')) return;
+    if(!confirm('Xóa đơn này khỏi danh sách ngày mai?')) return;
     
     appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== button.dataset.removeTomorrow);
     uploadConfirmedToFirebase();
@@ -2170,8 +1548,8 @@ function bindEvents(){
   document.getElementById('captureDetailBtn')?.addEventListener('click', captureDetailImage);
   document.getElementById('btnSaveProductionView')?.addEventListener('click', saveProductionViewSettings);
   document.getElementById('btnNotifyWorkshop')?.addEventListener('click', ()=>{
-    sendAppNotice('production', 'Văn phòng đã cập nhật dữ liệu đơn hàng. Vui lòng vào xem và chọn đơn mai có thể xuất.');
-    alert('Đã gửi thông báo trong ứng dụng cho quản đốc sản xuất.');
+    sendAppNotice('production', 'Văn phòng đã cập nhật dữ liệu đơn hàng mới. Vui lòng kiểm tra.');
+    alert('Đã gửi thông báo đến giao diện xưởng.');
   });
   document.getElementById('btnDismissNotice')?.addEventListener('click', dismissLatestNotice);
 }
@@ -2185,7 +1563,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   setupFirebaseListeners();
   bindEvents();
 });
-
 </script>
 
 </body>
