@@ -1128,6 +1128,7 @@ function processAllocation(){
   const remainingBB = new Map(appState.bbMap || new Map());
   const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
 
+  // Bước 1: Tính toán trừ tồn kho thực tế cho từng dòng đơn lẻ
   const temporaryDetails = appState.orders.map((order)=>{
     const lookupKey = remainingTP.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
     const stockBefore = remainingTP.get(lookupKey) || 0;
@@ -1160,6 +1161,7 @@ function processAllocation(){
     };
   });
 
+  // Bước 2: Tạo map lưu các nhóm container bị thiếu thành phẩm để CHẠY NGẦM LOGIC XUẤT HÀNG
   const groupShortageMap = new Map();
   temporaryDetails.forEach((row) => {
     if (row.isRowShortage) {
@@ -1167,17 +1169,27 @@ function processAllocation(){
     }
   });
 
+  // Bước 3: Gán trạng thái cho appState.details
   appState.details = temporaryDetails.map((row) => {
+    // LOGIC CHẠY NGẦM GỐC: Kiểm tra xem container nhóm đi chung có bị thiếu hay không
     const isContGroupShortage = !!groupShortageMap.get(row.contGroupId);
     
-    let status = isContGroupShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
+    // Lưu lại trạng thái logic gốc để phục vụ cho các bộ lọc "ĐƠN HÀNG CÓ THỂ XUẤT"
+    let logicStatus = isContGroupShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
     if (confirmedIds.has(row.id)) {
-      status = 'MAI CÓ THỂ XUẤT';
+      logicStatus = 'MAI CÓ THỂ XUẤT';
+    }
+
+    // CHỈ CHỈNH MỤC HIỂN THỊ: Đơn hàng đủ thành phẩm thực tế thì hiển thị ĐỦ XUẤT, thiếu thì hiển thị THIẾU TP
+    let displayStatus = row.isRowShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
+    if (confirmedIds.has(row.id)) {
+      displayStatus = 'MAI CÓ THỂ XUẤT';
     }
 
     return {
       ...row,
-      status
+      status: logicStatus,          // Giữ nguyên logic gốc cho hệ thống lọc đơn xuất hàng, xuất Excel
+      displayStatus: displayStatus  // Chỉ dùng thuộc tính này phục vụ hiển thị trên bảng Chi tiết hệ thống
     };
   });
 
@@ -1602,7 +1614,7 @@ function renderDetails(){
       <td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td>
       
       <td>${escapeHtml(item.ngay)}</td>
-      <td>${statusBadge(item.status)}</td>
+      <td>${statusBadge(item.displayStatus)}</td>
     </tr>`).join('') || '<tr><td colspan="10" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
 }
 
