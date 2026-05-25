@@ -295,10 +295,10 @@ tbody tr:hover{
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
         <h2 class="text-xl font-bold text-yellow-400 uppercase">
-          ⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT
+          ⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT (DANH SÁCH DUYỆT THIẾU KHO)
           <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span>
         </h2>
-        <div class="text-slate-400 text-sm mt-1">Đơn thiếu thành phẩm nhưng đã được xác nhận từ sản xuất hoặc điều phối</div>
+        <div class="text-slate-400 text-sm mt-1">Quản đốc chỉ cần chọn những mã hàng bị THIẾU thực tế của cụm ghép, hệ thống sẽ tự nhận diện gom cả cụm đủ đi kèm</div>
       </div>
     </div>
 
@@ -426,7 +426,7 @@ tbody tr:hover{
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
         <h2 class="text-xl font-bold text-red-400 uppercase">⚠️ THÀNH PHẨM CẦN SẢN XUẤT</h2>
-        <div class="text-slate-400 text-sm mt-1">Tổng hợp khối lượng thành phẩm còn thiếu hụt dưới kho cần chạy lò gấp</div>
+        <div class="text-slate-400 text-sm mt-1">Tổng hợp khối lượng thành phẩm thực sự thiếu hụt cần chạy lò gấp (Đơn đủ hàng ghép cont sẽ không xuất hiện tại đây)</div>
       </div>
       <button onclick="document.getElementById('tpSanXuatBox').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Thu gọn / Mở rộng</button>
     </div>
@@ -634,7 +634,7 @@ function applyRoleView(role) {
     document.getElementById('currentRoleLabel').textContent = "🏭 Quản đốc sản xuất (Xưởng)";
     document.getElementById('section-production-permissions').classList.add('hideBox');
     document.getElementById('section-import').classList.add('hideBox');
-    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
+    document.getElementById('btnNotifyWorkshop').classList.add('addBox');
     document.getElementById('btnResetStorage').classList.add('hideBox');
     applyProductionViewSettings();
   }
@@ -1161,35 +1161,44 @@ function processAllocation(){
     };
   });
 
-  // Bước 2: Tạo map lưu các nhóm container bị thiếu thành phẩm để CHẠY NGẦM LOGIC XUẤT HÀNG
-  const groupShortageMap = new Map();
+  // MỚI: Quét xem những nhóm cont nào có chứa ít nhất 1 dòng nằm trong danh sách Quản đốc ĐÃ CỨU (confirmedTomorrow)
+  const groupHasConfirmedShortageMap = new Map();
   temporaryDetails.forEach((row) => {
-    if (row.isRowShortage) {
-      groupShortageMap.set(row.contGroupId, true);
+    if (confirmedIds.has(row.id)) {
+      groupHasConfirmedShortageMap.set(row.contGroupId, true);
     }
   });
 
-  // Bước 3: Gán trạng thái cho appState.details
+  // Bước 2: Tạo bản đồ kiểm tra thiếu hụt tự nhiên của Container (Phục vụ logic ngầm)
+  const groupNaturalShortageMap = new Map();
+  temporaryDetails.forEach((row) => {
+    if (row.isRowShortage) {
+      groupNaturalShortageMap.set(row.contGroupId, true);
+    }
+  });
+
+  // Bước 3: Áp dụng quy tắc đồng bộ Container
   appState.details = temporaryDetails.map((row) => {
-    // LOGIC CHẠY NGẦM GỐC: Kiểm tra xem container nhóm đi chung có bị thiếu hay không
-    const isContGroupShortage = !!groupShortageMap.get(row.contGroupId);
+    const isContGroupNaturallyShortage = !!groupNaturalShortageMap.get(row.contGroupId);
+    const isContGroupSavedByWorkshop = !!groupHasConfirmedShortageMap.get(row.contGroupId);
     
-    // Lưu lại trạng thái logic gốc để phục vụ cho các bộ lọc "ĐƠN HÀNG CÓ THỂ XUẤT"
-    let logicStatus = isContGroupShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
-    if (confirmedIds.has(row.id)) {
-      logicStatus = 'MAI CÓ THỂ XUẤT';
+    // LOGIC CHẠY NGẦM HỆ THỐNG XUẤT HÀNG: 
+    // Container có thể xuất nếu: Tự nhiên nó đủ (không thiếu dòng nào) HOẶC nó được Quản đốc bấm cứu dòng thiếu đi kèm!
+    let logicStatus = 'THIẾU TP';
+    if (!isContGroupNaturallyShortage || isContGroupSavedByWorkshop) {
+      logicStatus = 'ĐỦ XUẤT';
     }
 
-    // CHỈ CHỈNH MỤC HIỂN THỊ: Đơn hàng đủ thành phẩm thực tế thì hiển thị ĐỦ XUẤT, thiếu thì hiển thị THIẾU TP
+    // ĐỐI VỚI HIỂN THỊ CHI TIẾT VÀ TRẠNG THÁI RIÊNG LẺ:
     let displayStatus = row.isRowShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
-    if (confirmedIds.has(row.id)) {
+    if (isContGroupSavedByWorkshop) {
       displayStatus = 'MAI CÓ THỂ XUẤT';
     }
 
     return {
       ...row,
-      status: logicStatus,          // Giữ nguyên logic gốc cho hệ thống lọc đơn xuất hàng, xuất Excel
-      displayStatus: displayStatus  // Chỉ dùng thuộc tính này phục vụ hiển thị trên bảng Chi tiết hệ thống
+      status: logicStatus,         // Dùng lọc Đơn có thể xuất và xuất Excel (Đơn ghép tự động đi chung)
+      displayStatus: displayStatus // Dùng để hiển thị màu sắc trên bảng Chi tiết hệ thống
     };
   });
 
@@ -1198,26 +1207,29 @@ function processAllocation(){
 
 function buildProductionSummary(){
   const map = new Map();
-  appState.details.filter((item)=>item.status === 'THIẾU TP').forEach((item)=>{
-    const current = map.get(item.code) || {
-      code:item.code,
-      demand:0,
-      stock:0,
-      shortage:0,
-      orders:0,
-      nearestKey:item.ngayKey,
-      nearest:item.ngay
-    };
+  // CHỈ HIỆN CÁC DÒNG THỰC TẾ THIẾU và Container đó CHƯA ĐƯỢC Quản đốc bấm xác nhận cứu đơn
+  appState.details.forEach((item)=>{
+    if (item.isRowShortage && item.status === 'THIẾU TP') {
+      const current = map.get(item.code) || {
+        code:item.code,
+        demand:0,
+        stock:0,
+        shortage:0,
+        orders:0,
+        nearestKey:item.ngayKey,
+        nearest:item.ngay
+      };
 
-    current.demand += item.needTon;
-    current.stock += Math.max(0, item.stockBefore);
-    current.shortage += item.shortage;
-    current.orders += 1;
-    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
-      current.nearestKey = item.ngayKey;
-      current.nearest = item.ngay;
+      current.demand += item.needTon;
+      current.stock += Math.max(0, item.stockBefore);
+      current.shortage += item.shortage;
+      current.orders += 1;
+      if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
+        current.nearestKey = item.ngayKey;
+        current.nearest = item.ngay;
+      }
+      map.set(item.code, current);
     }
-    map.set(item.code, current);
   });
 
   appState.production = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
@@ -1360,7 +1372,7 @@ function planNote(item){
 }
 
 function getReadyOrders(){
-  return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT' || item.status === 'MAI CÓ THỂ XUẤT');
+  return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT');
 }
 
 function planRows(){
@@ -1394,7 +1406,7 @@ function planTableHtml(rows){
             <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td>
             <td>${escapeHtml(item.donHang)}</td>
             <td>${escapeHtml(item.tenDonHang)}</td>
-            <td class="text-center font-semibold">${formatNumber(item.soCont, 0)}</td>
+            <td class="text-center font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td>
             <td class="text-center">${formatNumber(item.tanCont)}</td>
             <td class="text-center font-semibold">${formatNumber(item.tanCont)}</td>
             <td class="text-center font-semibold">${escapeHtml(item.hangVanChuyen)}</td>
@@ -1439,7 +1451,7 @@ function refreshAll(){
   applyProductionViewSettings();
   
   const allReadyOrders = getReadyOrders();
-  const allShortageOrders = appState.details.filter((item)=>item.status === 'THIẾU TP');
+  const allShortageOrders = appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP');
   const totalProductionTon = appState.production.reduce((sum, item)=>sum + item.shortage, 0);
 
   document.getElementById('kpi-total-orders').textContent = formatNumber(appState.orders.length, 0);
@@ -1450,7 +1462,8 @@ function refreshAll(){
   const tomorrowCard = document.getElementById('section-tomorrow');
   const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
   
-  let candidates = allShortageOrders;
+  // ỨNG VIÊN CỨU ĐƠN: Chỉ hiện những dòng THỰC SỰ THIẾU HỤT TỰ NHIÊN và cụm cont đó chưa từng được duyệt cứu
+  let candidates = appState.details.filter((item) => item.isRowShortage && item.status === 'THIẾU TP');
   if(tomSelectVal !== 'ALL') candidates = candidates.filter((item)=>item.ngayKey === tomSelectVal);
 
   const candHtml = candidates.map((item)=>`
@@ -1525,7 +1538,7 @@ function exportExcel(){
       index === 0 ? item.planDate : '',
       item.donHang,
       item.tenDonHang,
-      item.soCont,
+      item.soCont > 0 ? item.soCont : 'Ghép',
       item.tanCont,
       item.tanCont,
       item.hangVanChuyen,
@@ -1552,7 +1565,7 @@ function renderProduction(){
   if (!tableBody || !productionCard) return;
   
   const { mode, from, to } = getFilterControls(productionCard);
-  const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.status === 'THIẾU TP'), mode, from, to);
+  const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP'), mode, from, to);
   
   const map = new Map();
   filteredOrders.forEach((item)=>{
@@ -1573,7 +1586,7 @@ function renderProduction(){
 
   tableBody.innerHTML = prodList.map((item)=>`
     <tr>
-      <td class="font-bold text-orange-400">${escapeHtml(item.code)}</td>
+      <td class="font-bold text-red-400">${escapeHtml(item.code)}</td>
       <td>${formatNumber(item.demand, 1)}T</td>
       <td>${formatNumber(item.stock, 1)}T</td>
       <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
