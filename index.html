@@ -172,7 +172,7 @@ tbody tr:hover{
   </div>
 </div>
 
-<div id="mainContentApp" class="max-w-[1900px] mx-auto space-y-5 hideBox">
+<div class="max-w-[1900px] mx-auto space-y-5">
 
   <div class="card p-6">
     <div class="flex justify-between items-center flex-wrap gap-5">
@@ -284,7 +284,8 @@ tbody tr:hover{
         <input type="file" id="orderFileInput" class="input" />
       </div>
       <div class="bg-slate-800 rounded-xl p-5">
-        <div class="text-base font-bold mb-3 uppercase text-slate-300">🏭 FILE TỒN KHO THÀNH PHẨM</div>
+        <div class="text-base font-bold mb-3 uppercase text-slate-300">🏭 FILE TỒN KHO TRUNG TÂM</div>
+        <div class="text-xs text-slate-400 mb-2">Tự động bóc tách Sheet Thành Phẩm (TP) & Bao Bì (BB)</div>
         <input type="file" id="stockFileInput" class="input" />
       </div>
     </div>
@@ -523,16 +524,18 @@ tbody tr:hover{
             <tr>
               <th>Đơn hàng</th>
               <th>Khách hàng</th>
-              <th>Tên đơn hàng</th>
+              <th>Số cont</th>
               <th>SL đơn</th>
               <th>Tồn TP</th>
-              <th>Thiếu</th>
+              <th>Thiếu TP</th>
+              <th class="text-orange-400">Tồn Bao Bì (Vỏ)</th>
+              <th class="text-orange-400">Thiếu Bao Bì (Vỏ)</th>
               <th>Ngày giao</th>
               <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
-             <tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp</td></tr>
+             <tr><td colspan="10" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp</td></tr>
           </tbody>
         </table>
       </div>
@@ -567,6 +570,7 @@ const appState = {
   confirmedTomorrow: [],
   exportPreview: [],
   stockMap: new Map(),
+  bbMap: new Map(),
   productionView: {
     tomorrow: true,
     ready: false,
@@ -578,6 +582,19 @@ const appState = {
 
 const SECURITY_ACC = "omotobike";
 const SECURITY_PSW = "hoilamchi";
+
+const MANUAL_MAP = {
+  'PM-400目-25KG(HẠT42)BỎBAOJB1,3TẤN': 'PM-400目-25KG(HẠT37)',
+  'PM-400目-25KG(HẠT42)BỎBAOJB1,35TẤN': 'PM-400目-25KG(HẠT37)',
+  'SN10-25KGSƠN': 'SN10-25KG(52*76)',
+  'SN10-25KGKEO': 'SN10-25KG(52*76)',
+  'SN10-25KG': 'SN10-25KG(52*76)',
+  'SN20-25KG(ĐẸP)': 'SN20-25KG(50*73)',
+  'SN25(500#)-(BỘT33)BỎBAOJB1.2T': 'SN25(500目)-25KG',
+  'SN25(500#)-(BỘT33)XẾPLẾT': 'SN25(500目)-25KG',
+  'BỘT45-25KGBAOTRẮNG': 'BAOTRẮNGK45VAN(BỘT45+70)',
+  'MS2A-25KG(HẠT15)': 'MS2A-25KG'
+};
 
 function selectUserRole(role) {
   if (role === 'admin') {
@@ -599,13 +616,10 @@ function selectUserRole(role) {
 function applyRoleView(role) {
   if (!role) {
     document.getElementById('loginSection').classList.remove('hideBox');
-    document.getElementById('mainContentApp').classList.add('hideBox');
     return;
   }
-
+  
   document.getElementById('loginSection').classList.add('hideBox');
-  document.getElementById('mainContentApp').classList.remove('hideBox');
-
   if (role === 'admin') {
     document.getElementById('currentRoleLabel').textContent = "💻 Chủ quản văn phòng (Máy chủ)";
     document.getElementById('section-tomorrow').classList.remove('hideBox');
@@ -640,7 +654,7 @@ function currentRole(){
 
 function applyProductionViewSettings(){
   const role = currentRole();
-  if(!role || role === 'admin') return;
+  if(role === 'admin' || !role) return;
   const view = appState.productionView || {};
   const showTomorrow = view.tomorrow !== false;
 
@@ -737,6 +751,11 @@ function setupFirebaseListeners() {
       } else {
         appState.stockMap = new Map();
       }
+      if (data.bbMapArray) {
+        appState.bbMap = new Map(data.bbMapArray);
+      } else {
+        appState.bbMap = new Map();
+      }
       
       processAllocation();
       fillAllDateSelects();
@@ -764,7 +783,7 @@ function setupFirebaseListeners() {
       ...(snapshot.val() || {})
     };
     renderProductionViewSettings();
-    if (currentRole()) applyRoleView(currentRole());
+    if(currentRole()) applyRoleView(currentRole());
   });
 
   database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
@@ -779,13 +798,15 @@ function resetAppState() {
   appState.production = [];
   appState.confirmedTomorrow = [];
   appState.stockMap = new Map();
+  appState.bbMap = new Map();
 }
 
 function uploadDataToFirebase() {
   if (!database) return;
   database.ref("thanhpham_system/cloud_data").set({
     orders: appState.orders,
-    stockMapArray: Array.from(appState.stockMap.entries())
+    stockMapArray: Array.from(appState.stockMap.entries()),
+    bbMapArray: Array.from(appState.bbMap.entries())
   });
 }
 
@@ -825,10 +846,60 @@ function normalizeCode(value){
     .replace(/KG/g, 'KG');
 }
 
+function cleanTextBB(v){
+  return String(v || '')
+    .normalize('NFC')
+    .toUpperCase()
+    .replace(/\s+/g,'')
+    .trim();
+}
+
 function baseProductCode(value){
   const clean = normalizeCode(value);
   const match = clean.match(/[A-Z]+\d+[A-Z]*/);
   return match ? match[0] : clean.split('-')[0];
+}
+
+function findBBCode(orderCode, donHang) {
+  const cleaned = cleanTextBB(orderCode);
+  const don = cleanTextBB(donHang);
+
+  if (cleaned.includes("MS4A") && cleaned.includes("25KG") && cleaned.includes("HẠT37") && don.includes("NGỌCTHỊNH")) {
+    return cleanTextBB("MS4A-25KG(BAO KHÁCH)");
+  }
+  if (cleaned.includes("MS6A") && cleaned.includes("25KG") && cleaned.includes("CHỮĐỎ") && don.includes("NGỌCTHỊNH")) {
+    return cleanTextBB("MS6A-25KG (CHỮ ĐỎ) BAO KHÁCH");
+  }
+  if (cleaned.includes("JUMBOMS2A") && cleaned.includes("1,15TẤN") && cleaned.includes("HẠT12")) {
+    return cleanTextBB("JB 90X90X134 KO IN, CÓ TRÁNG,");
+  }
+  if (cleaned.includes("JUMBREAT15") || (cleaned.includes("AT15") && cleaned.includes("1T"))) {
+    return cleanTextBB("JB AT15 (90*90*120)");
+  }
+  if (cleaned.includes("SN10") && cleaned.includes("25KG")) return cleanTextBB("SN10 - 25KG (52*76)");
+  if (cleaned.includes("SN15") && cleaned.includes("25KG")) return cleanTextBB("SN15 - 25KG (50*74)");
+  if (cleaned.includes("SN20") && cleaned.includes("25KG")) return cleanTextBB("SN20 - 25KG (50*73)");
+  if (cleaned.includes("SN05") && cleaned.includes("25KG")) return cleanTextBB("SN05 - 25KG");
+  if (cleaned.includes("SN06") && cleaned.includes("25KG")) return cleanTextBB("SN06 - 25KG");
+  if (cleaned.includes("SN08") && cleaned.includes("25KG")) return cleanTextBB("SN08 - 25KG");
+  if (cleaned.includes("SN30") && cleaned.includes("25KG")) return cleanTextBB("SN30 - 25KG");
+  if (cleaned.includes("SN45") && cleaned.includes("25KG")) return cleanTextBB("SN45 - 25KG");
+  if (cleaned.includes("SN70") && cleaned.includes("50KG")) return cleanTextBB("SN70 - 50KG");
+  if (cleaned.includes("BỘT45") && cleaned.includes("25KG") && cleaned.includes("BAOTRẮNG")) return cleanTextBB("Bao Trắng K45  van (Bột 45+70)");
+  if (cleaned.includes("BỘT70") && cleaned.includes("50KG") && (cleaned.includes("BT") || cleaned.includes("BAOTRẮNG"))) return cleanTextBB("Bao Trắng K55");
+  if (cleaned.includes("BỘT90") && cleaned.includes("50KG") && cleaned.includes("BAO")) return cleanTextBB("Bao Trắng K55");
+  if (cleaned.includes("CPĐ04") && cleaned.includes("25KG") && cleaned.includes("HẠT20")) return cleanTextBB("CPĐ04-25KG(BỘT 20 SƠN)");
+  if (cleaned.includes("CPĐ07") && cleaned.includes("25KG") && cleaned.includes("HẠT45")) return cleanTextBB("CPĐ07-25KG(BỘT 45)");
+  if (cleaned.includes("DC10") && cleaned.includes("25KG")) return cleanTextBB("DC-10-25KG");
+  if (cleaned.includes("DC65") && cleaned.includes("50KG")) return cleanTextBB("DC-65-50KG(BỘT 65)");
+  if (cleaned.includes("GRADE800") && cleaned.includes("25KG") && (cleaned.includes("BỘT45") || cleaned.includes("HẠT45"))) return cleanTextBB("Grade 800-25KG(HẠT 45)");
+
+  for (const key in MANUAL_MAP) {
+    if (cleaned.includes(cleanTextBB(key))) {
+      return cleanTextBB(MANUAL_MAP[key]);
+    }
+  }
+  return cleaned;
 }
 
 function parseNumber(value){
@@ -953,17 +1024,34 @@ function parseOrders(orderRows){
   if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề dữ liệu mẫu Excel đơn hàng');
   const map = columnMap(orderRows[headerIndex]);
 
-  return orderRows.slice(headerIndex + 1).map((row, index)=>{
+  let lastValidSoCont = 0;
+  let lastValidHangVanChuyen = "";
+  let virtualGroupCounter = 0;
+
+  const rawParsed = orderRows.slice(headerIndex + 1).map((row, index)=>{
     const donHang = textOf(getByHeader(row, map, ['DonHang', 'Đơn hàng', 'Don Hang']));
     const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang', 'Tên đơn hàng', 'Ten Don Hang', 'Khách hàng', 'Khach Hang']));
     const maBao = textOf(getByHeader(row, map, ['MaBao', 'Mã Bao', 'Mã TP', 'Ma TP']));
     if(!donHang || !maBao) return null;
 
-    const soCont = parseNumber(getByHeader(row, map, ['So Cont', 'Số Cont', 'SoCont'])) || 0;
+    let soContRaw = getByHeader(row, map, ['So Cont', 'Số Cont', 'SoCont']);
+    let soCont = parseNumber(soContRaw);
+    let hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển', 'Hang Van Chuyen', 'Hãng VC', 'Hang VC']));
+
+    if (soContRaw !== '' && soCont > 0) {
+      lastValidSoCont = soCont;
+      lastValidHangVanChuyen = hangVanChuyen;
+      virtualGroupCounter++;
+    } else {
+      soCont = lastValidSoCont;
+      if (!hangVanChuyen) {
+        hangVanChuyen = lastValidHangVanChuyen;
+      }
+    }
+
     const tanCont = parseNumber(getByHeader(row, map, ['Tan/cont', 'Tấn/cont', 'Tan Cont'])) || 0;
     const soLuongKg = parseNumber(getByHeader(row, map, ['SoLuongKg', 'Số lượng Kg']));
     const quyCachBao = parseNumber(getByHeader(row, map, ['QuyCachBao', 'Quy Cách Bao']));
-    const hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển', 'Hang Van Chuyen', 'Hãng VC', 'Hang VC']));
     const ghiChu = textOf(getByHeader(row, map, ['GhiChu', 'Ghi chú', 'Ghi Chu']));
     const ngayRaw = getByHeader(row, map, ['Ngay', 'Ngày', 'Ngày giao']);
 
@@ -983,49 +1071,80 @@ function parseOrders(orderRows){
       hangVanChuyen,
       ghiChu,
       ngayKey: dateKey(ngayRaw),
-      ngay: displayDate(ngayRaw)
+      ngay: displayDate(ngayRaw),
+      contGroupId: `CONT_GRP_${virtualGroupCounter}`
     };
   }).filter(Boolean);
+
+  return rawParsed;
 }
 
-function parseTpStock(stockWorkbook){
-  const tpSheetName = findSheet(stockWorkbook, ['TON', 'KHO', 'TP']);
-  if(!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO TP');
+function parseStockAndPackaging(stockWorkbook){
+  let tpSheetName = null;
+  let bbSheetName = null;
+
+  stockWorkbook.SheetNames.forEach((name) => {
+    const upper = name.toUpperCase();
+    if (upper.includes('TP')) tpSheetName = name;
+    if (upper.includes('BB')) bbSheetName = name;
+  });
+
+  if (!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO TP');
 
   const stockMap = new Map();
-  stockWorkbook[tpSheetName].forEach((row)=>{
-    const productName = textOf(row[2]);
-    const stockTon = Math.max(0, parseNumber(row[12]));
+  stockWorkbook[tpSheetName].forEach((row) => {
+    const values = Object.values(row);
+    if (values.length < 13) return;
+    const productName = textOf(values[2]);
+    const stockTon = Math.max(0, parseNumber(values[12]));
     const exactKey = normalizeCode(productName);
     const baseKey = 'BASE:' + baseProductCode(productName);
 
-    if(!productName || !exactKey || normalizeText(productName).includes('TEN THANH PHAM')) return;
-    if(!textOf(row[3]) && stockTon === 0) return;
-
+    if (!productName || !exactKey || normalizeText(productName).includes('TEN THANH PHAM')) return;
+    
     stockMap.set(exactKey, (stockMap.get(exactKey) || 0) + stockTon);
     stockMap.set(baseKey, (stockMap.get(baseKey) || 0) + stockTon);
   });
 
-  return stockMap;
+  const bbMap = new Map();
+  if (bbSheetName) {
+    stockWorkbook[bbSheetName].forEach((row) => {
+      const values = Object.values(row);
+      if (values.length < 10) return;
+      const bbName = cleanTextBB(values[2]);
+      const stockPcs = Math.max(0, parseNumber(values[9]));
+      if (!bbName || normalizeText(bbName).includes('TENBAOBI')) return;
+      
+      bbMap.set(bbName, (bbMap.get(bbName) || 0) + stockPcs);
+    });
+  }
+
+  return { stockMap, bbMap };
 }
 
 function processAllocation(){
   if (!appState.stockMap) return;
-  const remaining = new Map(appState.stockMap);
+  const remainingTP = new Map(appState.stockMap);
+  const remainingBB = new Map(appState.bbMap || new Map());
   const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
 
-  appState.details = appState.orders.map((order)=>{
-    const lookupKey = remaining.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
-    const stockBefore = remaining.get(lookupKey) || 0;
+  const temporaryDetails = appState.orders.map((order)=>{
+    const lookupKey = remainingTP.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
+    const stockBefore = remainingTP.get(lookupKey) || 0;
     const canExportTon = Math.min(stockBefore, order.needTon);
     const shortage = Math.max(0, order.needTon - stockBefore);
     const stockAfter = stockBefore - canExportTon;
-    remaining.set(lookupKey, stockAfter);
+    remainingTP.set(lookupKey, stockAfter);
 
-    let status = shortage > 0 ? 'THIẾU TP' : 'ĐỦ XUẤT';
-    if (confirmedIds.has(order.id)) {
-      status = 'MAI CÓ THỂ XUẤT';
-    }
+    const matchBBCode = findBBCode(order.maBao, order.donHang);
+    const bbStockBefore = remainingBB.get(matchBBCode) || 0;
+    
+    const bagWeight = order.quyCachBao || 0;
+    const bbNeedPcs = bagWeight > 0 ? (order.soLuongKg / bagWeight) : 0;
+    
+    const bbShortage = Math.max(0, bbNeedPcs - bbStockBefore);
+    const bbStockAfter = Math.max(0, bbStockBefore - bbNeedPcs);
+    remainingBB.set(matchBBCode, bbStockAfter);
 
     return {
       ...order,
@@ -1033,6 +1152,31 @@ function processAllocation(){
       stockAfter,
       canExportTon,
       shortage,
+      isRowShortage: shortage > 0,
+      matchBBCode,
+      bbStockBefore,
+      bbNeedPcs,
+      bbShortage
+    };
+  });
+
+  const groupShortageMap = new Map();
+  temporaryDetails.forEach((row) => {
+    if (row.isRowShortage) {
+      groupShortageMap.set(row.contGroupId, true);
+    }
+  });
+
+  appState.details = temporaryDetails.map((row) => {
+    const isContGroupShortage = !!groupShortageMap.get(row.contGroupId);
+    
+    let status = isContGroupShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
+    if (confirmedIds.has(row.id)) {
+      status = 'MAI CÓ THỂ XUẤT';
+    }
+
+    return {
+      ...row,
       status
     };
   });
@@ -1267,10 +1411,13 @@ async function processFiles(){
 
     const sheetOrderName = findSheet(orderWb, ['KE', 'HOACH', 'GIAO', 'HANG']) || orderWb.SheetNames[0];
     appState.orders = parseOrders(orderWb[sheetOrderName]);
-    appState.stockMap = parseTpStock(stockWb);
+    
+    const parsedData = parseStockAndPackaging(stockWb);
+    appState.stockMap = parsedData.stockMap;
+    appState.bbMap = parsedData.bbMap;
 
     uploadDataToFirebase();
-    alert('Đã import và đồng bộ hóa đám mây thành công!');
+    alert('Đã import và đồng bộ hóa đám mây trung tâm thành công!');
   }catch(error){
     alert('Có lỗi định dạng Excel: ' + error.message);
   }
@@ -1446,13 +1593,17 @@ function renderDetails(){
     <tr>
       <td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td>
       <td>${escapeHtml(item.tenDonHang)}</td>
-      <td>${formatNumber(item.soCont, 0)}</td>
+      <td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td>
       <td>${formatNumber(item.tanCont)}T</td>
       <td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td>
       <td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td>
+      
+      <td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td>
+      <td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td>
+      
       <td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge(item.status)}</td>
-    </tr>`).join('') || '<tr><td colspan="8" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="10" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
 }
 
 function captureDetailImage(){
@@ -1564,11 +1715,7 @@ function bindEvents(){
 
 document.addEventListener('DOMContentLoaded', ()=>{
   const savedRole = localStorage.getItem('tp_user_role');
-  if(savedRole){
-    applyRoleView(savedRole);
-  } else {
-    applyRoleView('');
-  }
+  applyRoleView(savedRole);
   
   setupFirebaseListeners();
   bindEvents();
