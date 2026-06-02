@@ -16,6 +16,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
@@ -99,13 +100,13 @@ tbody tr:hover{
 <div id="loginSection" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4">
   <div class="card p-8 max-w-md w-full text-center space-y-5 border-violet-500/30">
     <div class="w-14 h-14 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-xl">🔐</div>
-    <h2 class="text-xl font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">ĐĂNG NHẬP HỆ THỐNG</h2>
-    <p class="text-slate-400 text-sm">Vui lòng nhập tài khoản bộ phận được cấp quyền</p>
+    <h2 class="text-xl font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">ĐĂNG NHẬP HỆ THỐNG AN TOÀN</h2>
+    <p class="text-slate-400 text-sm">Vui lòng chọn phân hệ và nhập tài khoản được cấp quyền</p>
     
     <div class="text-left space-y-3">
       <div>
-        <label class="text-xs text-slate-400 pl-1">Tài khoản:</label>
-        <input type="text" id="userInput" placeholder="Nhập tài khoản (ví dụ: hiepquandoc)..." class="input mt-1 text-sm py-2.5" />
+        <label class="text-xs text-slate-400 pl-1">Email / Tài khoản:</label>
+        <input type="text" id="userInput" placeholder="Nhập Email (ví dụ: hiepquandoc@sonnam.com)..." class="input mt-1 text-sm py-2.5" />
       </div>
       <div>
         <label class="text-xs text-slate-400 pl-1">Mật khẩu:</label>
@@ -627,44 +628,38 @@ const appState = {
   latestNotice: null
 };
 
-// DANH SÁCH TÀI KHOẢN BẢO MẬT HỆ THỐNG
-const SECURITY_ACC = "omotobike"; 
-const SECURITY_PSW = "hoilamchi"; 
-
-// Danh sách tài khoản Quản Đốc Sản Xuất
-const WORKSHOP_USERS = {
-  "hiepquandoc": { password: "123", fullName: "Hiệp Quản đốc" },
-  "dungquandoc": { password: "456", fullName: "Dũng Quản đốc" }
-};
-
-// HÀM XỬ LÝ ĐĂNG NHẬP MỚI KIỂM TRA TÀI KHOẢN MẬT KHẨU
+// HÀM XỬ LÝ ĐĂNG NHẬP MỚI QUA CỔNG BẢO MẬT FIREBASE AUTH
 function handleLogin(role) {
-  const user = document.getElementById('userInput').value.trim();
-  const pass = document.getElementById('passInput').value.trim();
+  const emailInput = document.getElementById('userInput').value.trim();
+  const passInput = document.getElementById('passInput').value.trim();
   const alertEl = document.getElementById('loginAlert');
 
-  if (!user || !pass) {
-    alertEl.textContent = "❌ Vui lòng nhập đầy đủ Tài khoản và Mật khẩu!";
+  if (!emailInput || !passInput) {
+    alertEl.textContent = "❌ Vui lòng nhập đầy đủ Tài khoản (Email) và Mật khẩu!";
     return;
   }
 
-  if (role === 'admin') {
-    if (user === SECURITY_ACC && pass === SECURITY_PSW) {
-      localStorage.setItem('tp_user_role', 'admin');
-      localStorage.setItem('tp_user_fullname', 'Chủ quản văn phòng');
-      applyRoleView('admin');
-    } else {
-      alertEl.textContent = "❌ Sai tài khoản hoặc mật khẩu máy chủ văn phòng!";
-    }
-  } else if (role === 'production') {
-    if (WORKSHOP_USERS[user] && WORKSHOP_USERS[user].password === pass) {
-      localStorage.setItem('tp_user_role', 'production');
-      localStorage.setItem('tp_user_fullname', WORKSHOP_USERS[user].fullName);
-      applyRoleView('production');
-    } else {
-      alertEl.textContent = "❌ Tài khoản hoặc Mật khẩu Quản đốc không chính xác!";
-    }
-  }
+  alertEl.textContent = "⏳ Đang xác thực tài khoản an toàn...";
+
+  // Xác thực đăng nhập trực tiếp lên máy chủ bảo mật của Google
+  firebase.auth().signInWithEmailAndPassword(emailInput, passInput)
+    .then((userCredential) => {
+      alertEl.textContent = "";
+      const user = userCredential.user;
+      
+      // Lưu lại thông tin vai trò phiên làm việc cục bộ
+      localStorage.setItem('tp_user_role', role);
+      // Tách phần tên email để hiển thị làm Tên người dùng đại diện
+      const displayName = emailInput.split('@')[0].toUpperCase();
+      localStorage.setItem('tp_user_fullname', role === 'admin' ? 'Chủ quản văn phòng' : 'Quản đốc ' + displayName);
+      
+      alert("🎉 Đăng nhập thành công!");
+      applyRoleView(role);
+    })
+    .catch((error) => {
+      console.error("Lỗi xác thực:", error.message);
+      alertEl.textContent = "❌ Tài khoản (Email) hoặc Mật khẩu không chính xác hoặc không thuộc phân hệ này!";
+    });
 }
 
 // HÀM GHI NHẬT KÝ LỊCH SỬ THAO TÁC TRUY VẾT LỖI (AUDIT LOG)
@@ -720,7 +715,6 @@ function deleteHistoryByDate() {
     alert("⚠️ Vui lòng nhập ngày cần xóa! Ví dụ: 1/6/2026 hoặc 01/06/2026");
     return;
   }
-  
   if (!confirm(`⚠️ Bạn có chắc chắn muốn xóa TOÀN BỘ lịch sử thao tác của ngày [${dateInput}] không?\nHành động này sẽ xóa vĩnh viễn trên đám mây và không thể khôi phục!`)) {
     return;
   }
@@ -745,7 +739,6 @@ function deleteHistoryByDate() {
 
     let deleteCount = 0;
     const promises = [];
-
     Object.keys(data).forEach(key => {
       const log = data[key];
       if (log.timestamp) {
@@ -776,69 +769,84 @@ function applyRoleView(role) {
     document.getElementById('loginSection').classList.remove('hideBox');
     return;
   }
-  
   document.getElementById('loginSection').classList.add('hideBox');
+
   const fullName = localStorage.getItem('tp_user_fullname') || 'Người dùng';
   document.getElementById('currentUserLabel').textContent = fullName;
 
   if (role === 'admin') {
-    document.getElementById('currentRoleLabel').textContent = "💻 Chủ quan văn phòng (Máy chủ)";
+    document.getElementById('currentRoleLabel').textContent = "💻 Chủ quản văn phòng (Máy chủ)";
     document.getElementById('section-tomorrow').classList.remove('hideBox');
-    document.getElementById('section-production-permissions').classList.remove('hideBox');
-    document.getElementById('section-bb-rules').classList.remove('hideBox');
-    document.getElementById('section-import').classList.remove('hideBox');
     document.getElementById('section-ready').classList.remove('hideBox');
     document.getElementById('section-production').classList.remove('hideBox');
     document.getElementById('section-total-packaging').classList.remove('hideBox');
     document.getElementById('section-detail').classList.remove('hideBox');
-    document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
+    document.getElementById('section-import').classList.remove('hideBox');
+    document.getElementById('section-bb-rules').classList.remove('hideBox');
+    document.getElementById('section-production-permissions').classList.remove('hideBox');
+    
     document.getElementById('btnResetStorage').classList.remove('hideBox');
-  } else {
-    document.getElementById('currentRoleLabel').textContent = "🏭 Quản đốc sản xuất (Xưởng)";
-    document.getElementById('section-production-permissions').classList.add('hideBox');
-    document.getElementById('section-bb-rules').classList.add('hideBox');
+    document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
+    document.getElementById('btn-wrap-confirm-workshop').classList.add('hideBox');
+  } else if (role === 'production') {
+    document.getElementById('currentRoleLabel').textContent = "🏭 Quản đốc xưởng sản xuất";
     document.getElementById('section-import').classList.add('hideBox');
-    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
+    document.getElementById('section-bb-rules').classList.add('hideBox');
+    document.getElementById('section-production-permissions').classList.add('hideBox');
+    
     document.getElementById('btnResetStorage').classList.add('hideBox');
-    applyProductionViewSettings();
+    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
+    document.getElementById('btn-wrap-confirm-workshop').classList.remove('hideBox');
+    
+    renderProductionViewSettings();
   }
-  renderProductionViewSettings();
-  renderLatestNotice();
   refreshAll();
 }
 
+// HÀM ĐĂNG XUẤT AN TOÀN NGẮT PHIÊN LÀM VIỆC TRÊN ĐÁM MÂY
 function switchRole() {
-  localStorage.removeItem('tp_user_role');
-  localStorage.removeItem('tp_user_fullname');
-  location.reload();
+  if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống không?")) {
+    firebase.auth().signOut().then(() => {
+      localStorage.removeItem('tp_user_role');
+      localStorage.removeItem('tp_user_fullname');
+      location.reload();
+    }).catch((error) => {
+      alert("Lỗi khi ngắt kết nối phiên: " + error.message);
+    });
+  }
 }
 
 function currentRole(){
   return localStorage.getItem('tp_user_role') || '';
 }
 
-function applyProductionViewSettings(){
-  const role = currentRole();
-  if(role === 'admin' || !role) return;
+function renderProductionViewSettings(){
+  if(currentRole() !== 'production') return;
   const view = appState.productionView || {};
   
-  document.getElementById('section-tomorrow').classList.toggle('hideBox', !(view.tomorrow !== false));
-  document.getElementById('section-ready').classList.toggle('hideBox', !view.ready);
-  document.getElementById('section-production').classList.toggle('hideBox', !view.production);
-  document.getElementById('section-total-packaging').classList.toggle('hideBox', !view.detail);
-  document.getElementById('section-detail').classList.toggle('hideBox', !view.detail);
+  const toggle = (id, show) => {
+    const el = document.getElementById(id);
+    if(el) {
+      if(show) el.classList.remove('hideBox');
+      else el.classList.add('hideBox');
+    }
+  };
+  
+  toggle('section-tomorrow', view.tomorrow !== false);
+  toggle('section-ready', !!view.ready);
+  toggle('section-production', !!view.production);
+  toggle('section-detail', !!view.detail);
 }
 
-function renderProductionViewSettings(){
+function syncCheckedPermissionsToUI(){
   const view = appState.productionView || {};
-  const controls = {
-    permTomorrow: view.tomorrow !== false,
-    permReady: !!view.ready,
-    permProduction: !!view.production,
-    permDetail: !!view.detail
-  };
-
-  Object.entries(controls).forEach(([id, checked]) => {
+  const pairs = [
+    ['permTomorrow', view.tomorrow !== false],
+    ['permReady', !!view.ready],
+    ['permProduction', !!view.production],
+    ['permDetail', !!view.detail]
+  ];
+  pairs.forEach(([id, checked]) => {
     const el = document.getElementById(id);
     if(el) el.checked = checked;
   });
@@ -875,13 +883,11 @@ function renderLatestNotice(){
     box?.classList.add('hideBox');
     return;
   }
-
   const seenId = localStorage.getItem(`tp_notice_seen_${currentRole()}`);
   if(String(notice.id) === seenId){
     box.classList.add('hideBox');
     return;
   }
-
   document.getElementById('appNoticeMessage').textContent = `${notice.message} (${notice.createdAt || ''})`;
   box.classList.remove('hideBox');
 }
@@ -895,7 +901,6 @@ function dismissLatestNotice(){
 
 function setupFirebaseListeners() {
   if (!database) return;
-  
   database.ref(".info/connected").on("value", function(snap) {
     const statusEl = document.getElementById("syncStatus");
     if (snap.val() === true) {
@@ -907,11 +912,37 @@ function setupFirebaseListeners() {
     }
   });
 
+  database.ref("thanhpham_system/production_view").on("value", function(snapshot) {
+    appState.productionView = snapshot.val() || { tomorrow: true, ready: false, production: false, detail: false };
+    syncCheckedPermissionsToUI();
+    renderProductionViewSettings();
+  });
+
+  database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
+    appState.latestNotice = snapshot.val();
+    renderLatestNotice();
+  });
+
   database.ref("thanhpham_system/bb_rules").on("value", function(snapshot) {
-    const rulesObj = snapshot.val() || {};
-    appState.bbRules = Object.entries(rulesObj).map(([id, item]) => ({ id, ...item }));
+    const data = snapshot.val();
+    appState.bbRules = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
     renderCloudBBRulesTable();
-    if (appState.orders.length > 0) {
+    if(appState.orders.length > 0) {
+      processAllocation();
+      refreshAll();
+    }
+  });
+
+  database.ref("thanhpham_system/packaging_ordered").on("value", function(snapshot) {
+    appState.packagingOrdered = snapshot.val() || {};
+    if(appState.orders.length > 0) {
+      renderTotalPackaging();
+    }
+  });
+
+  database.ref("thanhpham_system/confirmed_tomorrow").on("value", function(snapshot) {
+    appState.confirmedTomorrow = snapshot.val() || [];
+    if(appState.orders.length > 0) {
       processAllocation();
       refreshAll();
     }
@@ -919,65 +950,31 @@ function setupFirebaseListeners() {
 
   database.ref("thanhpham_system/cloud_data").on("value", function(snapshot) {
     const data = snapshot.val();
-    if (data) {
-      appState.orders = data.orders || [];
-      appState.stockMap = data.stockMapArray ? new Map(data.stockMapArray) : new Map();
-      appState.bbMap = data.bbMapArray ? new Map(data.bbMapArray) : new Map();
-      
-      processAllocation();
-      fillAllDateSelects();
+    if (!data) {
+      resetAppStateToEmpty();
       refreshAll();
-    } else {
-      resetAppState();
-      refreshAll();
+      return;
     }
-  });
-
-  database.ref("thanhpham_system/confirmed_tomorrow").on("value", function(snapshot) {
-    appState.confirmedTomorrow = snapshot.val() || [];
-    if (appState.orders.length > 0) {
-      processAllocation();
-    }
+    appState.orders = data.orders || [];
+    appState.stockMap = new Map(data.stockMapArray || []);
+    appState.bbMap = new Map(data.bbMapArray || []);
+    
+    fillDateSelect(document.getElementById('tomorrowDateSelect'));
+    processAllocation();
     refreshAll();
-  });
-
-  database.ref("thanhpham_system/packaging_ordered").on("value", function(snapshot) {
-    const data = snapshot.val() || {};
-    appState.packagingOrdered = {};
-    Object.values(data).forEach(item => {
-      if (item && item.code) {
-        appState.packagingOrdered[item.code] = item.ordered;
-      }
-    });
-    renderTotalPackaging();
-  });
-
-  database.ref("thanhpham_system/production_view").on("value", function(snapshot) {
-    appState.productionView = {
-      tomorrow: true, ready: false, production: false, detail: false,
-      ...(snapshot.val() || {})
-    };
-    renderProductionViewSettings();
-    if(currentRole()) applyRoleView(currentRole());
-  });
-
-  database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
-    appState.latestNotice = snapshot.val();
-    renderLatestNotice();
   });
 }
 
-function resetAppState() {
+function resetAppStateToEmpty(){
   appState.orders = [];
   appState.details = [];
   appState.production = [];
-  appState.confirmedTomorrow = [];
+  appState.exportPreview = [];
   appState.stockMap = new Map();
   appState.bbMap = new Map();
-  appState.packagingOrdered = {};
 }
 
-function uploadDataToFirebase() {
+function uploadCloudDataToFirebase() {
   if (!database) return;
   database.ref("thanhpham_system/cloud_data").set({
     orders: appState.orders,
@@ -999,7 +996,6 @@ function clearSystemCache() {
         database.ref("thanhpham_system/confirmed_tomorrow").remove(),
         database.ref("thanhpham_system/notices").remove()
       ];
-      
       Promise.all(promises).then(() => {
         alert("Đã làm trống dữ liệu vận hành thành công! Toàn bộ quy tắc match bao bì vẫn được bảo toàn.");
         location.reload();
@@ -1040,64 +1036,37 @@ function baseProductCode(value){
 
 function findBBCode(orderCode, donHang) {
   const cleaned = cleanTextBB(orderCode);
-  const don = cleanTextBB(donHang);
-
-  if (appState.bbRules && appState.bbRules.length > 0) {
-    for (const rule of appState.bbRules) {
-      const kw = cleanTextBB(rule.keyword);
-      if (kw && (cleaned.includes(kw) || don.includes(kw))) {
+  if(appState.bbRules && appState.bbRules.length > 0) {
+    const combinedText = cleanTextBB(orderCode + " " + donHang);
+    for(const rule of appState.bbRules) {
+      if(rule.keyword && combinedText.includes(cleanTextBB(rule.keyword))) {
         return cleanTextBB(rule.targetCode);
       }
     }
   }
-
-  if (cleaned.includes("MS4A") && cleaned.includes("25KG") && cleaned.includes("HẠT37") && don.includes("NGỌCTHỊNH")) return cleanTextBB("MS4A-25KG(BAO KHÁCH)");
-  if (cleaned.includes("MS6A") && cleaned.includes("25KG") && cleaned.includes("CHỮĐỎ") && don.includes("NGỌCTHỊNH")) return cleanTextBB("MS6A-25KG (CHỮ ĐỎ) BAO KHÁCH");
-  if (cleaned.includes("JUMBOMS2A") && cleaned.includes("1,15TẤN") && cleaned.includes("HẠT12")) return cleanTextBB("JB 90X90X134 KO IN, CÓ TRÁNG,");
-  if (cleaned.includes("JUMBREAT15") || (cleaned.includes("AT15") && cleaned.includes("1T"))) return cleanTextBB("JB AT15 (90*90*120)");
-  if (cleaned.includes("SN10") && cleaned.includes("25KG")) return cleanTextBB("SN10 - 25KG (52*76)");
-  if (cleaned.includes("SN15") && cleaned.includes("25KG")) return cleanTextBB("SN15 - 25KG (50*74)");
-  if (cleaned.includes("SN20") && cleaned.includes("25KG")) return cleanTextBB("SN20 - 25KG (50*73)");
   return cleaned;
 }
 
 function toggleRuleForm() {
-  const box = document.getElementById('bbRuleFormBox');
-  if (box) {
-    box.classList.toggle('hideBox');
-    document.getElementById('ruleKeywordInput').value = '';
-    document.getElementById('ruleTargetInput').value = '';
-  }
+  document.getElementById('bbRuleFormBox').classList.toggle('hideBox');
 }
 
 function toggleBBRulesContent() {
-  const content = document.getElementById('bbRulesMainContent');
-  const btn = document.getElementById('btnToggleBBRules');
-  if (content) {
-    const isHidden = content.toggleAttribute('data-collapsed');
-    if (isHidden) {
-      content.classList.add('hideBox');
-      btn.textContent = 'Mở rộng quy tắc đám mây 🔽';
-    } else {
-      content.classList.remove('hideBox');
-      btn.textContent = 'Thu gọn quy tắc đám mây 🔼';
-    }
-  }
+  document.getElementById('bbRulesMainContent').classList.toggle('hideBox');
 }
 
 function saveCloudBBRule() {
-  if (!database) return alert('Chưa kết nối dữ liệu mạng.');
+  if (!database) return;
   const keyword = document.getElementById('ruleKeywordInput').value.trim();
   const targetCode = document.getElementById('ruleTargetInput').value.trim();
-
   if (!keyword || !targetCode) return alert('Vui lòng điền đầy đủ cả từ khóa và mã bao bì tương ứng!');
-
+  
   const newRule = {
     keyword: keyword,
     targetCode: targetCode,
     createdAt: new Date().toLocaleString('vi-VN')
   };
-
+  
   database.ref("thanhpham_system/bb_rules").push(newRule).then(() => {
     alert('🎉 Đã lưu quy tắc bao bì đồng bộ lên đám mây máy chủ thành công!');
     toggleRuleForm();
@@ -1129,48 +1098,35 @@ function renderCloudBBRulesTable() {
 
 function parseNumber(value){
   if(value === null || value === undefined || value === '') return 0;
-  if(typeof value === 'number') return Number.isFinite(value) ? value : 0;
-  const raw = String(value).trim();
-  if(/^\([\d\s,.-]+\)$/.test(raw)) return 0;
-  const text = raw.replace(/\s/g, '').replace(/,/g, '.');
-  const match = text.match(/-?\d+(\.\d+)?/);
-  return match ? Number(match[0]) : 0;
+  const clean = String(value).replace(/[^0-9.-]/g, '');
+  return Number(clean) || 0;
 }
 
-function toExcelDate(value) {
-  if (value === null || value === undefined || value === '') return null;
-  let year, month, day;
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    if (value.getUTCHours() === 0 && value.getUTCMinutes() === 0) {
-      year = value.getUTCFullYear(); month = value.getUTCMonth() + 1; day = value.getUTCDate();
-    } else {
-      year = value.getFullYear(); month = value.getMonth() + 1; day = value.getDate();
-    }
-    return { year, month, day };
+function formatDate(dateObj){
+  if(!dateObj) return '---';
+  if(dateObj instanceof Date && !isNaN(dateObj)){
+    return `${dateObj.getDate()}/${dateObj.getMonth()+1}/${dateObj.getFullYear()}`;
   }
-  if (typeof value === 'number') {
-    const date = new Date(Math.round((value - 25569) * 86400 * 1000));
-    if (!Number.isNaN(date.getTime())) {
-      return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
-    }
-    return null;
+  const str = textOf(dateObj);
+  if(str.includes('GMT') || str.includes('00:00:00')){
+    const d = new Date(str);
+    if(!isNaN(d)) return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
   }
-  const raw = String(value).trim();
-  const dmyMatch = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
-  if (dmyMatch) return { day: Number(dmyMatch[1]), month: Number(dmyMatch[2]), year: Number(dmyMatch[3]) };
-  return null;
+  return str;
 }
 
-function dateKey(value) {
-  const info = toExcelDate(value);
-  if (!info) return '';
-  return `${info.year}-${String(info.month).padStart(2, '0')}-${String(info.day).padStart(2, '0')}`;
-}
-
-function displayDate(value) {
-  const info = toExcelDate(value);
-  if (!info) return '';
-  return `${String(info.day).padStart(2, '0')}/${String(info.month).padStart(2, '0')}/${info.year}`;
+function dateKey(dateObj){
+  if(!dateObj) return '';
+  let d = dateObj;
+  if(!(d instanceof Date)){
+    d = new Date(textOf(dateObj));
+  }
+  if(isNaN(d.getTime())){
+    const parts = textOf(dateObj).split('/');
+    if(parts.length === 3) return `${parts[2]}-${String(parts[1]).padStart(2,'0')}-${String(parts[0]).padStart(2,'0')}`;
+    return textOf(dateObj);
+  }
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
 function formatNumber(value, digits = 2){
@@ -1192,7 +1148,9 @@ function readExcel(file){
           result[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header:1, defval:'', raw:true });
         });
         resolve(result);
-      }catch(error){ reject(error); }
+      }catch(error){
+        reject(error);
+      }
     };
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
@@ -1215,7 +1173,9 @@ function findHeaderIndex(rows, requiredHeaders){
 
 function columnMap(headerRow){
   const map = {};
-  headerRow.forEach((cell, index)=>{ map[normalizeText(cell)] = index; });
+  headerRow.forEach((cell, index)=>{
+    map[normalizeText(cell)] = index;
+  });
   return map;
 }
 
@@ -1229,55 +1189,60 @@ function getByHeader(row, map, names){
 
 function parseOrders(orderRows){
   const headerIndex = findHeaderIndex(orderRows, ['DonHang', 'MaBao']);
-  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề cột chuẩn!');
+  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề cột chuẩn của File Đơn Hàng!');
   const map = columnMap(orderRows[headerIndex]);
-
-  let lastValidSoCont = 0; let lastValidHangVanChuyen = ""; let virtualGroupCounter = 0;
-
-  return orderRows.slice(headerIndex + 1).map((row, index)=>{
-    const donHang = textOf(getByHeader(row, map, ['DonHang', 'Đơn hàng']));
-    const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang', 'Khách hàng']));
-    const maBao = textOf(getByHeader(row, map, ['MaBao', 'Mã Bao']));
-    if(!donHang || !maBao) return null;
-
-    let soContRaw = getByHeader(row, map, ['So Cont', 'Số Cont']);
-    let soCont = parseNumber(soContRaw);
-    let hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển']));
-
-    if (soContRaw !== '' && soCont > 0) {
-      lastValidSoCont = soCont; lastValidHangVanChuyen = hangVanChuyen; virtualGroupCounter++;
-    } else {
-      soCont = lastValidSoCont; if (!hangVanChuyen) hangVanChuyen = lastValidHangVanChuyen;
-    }
-
-    const tanCont = parseNumber(getByHeader(row, map, ['Tan/cont', 'Tấn/cont'])) || 0;
-    const soLuongKg = parseNumber(getByHeader(row, map, ['SoLuongKg', 'Số lượng Kg']));
-    const quyCachBao = parseNumber(getByHeader(row, map, ['QuyCachBao', 'Quy Cách Bao']));
-    const ghiChu = textOf(getByHeader(row, map, ['GhiChu', 'Ghi chú']));
-    const ngayRaw = getByHeader(row, map, ['Ngay', 'Ngày']);
-
-    return {
-      id: `${donHang}__${index}`, donHang, tenDonHang, maBao, code: maBao,
-      stockKey: normalizeCode(maBao), baseCode: baseProductCode(maBao), soCont, tanCont,
-      needTon: soCont * tanCont, soLuongKg, quyCachBao, hangVanChuyen, ghiChu,
-      ngayKey: dateKey(ngayRaw), ngay: displayDate(ngayRaw), contGroupId: `CONT_GRP_${virtualGroupCounter}`
-    };
-  }).filter(Boolean);
+  let lastValidSoCont = 0;
+  let lastValidHangVanChuyen = '';
+  const list = [];
+  
+  for(let i = headerIndex + 1; i < orderRows.length; i++){
+    const row = orderRows[i];
+    const donHang = textOf(getByHeader(row, map, ['DonHang']));
+    if(!donHang) continue;
+    const maBao = textOf(getByHeader(row, map, ['MaBao']));
+    const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang','TenHang','LoaiHang']));
+    const rawSoCont = getByHeader(row, map, ['SoCont','Cont']);
+    const hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen','HangVC','Tau']));
+    const tanCont = parseNumber(getByHeader(row, map, ['TanCont','TrongLuong','TrongLuongDon']));
+    const baoCont = parseNumber(getByHeader(row, map, ['BaoCont','SoBao','SLBao']));
+    const ngayGiao = getByHeader(row, map, ['NgayGiaoHang','NgayGiao','NgayXuat']);
+    const ghiChu = textOf(getByHeader(row, map, ['GhiChu','Lưu ý']));
+    
+    let currentSoCont = parseNumber(rawSoCont);
+    if(currentSoCont > 0) { lastValidSoCont = currentSoCont; } else if(rawSoCont === '' || textOf(rawSoCont).toUpperCase() === 'GHEP') { currentSoCont = 0; } else { currentSoCont = lastValidSoCont; }
+    if(hangVanChuyen) { lastValidHangVanChuyen = hangVanChuyen; }
+    
+    list.push({
+      id: `${donHang}_${maBao}_${i}`,
+      donHang, maBao, tenDonHang,
+      soCont: currentSoCont || 0,
+      hangVanChuyen: hangVanChuyen || lastValidHangVanChuyen,
+      needTon: tanCont,
+      needBao: baoCont,
+      ngay: formatDate(ngayGiao),
+      ngayKey: dateKey(ngayGiao),
+      ghiChu,
+      stockKey: normalizeCode(tenDonHang),
+      baseCode: baseProductCode(tenDonHang),
+      bbKey: findBBCode(maBao, donHang)
+    });
+  }
+  return list;
 }
 
-function parseStockAndPackaging(stockWorkbook){
-  let tpSheetName = null; let bbSheetName = null;
-  stockWorkbook.SheetNames.forEach((name) => {
-    if (name.toUpperCase().includes('TP')) tpSheetName = name;
-    if (name.toUpperCase().includes('BB')) bbSheetName = name;
-  });
-  if (!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO TP');
-
+function processStock(stockWorkbook){
+  const tpSheetName = findSheet(stockWorkbook, ['TP','THANHPHAM']);
+  const bbSheetName = findSheet(stockWorkbook, ['BB','BAOBI']);
+  if(!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO THÀNH PHẨM (TP)');
+  
   const stockMap = new Map();
   stockWorkbook[tpSheetName].forEach((row) => {
-    const values = Object.values(row); if (values.length < 13) return;
-    const productName = textOf(values[2]); const stockTon = Math.max(0, parseNumber(values[12]));
-    const exactKey = normalizeCode(productName); const baseKey = 'BASE:' + baseProductCode(productName);
+    const values = Object.values(row);
+    if (values.length < 13) return;
+    const productName = textOf(values[2]);
+    const stockTon = Math.max(0, parseNumber(values[12]));
+    const exactKey = normalizeCode(productName);
+    const baseKey = 'BASE:' + baseProductCode(productName);
     if (!productName || !exactKey || normalizeText(productName).includes('TEN THANH PHAM')) return;
     stockMap.set(exactKey, (stockMap.get(exactKey) || 0) + stockTon);
     stockMap.set(baseKey, (stockMap.get(baseKey) || 0) + stockTon);
@@ -1286,8 +1251,10 @@ function parseStockAndPackaging(stockWorkbook){
   const bbMap = new Map();
   if (bbSheetName) {
     stockWorkbook[bbSheetName].forEach((row) => {
-      const values = Object.values(row); if (values.length < 10) return;
-      const bbName = cleanTextBB(values[2]); const stockPcs = Math.max(0, parseNumber(values[9]));
+      const values = Object.values(row);
+      if (values.length < 10) return;
+      const bbName = cleanTextBB(values[2]);
+      const stockPcs = Math.max(0, parseNumber(values[9]));
       if (!bbName || normalizeText(bbName).includes('TENBAOBI')) return;
       bbMap.set(bbName, (bbMap.get(bbName) || 0) + stockPcs);
     });
@@ -1300,74 +1267,83 @@ function processAllocation(){
   const remainingTP = new Map(appState.stockMap);
   const remainingBB = new Map(appState.bbMap || new Map());
   const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
-
+  
   const temporaryDetails = appState.orders.map((order)=>{
     const lookupKey = remainingTP.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
     const stockBefore = remainingTP.get(lookupKey) || 0;
     const canExportTon = Math.min(stockBefore, order.needTon);
-    const shortage = Math.max(0, order.needTon - stockBefore);
-    remainingTP.set(lookupKey, stockBefore - canExportTon);
-
-    const matchBBCode = findBBCode(order.maBao, order.donHang);
-    const bbStockBefore = remainingBB.get(matchBBCode) || 0;
-    const bagWeight = order.quyCachBao || 0;
-    const bbNeedPcs = bagWeight > 0 ? (order.soLuongKg / bagWeight) : 0;
-    const tpQuyDoiPcs = (bagWeight > 0 && stockBefore > 0) ? ((stockBefore * 1000) / bagWeight) : 0;
-    const bbShortage = Math.max(0, bbNeedPcs - (bbStockBefore + tpQuyDoiPcs));
+    const shortage = Math.max(0, order.needTon - canExportTon);
+    remainingTP.set(lookupKey, Math.max(0, stockBefore - order.needTon));
     
-    const netBBNeedFromShelf = Math.max(0, bbNeedPcs - tpQuyDoiPcs);
-    remainingBB.set(matchBBCode, Math.max(0, bbStockBefore - netBBNeedFromShelf));
-
-    return { ...order, stockBefore, canExportTon, shortage, isRowShortage: shortage > 0, matchBBCode, bbStockBefore, bbNeedPcs, bbShortage };
-  });
-
-  const groupHasConfirmedShortageMap = new Map();
-  temporaryDetails.forEach((row) => {
-    if (confirmedIds.has(row.id)) groupHasConfirmedShortageMap.set(row.contGroupId, true);
-  });
-
-  const groupNaturalShortageMap = new Map();
-  temporaryDetails.forEach((row) => {
-    if (row.isRowShortage) groupNaturalShortageMap.set(row.contGroupId, true);
-  });
-
-  appState.details = temporaryDetails.map((row) => {
-    const isContGroupNaturallyShortage = !!groupNaturalShortageMap.get(row.contGroupId);
-    const isContGroupSavedByWorkshop = !!groupHasConfirmedShortageMap.get(row.contGroupId);
+    const bbStockBefore = remainingBB.get(order.bbKey) || 0;
+    const canExportBao = Math.min(bbStockBefore, order.needBao);
+    const bbShortage = Math.max(0, order.needBao - canExportBao);
+    remainingBB.set(order.bbKey, Math.max(0, bbStockBefore - order.needBao));
     
-    let logicStatus = 'THIẾU TP';
-    if (!isContGroupNaturallyShortage || isContGroupSavedByWorkshop) logicStatus = 'ĐỦ XUẤT';
-
-    let displayStatus = row.isRowShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
-    if (isContGroupSavedByWorkshop) displayStatus = 'MAI CÓ THỂ XUẤT';
-
-    return { ...row, status: logicStatus, displayStatus: displayStatus };
+    const isRowShortage = shortage > 0.001;
+    const isForced = confirmedIds.has(order.id);
+    let status = isRowShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
+    if(isForced) status = 'ĐỦ XUẤT';
+    
+    return {
+      ...order,
+      stockBefore,
+      shortage,
+      bbStockBefore,
+      bbShortage,
+      isRowShortage,
+      isForced,
+      status,
+      displayStatus: isForced ? 'DUYỆT ÉP XUẤT' : status
+    };
   });
 
-  buildProductionSummary();
-}
+  const clusterMap = new Map();
+  temporaryDetails.forEach((item)=>{
+    const key = `${item.donHang}_${item.soCont}_${item.hangVanChuyen}`;
+    if(!clusterMap.has(key)) clusterMap.set(key, []);
+    clusterMap.get(key).push(item);
+  });
 
-function buildProductionSummary(){
-  const map = new Map();
-  appState.details.forEach((item)=>{
-    if (item.isRowShortage && item.status === 'THIẾU TP') {
-      const current = map.get(item.code) || { code:item.code, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
-      current.demand += item.needTon; current.stock += Math.max(0, item.stockBefore); current.shortage += item.shortage; current.orders += 1;
-      if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
-        current.nearestKey = item.ngayKey; current.nearest = item.ngay;
+  clusterMap.forEach((clusterList)=>{
+    const hasShortageInCluster = clusterList.some((i)=>i.status === 'THIẾU TP');
+    clusterList.forEach((item)=>{
+      if(hasShortageInCluster){
+        item.displayStatus = item.isForced ? 'DUYỆT ÉP XUẤT' : 'CHỜ CỤM GHÉP CÓ THIẾU KHO';
+        if(!item.isForced) item.status = 'THIẾU TP';
       }
-      map.set(item.code, current);
+    });
+  });
+
+  appState.details = temporaryDetails;
+  const map = new Map();
+  appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP').forEach((item)=>{
+    const current = map.get(item.stockKey) || {
+      code: item.tenDonHang,
+      demand: 0, stock: 0, shortage: 0, orders: 0,
+      nearestKey: item.ngayKey, nearest: item.ngay
+    };
+    current.demand += item.needTon;
+    current.stock += Math.max(0, item.stockBefore);
+    current.shortage += item.shortage;
+    current.orders += 1;
+    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
+      current.nearestKey = item.ngayKey;
+      current.nearest = item.ngay;
     }
+    map.set(item.stockKey, current);
   });
   appState.production = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
 }
 
 function setBadgeCount(card, count){
-  const badge = card?.querySelector('h2 span'); if(badge) badge.textContent = count;
+  const badge = card?.querySelector('h2 span');
+  if(badge) badge.textContent = count;
 }
 
 function setTable(card, headers, rowsHtml, tableIndex = 0){
-  const table = card?.querySelectorAll('table')[tableIndex]; if(!table) return;
+  const table = card?.querySelectorAll('table')[tableIndex];
+  if(!table) return;
   table.innerHTML = `<thead><tr>${headers.map((h)=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rowsHtml || `<tr><td colspan="${headers.length}" class="text-center text-slate-500 py-8">Chưa có dữ liệu</td></tr>`}</tbody>`;
 }
 
@@ -1379,67 +1355,103 @@ function rowsByDateMode(rows, mode, from, to){
 }
 
 function getFilterControls(card){
-  const select = card?.querySelector('select'); const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
-  return { mode: select?.value || 'ALL', from: dates[0]?.value || '', to: dates[1]?.value || dates[0]?.value || '' };
+  const select = card?.querySelector('select');
+  const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
+  return {
+    mode: select?.value || 'ALL',
+    from: dates[0]?.value || '',
+    to: dates[1]?.value || dates[0]?.value || ''
+  };
 }
 
 function fillDateSelect(select){
   if(!select) return;
   const dates = Array.from(new Set(appState.orders.map((o)=>o.ngayKey).filter(Boolean))).sort();
-  select.innerHTML = '<option value="ALL">Tất cả ngày giao hàng (ALL)</option>' + dates.map((key)=>`<option value="${key}">${displayDate(key)}</option>`).join('');
+  select.innerHTML = '<option value="ALL">Tất cả ngày giao hàng (ALL)</option>' + dates.map((d)=>`<option value="${d}">${d.split('-').reverse().join('/')}</option>`).join('');
 }
 
-function fillAllDateSelects() {
-  fillDateSelect(document.getElementById('tomorrowDateSelect'));
+function planDateDisplay(){
+  const controls = getFilterControls(document.getElementById('section-ready'));
+  if(controls.mode === '1 ngày' && controls.from) return controls.from.split('-').reverse().join('/');
+  const d = new Date();
+  d.setDate(d.getDate()+1);
+  return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
 }
 
-function statusBadge(status){
-  const isOk = status === 'ĐỦ XUẤT'; const isOverride = status === 'MAI CÓ THỂ XUẤT';
-  const cls = isOk ? 'bg-green-600 text-white' : isOverride ? 'bg-yellow-500 text-black font-bold' : 'bg-red-500 text-white';
-  return `<span class="${cls} px-2.5 py-0.5 rounded-full text-xs font-semibold">${isOverride ? 'ƯU TIÊN XUẤT' : status}</span>`;
+function planDateKey(){
+  const controls = getFilterControls(document.getElementById('section-ready'));
+  if(controls.mode === '1 ngày' && controls.from) return controls.from;
+  const d = new Date();
+  d.setDate(d.getDate()+1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-
-function tomorrowDate(){ const d = new Date(); d.setDate(d.getDate() + 1); return d; }
-function planDateKey(){ return dateKey(tomorrowDate()); }
-function planDateDisplay(){ return displayDate(tomorrowDate()); }
 
 function shortOrderDate(item){
-  if(item?.ngayKey){ const parts = item.ngayKey.split('-'); return `${Number(parts[2])}/${Number(parts[1])}`; }
-  const d = tomorrowDate(); return `${d.getDate()}/${d.getMonth() + 1}`;
+  if(!item.ngay) return '';
+  const p = item.ngay.split('/');
+  return p.length >= 2 ? `${p[0]}/${p[1]}` : item.ngay;
 }
 
 function isManualLoading(item){
-  const bag = item.quyCachBao || parseNumber((normalizeText(item.maBao).match(/(\d+)\s*KG/) || [])[1]);
-  return bag >= 25 && bag <= 50;
+  const txt = normalizeText(item.ghiChu || '');
+  return txt.includes("BOC TAY") || txt.includes("BOCTAY");
 }
 
-function formatPlanTime(slot){ return `${slot.period === 'morning' ? 'Sáng' : 'Chiều'} ${slot.hour}h${slot.minute ? String(slot.minute).padStart(2, '0') : ''}`; }
+function buildSlots(startHour, startMinute, gap){
+  const arr = [];
+  let h = startHour;
+  let m = startMinute;
+  for(let i=0; i<30; i++){
+    arr.push({ hour:h, minute:m });
+    m += gap;
+    if(m >= 60){ h += Math.floor(m/60); m = m%60; }
+  }
+  return arr;
+}
 
-function buildSlots(startHour, startMinute, count){
-  const slots = []; let hour = startHour; let minute = startMinute;
-  for(let index = 0; index < count; index++){ slots.push({ hour, minute }); minute += 30; if(minute >= 60){ hour += 1; minute -= 60; } }
-  return slots;
+function formatPlanTime(slot){
+  return `${String(slot.hour).padStart(2,'0')}h${String(slot.minute).padStart(2,'0')}`;
 }
 
 function assignPlanTimes(rows){
-  const manualSlots = [ { period:'morning', hour:6, minute:15 }, { period:'morning', hour:6, minute:15 }, { period:'morning', hour:7, minute:0 }, { period:'morning', hour:7, minute:30 }, { period:'morning', hour:8, minute:0 }, ...buildSlots(13, 0, 40).map((s)=>({ ...s, period:'afternoon' })) ];
-  const otherSlots = buildSlots(13, 0, 60).map((s)=>({ ...s, period:'afternoon' })); let mIdx = 0; let oIdx = 0;
+  const manualSlots = [
+    { period:'morning', hour:4, minute:15 },
+    { period:'morning', hour:5, minute:15 },
+    { period:'morning', hour:6, minute:15 },
+    { period:'morning', hour:7, minute:0 },
+    { period:'morning', hour:7, minute:30 },
+    { period:'morning', hour:8, minute:0 },
+    ...buildSlots(13, 0, 40).map((s)=>({ ...s, period:'afternoon' }))
+  ];
+  const otherSlots = buildSlots(13, 0, 60).map((s)=>({ ...s, period:'afternoon' }));
+  let mIdx = 0; let oIdx = 0;
+  
   return rows.map((item)=>{
-    const manual = isManualLoading(item); const slot = manual ? (manualSlots[mIdx++] || otherSlots[oIdx++]) : (otherSlots[oIdx++] || manualSlots[mIdx++]);
-    return { ...item, planDate: planDateDisplay(), planDateKey: planDateKey(), planTime: formatPlanTime(slot || { period:'afternoon', hour:13, minute:0 }) };
+    const manual = isManualLoading(item);
+    const slot = manual ? (manualSlots[mIdx++] || otherSlots[oIdx++]) : (otherSlots[oIdx++] || manualSlots[mIdx++]);
+    return {
+      ...item,
+      planDate: planDateDisplay(),
+      planDateKey: planDateKey(),
+      planTime: formatPlanTime(slot || { period:'afternoon', hour:13, minute:0 })
+    };
   });
 }
 
 function planNote(item){
-  const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : ''; const d = shortOrderDate(item);
+  const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : '';
+  const d = shortOrderDate(item);
   if(isManualLoading(item)) return `Bốc tay tàu${ship} ngày ${d}`;
   return `${item.ghiChu || 'bốc hầm chồng đôi không pallet'} + tàu${ship} ngày ${d}`;
 }
 
-function getReadyOrders() { return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT'); }
+function getReadyOrders() {
+  return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT');
+}
 
 function planRows(){
-  const ready = getReadyOrders(); return assignPlanTimes(ready.filter(isManualLoading).concat(ready.filter((i)=>!isManualLoading(i))));
+  const ready = getReadyOrders();
+  return assignPlanTimes(ready.filter(isManualLoading).concat(ready.filter((i)=>!isManualLoading(i))));
 }
 
 function planTableHtml(rows){
@@ -1452,38 +1464,24 @@ function planTableHtml(rows){
         ${rows.map((item, index)=>`
           <tr>
             <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td><td>${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
-            <td class="text-center font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td><td class="text-center">${formatNumber(item.tanCont)}</td>
-            <td class="text-center font-semibold">${formatNumber(item.tanCont)}</td><td class="text-center font-semibold">${escapeHtml(item.hangVanChuyen)}</td>
-            <td class="text-center font-bold text-violet-400">${escapeHtml(item.planTime)}</td><td class="font-medium">${escapeHtml(planNote(item))}</td>
-          </tr>`).join('') || '<tr><td colspan="9" class="text-center text-slate-500 py-8">Không có dữ liệu kế hoạch xuất</td></tr>'}
-        <tr class="bg-slate-950 font-bold">
-          <td colspan="3" class="text-right text-slate-400">Tổng cộng hệ thống:</td><td class="text-center text-green-400 text-lg">${formatNumber(totalCont, 0)}</td>
-          <td></td><td class="text-center text-green-400 text-lg">${formatNumber(totalOrder)}</td><td colspan="3"></td>
-        </tr>
+            <td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont,0) : 'Ghép'}</td><td>27</td><td>${formatNumber(item.needTon, 1)}T</td>
+            <td class="text-cyan-400 font-medium">${escapeHtml(item.hangVanChuyen || '---')}</td><td class="text-yellow-400 font-bold">${escapeHtml(item.planTime)}</td><td>${escapeHtml(planNote(item))}</td>
+          </tr>`).join('')}
       </tbody>
     </table>`;
 }
 
-async function processFiles(){
-  const orderFile = document.getElementById('orderFileInput').files[0];
-  const stockFile = document.getElementById('stockFileInput').files[0];
-  if(!orderFile || !stockFile) return alert('Vui lòng chọn đầy đủ cả File Đơn Hàng và File Tồn Kho!');
-  try{
-    const orderWb = await readExcel(orderFile); const stockWb = await readExcel(stockFile);
-    const sheetOrderName = findSheet(orderWb, ['KE', 'HOACH', 'GIAO', 'HANG']) || orderWb.SheetNames[0];
-    appState.orders = parseOrders(orderWb[sheetOrderName]);
-    const parsedData = parseStockAndPackaging(stockWb);
-    appState.stockMap = parsedData.stockMap; appState.bbMap = parsedData.bbMap;
-    uploadDataToFirebase();
-    alert('🎉 Đã import thành công và tự động đồng bộ hóa dữ liệu đám mây toàn hệ thống!');
-  }catch(error){ alert('Có lỗi cấu trúc Excel: ' + error.message); }
+function statusBadge(status){
+  if(status === 'ĐỦ XUẤT') return `<span class="bg-green-500/10 text-green-400 border border-green-500/20 text-xs px-2.5 py-1 rounded-full font-semibold">✅ Đủ tồn kho</span>`;
+  if(status === 'MAI CÓ THỂ XUẤT' || status === 'DUYỆT ÉP XUẤT') return `<span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-xs px-2.5 py-1 rounded-full font-bold">⚡ Ưu tiên ép xuất</span>`;
+  if(status === 'CHỜ CỤM GHÉP CÓ THIẾU KHO') return `<span class="bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs px-2.5 py-1 rounded-full font-medium">⏳ Chờ cụm ghép thiếu</span>`;
+  return `<span class="bg-red-500/10 text-red-400 border border-red-500/20 text-xs px-2.5 py-1 rounded-full font-medium">⚠️ Thiếu thành phẩm</span>`;
 }
 
 function refreshAll(){
-  applyProductionViewSettings();
-  const allReadyOrders = getReadyOrders();
-  const allShortageOrders = appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP');
-  const totalProductionTon = appState.production.reduce((sum, item)=>sum + item.shortage, 0);
+  const allReadyOrders = appState.details.filter((item) => item.status === 'ĐỦ XUẤT');
+  const allShortageOrders = appState.details.filter((item) => item.status === 'THIẾU TP');
+  const totalProductionTon = appState.production.reduce((sum, item) => sum + item.shortage, 0);
 
   document.getElementById('kpi-total-orders').textContent = formatNumber(appState.orders.length, 0);
   document.getElementById('kpi-ready-orders').textContent = formatNumber(allReadyOrders.length, 0);
@@ -1492,10 +1490,9 @@ function refreshAll(){
 
   const tomorrowCard = document.getElementById('section-tomorrow');
   const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
-  
   let candidates = appState.details.filter((item) => item.isRowShortage && item.status === 'THIẾU TP');
   if(tomSelectVal !== 'ALL') candidates = candidates.filter((item)=>item.ngayKey === tomSelectVal);
-
+  
   const candHtml = candidates.map((item)=>`
     <tr>
       <td><input type="checkbox" data-candidate-id="${item.id}" class="w-5 h-5 accent-yellow-500 cursor-pointer"/></td>
@@ -1505,198 +1502,261 @@ function refreshAll(){
       <td>${escapeHtml(item.ngay)}</td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
+  setBadgeCount(tomorrowCard, candidates.length);
 
   const confHtml = appState.confirmedTomorrow.map((item)=>`
     <tr class="flash">
       <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.maBao)}</td>
       <td class="text-yellow-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
-      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-500 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold">❌ Hủy</button></td>
+      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-600 text-red-300 px-3 py-1 rounded-lg text-xs">❌ Hủy duyệt</button></td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Hành động'], confHtml, 1);
-  setBadgeCount(tomorrowCard, appState.confirmedTomorrow.length);
 
-  const readyCard = document.getElementById('section-ready');
-  if (readyCard) {
-    const rows = planRows(); setBadgeCount(readyCard, rows.length);
-    const fullTableEl = document.getElementById('fullExportTable');
-    if (fullTableEl) fullTableEl.innerHTML = planTableHtml(rows);
-    renderExportPreview();
-  }
-  renderProduction(); 
-  renderDetails();
+  renderReadySection();
+  renderProduction();
   renderTotalPackaging();
+  renderDetails();
 }
 
-function renderExportPreview(){
-  const card = document.getElementById('section-ready'); if(!card) return;
-  const { mode, from, to } = getFilterControls(card); const ready = getReadyOrders();
-  const filtered = rowsByDateMode(ready, mode, from, to);
-  appState.exportPreview = assignPlanTimes(filtered.filter(isManualLoading).concat(filtered.filter((item)=>!isManualLoading(item))));
-  const container = document.getElementById('exportPreviewContainer'); if(!container) return;
-  container.innerHTML = `<div class="p-5"><div class="text-lg font-bold text-emerald-400 uppercase">📦 BẢNG XEM TRƯỚC FORMAT FILE EXCEL KẾ HOẠCH (${appState.exportPreview.length} đơn)</div></div><div class="overflow-auto max-h-[520px] p-2">${planTableHtml(appState.exportPreview)}</div>`;
+function renderReadySection(){
+  const readyCard = document.getElementById('section-ready');
+  const { mode, from, to } = getFilterControls(readyCard);
+  const totalPlannedRows = planRows();
+  const filteredPlanned = rowsByDateMode(totalPlannedRows, mode, from, to);
+  
+  setBadgeCount(readyCard, filteredPlanned.length);
+  document.getElementById('exportPreviewContainer').innerHTML = filteredPlanned.length > 0 ? planTableHtml(filteredPlanned) : `<div class="p-5 text-center text-slate-500 text-sm">Không có đơn hàng sẵn sàng xuất nào phù hợp bộ lọc ngày đang chọn.</div>`;
+  
+  const fullHtml = filteredPlanned.map((item)=>`<tr><td class="font-bold text-green-400">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td><td>${escapeHtml(item.maBao)}</td><td>${formatNumber(item.needTon,1)}T</td><td>${escapeHtml(item.ngay)}</td><td>${statusBadge(item.displayStatus)}</td></tr>`).join('');
+  setTable(readyCard, ['Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'Khối lượng đơn', 'Ngày giao', 'Trạng thái'], fullHtml, 1);
 }
 
-function exportExcel(){
-  renderExportPreview();
-  if(!appState.exportPreview.length) return alert('Không tìm thấy dữ liệu đơn hàng phù hợp bộ lọc để xuất Excel!');
-  const totalCont = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
-  const totalOrder = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
-  const rows = [
-    ['KẾ HOẠCH XUẤT HÀNG'], [],
-    ['Ngày xuất','Khách hàng','Loại hàng','Số lượng (cont)','số lượng tấn /cont','SL đơn hàng','Hãng VC','Thời Gian','Ghi chú'],
-    ...appState.exportPreview.map((item, index)=>[index === 0 ? item.planDate : '', item.donHang, item.tenDonHang, item.soCont > 0 ? item.soCont : 'Gem', item.tanCont, item.tanCont, item.hangVanChuyen, item.planTime, planNote(item)]),
-    ['TỔNG','','',totalCont,'',totalOrder,'','','']
-  ];
-  const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!merges'] = [{ s:{ r:0, c:0 }, e:{ r:0, c:8 } }]; ws['!cols'] = [ { wch:12 }, { wch:28 }, { wch:32 }, { wch:14 }, { wch:16 }, { wch:12 }, { wch:12 }, { wch:14 }, { wch:42 } ];
-  XLSX.utils.book_append_sheet(wb, ws, "KE HOACH XUAT HANG"); XLSX.writeFile(wb, `KE_HOACH_XUAT_HANG_${planDateKey()}.xlsx`);
+function exportReadyExcel(){
+  const filteredPlanned = rowsByDateMode(planRows(), getFilterControls(document.getElementById('section-ready')).mode, document.getElementById('readyFromDate').value, document.getElementById('readyToDate').value);
+  if(filteredPlanned.length === 0) return alert('Không có dữ liệu phù hợp bộ lọc ngày để kết xuất file Excel!');
+  
+  const headers = [["Ngày xuất", "Khách hàng", "Loại hàng", "Số lượng (cont)", "số lượng tấn /cont", "SL đơn hàng", "Hãng VC", "Thời Gian", "Ghi chú"]];
+  const body = filteredPlanned.map((item, index)=>[index === 0 ? item.planDate : '', item.donHang, item.tenDonHang, item.soCont > 0 ? item.soCont : 'Ghép', 27, item.needTon, item.hangVanChuyen, item.planTime, planNote(item)]);
+  
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(headers.concat(body));
+  XLSX.utils.book_append_sheet(wb, ws, "KE HOACH XUAT HANG");
+  XLSX.writeFile(wb, `KE_HOACH_XUAT_HANG_${planDateKey()}.xlsx`);
 }
 
 function renderProduction(){
   const productionCard = document.getElementById('section-production');
   const tableBody = document.querySelector('#productionNeedTable tbody');
   if (!tableBody || !productionCard) return;
+  
   const { mode, from, to } = getFilterControls(productionCard);
   const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP'), mode, from, to);
   
   const map = new Map();
   filteredOrders.forEach((item)=>{
     const productionKey = item.tenDonHang || item.code;
-    const current = map.get(productionKey) || { code:productionKey, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
-    current.demand += item.needTon; current.stock += Math.max(0, item.stockBefore); current.shortage += item.shortage; current.orders += 1;
-    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){ current.nearestKey = item.ngayKey; current.nearest = item.ngay; }
+    const current = map.get(productionKey) || {
+      code: productionKey, demand: 0, stock: 0, shortage: 0, orders: 0,
+      nearestKey: item.ngayKey, nearest: item.ngay
+    };
+    current.demand += item.needTon;
+    current.stock += Math.max(0, item.stockBefore);
+    current.shortage += item.shortage;
+    current.orders += 1;
+    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
+      current.nearestKey = item.ngayKey;
+      current.nearest = item.ngay;
+    }
     map.set(productionKey, current);
   });
+  
   tableBody.innerHTML = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey)).map((item)=>`<tr><td class="font-bold text-red-400">${escapeHtml(item.code)}</td><td>${formatNumber(item.demand, 1)}T</td><td>${formatNumber(item.stock, 1)}T</td><td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td class="text-yellow-400 font-bold text-base">${formatNumber(item.shortage, 1)}T</td><td class="text-center font-semibold text-slate-300">${item.orders}</td><td><span class="bg-slate-900 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${escapeHtml(item.nearest)}</span></td></tr>`).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">🎉 Không có thành phẩm nào thiếu hụt!</td></tr>';
 }
 
 function renderTotalPackaging() {
   const tableBody = document.querySelector('#totalPackagingTable tbody');
   if (!tableBody) return;
-
-  const section = document.getElementById('section-total-packaging');
-  if (section && appState.details.length > 0) {
-    if (currentRole() === 'admin') {
-      section.classList.remove('hideBox');
-    } else if (currentRole() === 'production' && appState.productionView?.detail) {
-      section.classList.remove('hideBox');
-    } else {
-      section.classList.add('hideBox');
-    }
-  }
-
-  const packagingSummaryMap = new Map();
-
+  
+  const packagingMap = new Map();
   appState.details.forEach((item) => {
-    const bbCode = findBBCode(item.maBao, item.donHang) || item.maBao || "CHƯA PHÂN LOẠI";
-    const needPcs = Number(item.bbNeedPcs) || 0;
-    const shortagePcs = Number(item.bbShortage) || 0;
-
-    if (!packagingSummaryMap.has(bbCode)) {
-      packagingSummaryMap.set(bbCode, {
-        code: bbCode,
-        demand: 0,
-        stock: appState.bbMap?.get(bbCode) || 0,
-        shortage: 0,
-        orderCount: 0
-      });
-    }
-
-    const currentData = packagingSummaryMap.get(bbCode);
-    currentData.demand += needPcs;
-    currentData.shortage += shortagePcs;
-    currentData.orderCount += 1;
-    
-    packagingSummaryMap.set(bbCode, currentData);
+    if (!item.bbKey) return;
+    const current = packagingMap.get(item.bbKey) || { key: item.bbKey, demand: 0, stock: 0, shortage: 0, relatedOrders: 0 };
+    current.demand += item.needBao || 0;
+    current.stock = item.bbStockBefore || 0;
+    current.shortage += item.bbShortage || 0;
+    current.relatedOrders += 1;
+    packagingMap.set(item.bbKey, current);
   });
 
-  const summaryList = Array.from(packagingSummaryMap.values()).sort((a, b) => {
-    return b.shortage - a.shortage || a.code.localeCompare(b.code);
-  });
-
-  tableBody.innerHTML = summaryList.map((item) => {
-    const isOrdered = !!appState.packagingOrdered?.[item.code];
+  const sortedList = Array.from(packagingMap.values()).sort((a, b) => b.shortage - a.shortage);
+  
+  tableBody.innerHTML = sortedList.map(item => {
+    const isChecked = !!appState.packagingOrdered[item.key];
     return `
-    <tr class="border-b border-slate-800 hover:bg-slate-900/40">
-      <td class="font-bold text-orange-400">${escapeHtml(item.code)}</td>
-      <td class="font-semibold text-slate-100">${formatNumber(item.demand, 0)}</td>
-      <td class="text-blue-400 font-semibold">${formatNumber(item.stock, 0)}</td>
-      <td class="font-bold ${item.shortage > 0 ? 'text-red-400 text-base' : 'text-green-400'}">
-        ${item.shortage > 0 ? formatNumber(item.shortage, 0) : '0 (Đủ vỏ)'}
-      </td>
-      <td class="text-center font-medium text-violet-400"><span class="bg-slate-900 px-2.5 py-1 rounded-md border border-slate-700">${item.orderCount} Đơn</span></td>
-      <td class="text-center">
-        <input type="checkbox" data-bb-code="${escapeHtml(item.code)}" class="bb-ordered-checkbox w-5 h-5 accent-orange-500 cursor-pointer" ${isOrdered ? 'checked' : ''}/>
-      </td>
-    </tr>
-  `}).join('') || '<tr><td colspan="6" class="text-center text-slate-500 py-8">🎉 Không có nhu cầu bao bì nào phát sinh!</td></tr>';
+      <tr>
+        <td class="font-bold text-orange-400 font-mono">${escapeHtml(item.key)}</td>
+        <td class="font-medium">${formatNumber(item.demand, 0)}</td>
+        <td class="text-slate-400">${formatNumber(item.stock, 0)}</td>
+        <td class="${item.shortage > 0 ? 'text-red-400 font-bold' : 'text-green-400'}">${formatNumber(item.shortage, 0)}</td>
+        <td class="text-center font-semibold text-slate-300">${item.relatedOrders}</td>
+        <td class="text-center">
+          <input type="checkbox" data-pkg-key="${escapeHtml(item.key)}" ${isChecked ? 'checked' : ''} class="w-5 h-5 accent-orange-500 cursor-pointer pkg-order-checkbox" ${currentRole() !== 'admin' ? 'disabled' : ''} />
+        </td>
+      </tr>`;
+  }).join('') || '<tr><td colspan="6" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp phân tích bao bì</td></tr>';
 }
 
 function renderDetails(){
-  const detailCard = document.getElementById('section-detail'); const tableBody = document.querySelector('#detailAllOrdersTable tbody');
+  const detailCard = document.getElementById('section-detail');
+  const tableBody = document.querySelector('#detailAllOrdersTable tbody');
   if (!tableBody || !detailCard) return;
-  const { mode, from, to } = getFilterControls(detailCard); const searchTxt = normalizeText(document.getElementById('detailSearchInput')?.value || '');
-
+  
+  const { mode, from, to } = getFilterControls(detailCard);
+  const searchTxt = normalizeText(document.getElementById('detailSearchInput')?.value || '');
   let filtered = rowsByDateMode(appState.details, mode, from, to);
+  
   if(searchTxt){
     filtered = filtered.filter((item)=>
-      normalizeText(item.donHang).includes(searchTxt) || 
-      normalizeText(item.tenDonHang).includes(searchTxt) || 
+      normalizeText(item.donHang).includes(searchTxt) ||
+      normalizeText(item.tenDonHang).includes(searchTxt) ||
       normalizeText(item.maBao).includes(searchTxt) ||
       normalizeText(item.hangVanChuyen || '').includes(searchTxt)
     );
   }
+  
   tableBody.innerHTML = filtered.map((item)=>`<tr><td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td><td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td><td class="text-cyan-400 font-medium">${escapeHtml(item.hangVanChuyen || '---')}</td><td>${formatNumber(item.tanCont)}T</td><td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td><td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td><td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td><td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td><td>${escapeHtml(item.ngay)}</td><td>${statusBadge(item.displayStatus)}</td></tr>`).join('') || '<tr><td colspan="11" class="text-center text-slate-500 py-8">Không tìm thấy dữ liệu đơn hàng phù hợp</td></tr>';
 }
 
 function captureDetailImage() {
-  const sectionElement = document.getElementById('section-detail'); const tableElement = document.getElementById('detailAllOrdersTable'); const tableContainer = tableElement ? tableElement.parentElement : null;
+  const sectionElement = document.getElementById('section-detail');
+  const tableElement = document.getElementById('detailAllOrdersTable');
+  const tableContainer = tableElement ? tableElement.parentElement : null;
   if (!sectionElement || !tableContainer) return alert('Không tìm thấy vùng dữ liệu chi tiết để chụp!');
-
-  const btn = document.getElementById('captureDetailBtn'); const originalBtnHtml = btn ? btn.innerHTML : '';
-  if (btn) { btn.innerHTML = '⏳ Hệ thống đang dựng ảnh cuộn full...'; btn.disabled = true; }
-
-  const originalMaxHeight = tableContainer.style.maxHeight; const originalOverflowY = tableContainer.style.overflowY; const originalOverflowX = tableContainer.style.overflowX;
-  tableContainer.style.maxHeight = 'none'; tableContainer.style.overflowY = 'visible'; tableContainer.style.overflowX = 'visible';
-  if (btn) btn.style.visibility = 'hidden';
+  
+  const btn = document.getElementById('captureDetailBtn');
+  const originalBtnHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Đang kết xuất ảnh chụp...'; }
+  
+  const originalMaxHeight = tableContainer.style.maxHeight;
+  tableContainer.style.maxHeight = 'none';
 
   setTimeout(() => {
-    const fullWidth = sectionElement.scrollWidth; const fullHeight = sectionElement.scrollHeight;
-    html2canvas(sectionElement, { backgroundColor: '#020617', scale: 2, useCORS: true, logging: false, width: fullWidth, height: fullHeight, windowWidth: fullWidth, windowHeight: fullHeight, x: 0, y: 0, scrollX: 0, scrollY: 0 }).then(canvas => {
-      tableContainer.style.maxHeight = originalMaxHeight; tableContainer.style.overflowY = originalOverflowY; tableContainer.style.overflowX = originalOverflowX;
-      if (btn) { btn.style.visibility = 'visible'; btn.innerHTML = originalBtnHtml; btn.disabled = false; }
-      const now = new Date(); const formatTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
-      const link = document.createElement('a'); link.download = `Bao_Cao_Chi_Tiet_Don_Hang_${formatTime}.png`; link.href = canvas.toDataURL('image/png'); link.click();
-    }).catch(err => {
-      tableContainer.style.maxHeight = originalMaxHeight; tableContainer.style.overflowY = originalOverflowY; tableContainer.style.overflowX = originalOverflowX;
-      if (btn) { btn.style.visibility = 'visible'; btn.innerHTML = originalBtnHtml; btn.disabled = false; }
-      alert('Không thể thực hiện chụp ảnh cuộn: ' + err.message);
+    html2canvas(sectionElement, { useCORS: true, allowTaint: true, backgroundColor: '#020617', scale: 2 }).then(canvas => {
+      tableContainer.style.maxHeight = originalMaxHeight;
+      if (btn) { btn.disabled = false; btn.innerHTML = originalBtnHtml; }
+      
+      try {
+        canvas.toBlob(blob => {
+          if (!blob) return alert('Kết xuất ảnh thất bại!');
+          navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(() => {
+            alert('📸 Đã chụp toàn bộ bảng biểu thành công!\n\nẢnh sắc nét đã được copy trực tiếp vào khay nhớ bộ đệm. Giờ bạn chỉ cần mở Zalo và nhấn nút [Ctrl + V] để gửi nhanh cho các phòng ban!');
+          }).catch(err => {
+            console.error('Lỗi khay nhớ tạm:', err);
+            const imgUrl = canvas.toDataURL("image/png");
+            const w = window.open();
+            if(w) {
+              w.document.write(`<h3 style="color:#fff;font-family:sans-serif;text-align:center;">Chuột phải vào ảnh chọn "Sao chép hình ảnh"</h3><img src="${imgUrl}" style="max-width:100%; display:block; margin:20px auto; box-shadow:0 0 20px rgba(0,0,0,0.5); border-radius:8px;"/>`);
+              w.document.body.style.background = '#020617';
+            } else {
+              alert('Vui lòng cho phép trình duyệt mở cửa sổ Pop-up để xem ảnh chụp!');
+            }
+          });
+        }, "image/png");
+      } catch (e) {
+        tableContainer.style.maxHeight = originalMaxHeight;
+        alert('Lỗi xuất luồng ảnh hình: ' + e.message);
+      }
     });
   }, 400);
 }
 
+function processFiles(){
+  const orderFile = document.getElementById('orderFileInput').files[0];
+  const stockFile = document.getElementById('stockFileInput').files[0];
+  if(!orderFile || !stockFile) return alert('Vui lòng chọn đầy đủ cả File Đơn Hàng và File Tồn Kho trước khi nhấn đồng bộ!');
+  
+  Promise.all([readExcel(orderFile), readExcel(stockFile)]).then(([orderWb, stockWb])=>{
+    const orderSheetName = findSheet(orderWb, ['DONHANG','OD','ORDER']);
+    if(!orderSheetName) throw new Error('Không tìm thấy dữ liệu Sheet ĐƠN HÀNG trong tệp!');
+    
+    const parsedOrders = parseOrders(orderWb[orderSheetName]);
+    const { stockMap, bbMap } = processStock(stockWb);
+    
+    appState.orders = parsedOrders;
+    appState.stockMap = stockMap;
+    appState.bbMap = bbMap;
+    
+    fillDateSelect(document.getElementById('tomorrowDateSelect'));
+    processAllocation();
+    uploadCloudDataToFirebase();
+    writeAuditLog("Import tệp Excel đồng bộ dữ liệu mới", `Số lượng đơn hàng nạp: ${parsedOrders.length} dòng dữ liệu.`);
+    
+    alert('🎉 Chúc mừng! Đã bóc tách và đồng bộ toàn bộ dữ liệu lên mạng đám mây máy chủ thành công!');
+  }).catch((err)=>{
+    console.error(err);
+    alert('❌ Lỗi xử lý cấu trúc tệp Excel: ' + err.message);
+  });
+}
+
 function bindEvents(){
+  document.getElementById('btnOpenHistory')?.addEventListener('click', ()=>{
+    document.getElementById('historyPopup').classList.remove('hideBox');
+    loadAuditLogsToTable();
+  });
+  document.getElementById('btnCloseHistory')?.addEventListener('click', ()=>{
+    document.getElementById('historyPopup').classList.add('hideBox');
+  });
+
+  document.getElementById('totalPackagingTable').addEventListener('change', (e) => {
+    if (!database || !e.target.classList.contains('pkg-order-checkbox')) return;
+    const checkbox = e.target;
+    const pkgKey = checkbox.dataset.pkgKey;
+    if (!pkgKey) return;
+    database.ref(`thanhpham_system/packaging_ordered/${pkgKey}`).set(checkbox.checked ? true : null);
+  });
+
+  document.getElementById('tomorrowCandidateTable').addEventListener('change', (e) => {
+    const checkbox = e.target;
+    if (!checkbox || !checkbox.dataset.candidateId) return;
+    const candidateId = checkbox.dataset.candidateId;
+    const isChecked = checkbox.checked;
+    
+    const targetItem = appState.details.find((item) => item.id === candidateId);
+    if (!targetItem) return;
+    
+    const clusterRows = appState.details.filter((item) => 
+      item.donHang === targetItem.donHang && 
+      item.soCont === targetItem.soCont && 
+      item.hangVanChuyen === targetItem.hangVanChuyen
+    );
+
+    clusterRows.forEach((row) => {
+      const cb = document.querySelector(`input[data-candidate-id="${row.id}"]`);
+      if (cb) cb.checked = isChecked;
+    });
+  });
+
   document.getElementById('btnWorkshopConfirm')?.addEventListener('click', ()=>{
-    const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked');
-    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một mã hàng bị thiếu trong danh sách!');
-
-    const candidateIds = Array.from(checkedBoxes).map((cb)=>cb.dataset.candidateId);
-    const selectedItems = appState.details.filter((item)=>candidateIds.includes(item.id));
-
-    let logsText = [];
-    selectedItems.forEach((item)=>{
-      if(!appState.confirmedTomorrow.some((c)=>c.id === item.id)){
+    if (currentRole() !== 'production') return alert('Chỉ có phân hệ Quản Đốc Sản Xuất mới có quyền duyệt ưu tiên mục này!');
+    const checkedBoxes = Array.from(document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked'));
+    if(checkedBoxes.length === 0) return alert('Vui lòng tích chọn ít nhất một mã hàng trong cụm đơn cần duyệt ưu tiên!');
+    
+    const logsText = [];
+    checkedBoxes.forEach((cb)=>{
+      const id = cb.dataset.candidateId;
+      const item = appState.details.find((i)=>i.id === id);
+      if(item && !appState.confirmedTomorrow.some((c)=>c.id === item.id)){
         appState.confirmedTomorrow.push({
-          id: item.id, donHang: item.donHang, maBao: item.maBao, shortage: item.shortage, ngay: item.ngay, ngayKey: item.ngayKey
+          id: item.id, donHang: item.donHang, maBao: item.maBao,
+          shortage: item.shortage, ngay: item.ngay, ngayKey: item.ngayKey
         });
         logsText.push(`Đơn: ${item.donHang} (${item.maBao}) - Thiếu: ${item.shortage}T`);
       }
     });
-
     uploadConfirmedToFirebase();
     writeAuditLog("Xác nhận duyệt ưu tiên cụm đơn ngày mai", logsText.join(" | "));
-
+    
     const nextRole = currentRole() === 'admin' ? 'production' : 'admin';
     const sourceLabel = localStorage.getItem('tp_user_fullname') || 'Quản đốc sản xuất';
     sendAppNotice(nextRole, `${sourceLabel} đã duyệt điều phối một số đơn hàng mai có thể xuất.`);
@@ -1712,41 +1772,16 @@ function bindEvents(){
     appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== button.dataset.removeTomorrow);
     uploadConfirmedToFirebase();
     
-    if(targetItem) {
-       writeAuditLog("Hủy duyệt đơn hàng ngày mai", `Mã ĐH: ${targetItem.donHang} | Mã bao bì: ${targetItem.maBao} | Thiếu hụt quy đổi: ${targetItem.shortage}T`);
+    if(targetItem){
+      writeAuditLog("Hủy bỏ trạng thái duyệt ưu tiên xuất", `Hủy đơn: ${targetItem.donHang} (${targetItem.maBao})`);
     }
   });
 
-  document.getElementById('totalPackagingTable')?.addEventListener('change', (e) => {
-    if (e.target.classList.contains('bb-ordered-checkbox')) {
-      const bbCode = e.target.dataset.bbCode;
-      const isChecked = e.target.checked;
-      if (database) {
-        const safeKey = btoa(encodeURIComponent(bbCode)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-        database.ref("thanhpham_system/packaging_ordered/" + safeKey).set({
-          code: bbCode,
-          ordered: isChecked,
-          updatedAt: new Date().toLocaleString('vi-VN')
-        });
-        writeAuditLog("Cập nhật trạng thái đặt bao bì", `Mã bao bì: ${bbCode} -> ${isChecked ? 'Đia ĐẶT' : 'CHƯA ĐẶT'}`);
-      }
-    }
-  });
-
-  document.getElementById('btnOpenHistory')?.addEventListener('click', ()=>{
-    document.getElementById('historyPopup').classList.remove('hideBox');
-    loadAuditLogsToTable();
-  });
-  document.getElementById('btnCloseHistory')?.addEventListener('click', ()=>{
-    document.getElementById('historyPopup').classList.add('hideBox');
-  });
-
-  document.getElementById('tomorrowDateSelect').addEventListener('change', refreshAll);
-  document.getElementById('btnPreviewReady')?.addEventListener('click', renderExportPreview);
-  document.getElementById('btnConfirmReady')?.addEventListener('click', exportExcel);
-  document.getElementById('readyExportMode')?.addEventListener('change', renderExportPreview);
-  document.getElementById('readyFromDate')?.addEventListener('change', renderExportPreview);
-  document.getElementById('readyToDate')?.addEventListener('change', renderExportPreview);
+  document.getElementById('btnPreviewReady')?.addEventListener('click', renderReadySection);
+  document.getElementById('btnConfirmReady')?.addEventListener('click', exportReadyExcel);
+  document.getElementById('readyExportMode')?.addEventListener('change', renderReadySection);
+  document.getElementById('readyFromDate')?.addEventListener('change', renderReadySection);
+  document.getElementById('readyToDate')?.addEventListener('change', renderReadySection);
 
   document.getElementById('btnFilterProd')?.addEventListener('click', renderProduction);
   document.getElementById('prodDisplayMode')?.addEventListener('change', renderProduction);
@@ -1761,6 +1796,7 @@ function bindEvents(){
   
   document.getElementById('captureDetailBtn')?.addEventListener('click', captureDetailImage);
   document.getElementById('btnSaveProductionView')?.addEventListener('click', saveProductionViewSettings);
+  
   document.getElementById('btnNotifyWorkshop')?.addEventListener('click', ()=>{
     sendAppNotice('production', '🚀 Văn phòng đã hoàn tất cập nhật dữ liệu đơn hàng và tồn kho mới nhất. Xin mời kiểm tra!');
     alert('🔔 Đã gửi tín hiệu thông báo thông minh thời gian thực đến màn hình xưởng!');
