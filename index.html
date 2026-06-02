@@ -2,33 +2,13 @@
 <html lang="vi">
 
 <head>
-
 <meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HỆ THỐNG TRA CỨU THÀNH PHẨM TỰ ĐỘNG</title>
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
-/>
-
-<title>
-  HỆ THỐNG TRA CỨU THÀNH PHẨM TỰ ĐỘNG
-</title>
-
-<link
-  rel="preconnect"
-  href="https://fonts.googleapis.com"
-/>
-
-<link
-  rel="preconnect"
-  href="https://fonts.gstatic.com"
-  crossorigin
-/>
-
-<link
-  href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700&display=swap"
-  rel="stylesheet"
-/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght=400;500;600;700&display=swap" rel="stylesheet"/>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -39,101 +19,79 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
-
 *{
-  font-family:'Be Vietnam Pro',sans-serif;
+  font-family: 'Be Vietnam Pro', sans-serif;
 }
-
 body{
-  background:#020617;
-  color:#f8fafc;
+  background: #020617;
+  color: #f8fafc;
 }
-
 table{
-  width:100%;
-  border-collapse:collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
-
-th,td{
-  padding:14px 16px;
-  border-bottom:1px solid #1e293b;
-  text-align:left;
-  white-space:nowrap;
-  font-size:15px;
+th, td{
+  padding: 14px 16px;
+  border-bottom: 1px solid #1e293b;
+  text-align: left;
+  white-space: nowrap;
+  font-size: 15px;
 }
-
 th{
-  background:#0f172a;
-  position:sticky;
-  top:0;
-  z-index:5;
-  font-weight:600;
-  color:#94a3b8;
+  background: #0f172a;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  font-weight: 600;
+  color: #94a3b8;
 }
-
 tbody tr:hover{
-  background:#0f172a;
+  background: #0f172a;
 }
-
 ::-webkit-scrollbar{
-  width:8px;
-  height:8px;
+  width: 8px;
+  height: 8px;
 }
-
 ::-webkit-scrollbar-thumb{
-  background:#334155;
-  border-radius:999px;
+  background: #334155;
+  border-radius: 999px;
 }
-
 .hideBox{
-  display:none !important;
+  display: none !important;
 }
-
 .flash{
-  animation:flashEffect 2s ease;
+  animation: flashEffect 2s ease;
 }
-
 @keyframes flashEffect{
-  0%{
-    background:#facc15;
-    color:black;
-  }
-  100%{
-    background:transparent;
-  }
+  0%{ background: #facc15; color: black; }
+  100%{ background: transparent; }
 }
-
 .card{
-  background:#0f172a;
-  border:1px solid #1e293b;
-  border-radius:16px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
 }
-
 .input{
-  width:100%;
-  background:#111827;
-  border:1px solid #334155;
-  border-radius:10px;
-  padding:12px;
-  outline:none;
-  transition:0.2s;
+  width: 100%;
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 12px;
+  outline: none;
+  transition: 0.2s;
   color: white;
 }
-
 .input:focus{
-  border-color:#8b5cf6;
-  box-shadow:0 0 0 3px rgba(139,92,246,0.2);
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
 }
-
 .btn{
-  padding:12px 20px;
-  border-radius:10px;
-  font-weight:600;
-  transition:0.2s;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: 0.2s;
 }
-
 </style>
-
 </head>
 
 <body class="p-5">
@@ -141,23 +99,13 @@ tbody tr:hover{
 <div id="loginSection" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4">
   <div class="card p-8 max-w-md w-full text-center space-y-5 border-violet-500/30">
     <div class="w-14 h-14 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-xl">🔐</div>
-    <h2 class="text-xl font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">VUI LÒNG CHỌN BỘ PHẬN</h2>
-    <p class="text-slate-400 text-sm">Hệ thống sẽ tự động phân quyền giao diện phù hợp</p>
+    <h2 class="text-xl font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">ĐĂNG NHẬP HỆ THỐNG</h2>
+    <p class="text-slate-400 text-sm">Vui lòng nhập tài khoản bộ phận được cấp quyền</p>
     
-    <button onclick="selectUserRole('production')" class="btn w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-sm">
-      🏭 Quản đốc sản xuất (Xưởng - Vào thẳng)
-    </button>
-
-    <div class="relative flex py-2 items-center">
-        <div class="flex-grow border-t border-slate-700"></div>
-        <span class="flex-shrink mx-4 text-slate-500 text-xs tracking-wider">HOẶC ĐĂNG NHẬP VĂN PHÒNG</span>
-        <div class="flex-grow border-t border-slate-700"></div>
-    </div>
-
     <div class="text-left space-y-3">
       <div>
         <label class="text-xs text-slate-400 pl-1">Tài khoản:</label>
-        <input type="text" id="userInput" placeholder="Nhập tài khoản..." class="input mt-1 text-sm py-2.5" />
+        <input type="text" id="userInput" placeholder="Nhập tài khoản (ví dụ: hiepquandoc)..." class="input mt-1 text-sm py-2.5" />
       </div>
       <div>
         <label class="text-xs text-slate-400 pl-1">Mật khẩu:</label>
@@ -165,9 +113,15 @@ tbody tr:hover{
       </div>
     </div>
 
-    <button onclick="selectUserRole('admin')" class="btn w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
-      💻 Chủ quản văn phòng (Máy chủ)
-    </button>
+    <div class="grid grid-cols-2 gap-3 pt-2">
+      <button onclick="handleLogin('production')" class="btn bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-sm">
+        🏭 Xưởng Sản Xuất
+      </button>
+      <button onclick="handleLogin('admin')" class="btn bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
+        💻 Máy Chủ Văn Phòng
+      </button>
+    </div>
+    
     <div id="loginAlert" class="text-red-400 text-sm font-semibold mt-1"></div>
   </div>
 </div>
@@ -177,24 +131,52 @@ tbody tr:hover{
   <div class="card p-6">
     <div class="flex justify-between items-center flex-wrap gap-5">
       <div class="flex items-center gap-4 flex-wrap">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-2xl font-bold">
-          TP
-        </div>
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-2xl font-bold">TP</div>
         <div>
-          <h1 class="text-2xl font-bold tracking-tight uppercase">
-            📦 HỆ THỐNG TRA CỨU THÀNH PHẨM TỰ ĐỘNG
-          </h1>
+          <h1 class="text-2xl font-bold tracking-tight uppercase">📦 HỆ THỐNG TRA CỨU THÀNH PHẨM TỰ ĐỘNG</h1>
           <div class="flex items-center gap-3 text-slate-400 mt-1 text-sm">
             <span>Bộ phận: <span id="currentRoleLabel" class="text-violet-400 font-semibold">...</span></span>
+            <span>Người đăng nhập: <span id="currentUserLabel" class="text-yellow-400 font-semibold">...</span></span>
             <span id="syncStatus" class="text-xs px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-medium">🟡 Đang kết nối mạng...</span>
           </div>
         </div>
       </div>
 
-      <div class="flex gap-3 text-sm">
+      <div class="flex gap-3 text-sm flex-wrap">
+        <button id="btnOpenHistory" class="btn bg-blue-950 hover:bg-blue-900 text-blue-400 border border-blue-800/50">⏳ Xem lịch sử thao tác</button>
         <button id="btnNotifyWorkshop" class="btn bg-amber-600 hover:bg-amber-500 text-black hideBox">🔔 Báo xưởng xem dữ liệu</button>
-        <button id="btnResetStorage" class="btn bg-rose-950/60 hover:bg-rose-900 text-rose-300 hideBox" onclick="clearSystemCache()">🗑️ Xóa dữ liệu gốc đám mây</button>
+        <button id="btnResetStorage" class="btn bg-rose-950/60 hover:bg-rose-900 text-rose-300 hideBox" onclick="clearSystemCache()">🗑️ Xóa sạch dữ liệu (Giữ quy tắc Bao Bì)</button>
         <button onclick="switchRole()" class="btn bg-slate-700 hover:bg-slate-600">🔄 Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="historyPopup" class="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 hideBox">
+    <div class="card max-w-4xl w-full flex flex-col max-h-[85vh] border-blue-500/30 shadow-2xl overflow-hidden">
+      <div class="p-5 bg-slate-900 border-b border-slate-800 flex flex-wrap justify-between items-center gap-4">
+        <h3 class="text-lg font-bold text-blue-400 uppercase tracking-wide">📜 NHẬT KÝ CHI TIẾT TRUY VẾT HỆ THỐNG</h3>
+        
+        <div class="flex items-center gap-2 text-sm bg-slate-950 p-1 border border-slate-800 rounded-xl">
+          <input type="text" id="deleteHistoryDateInput" placeholder="Ví dụ: 1/6/2026" class="bg-transparent text-white w-32 text-center outline-none py-1 px-2 font-mono text-xs" />
+          <button onclick="deleteHistoryByDate()" class="bg-red-600 hover:bg-red-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition">❌ Xóa ngày này</button>
+        </div>
+
+        <button id="btnCloseHistory" class="text-slate-400 hover:text-white font-bold text-xl px-2">&times;</button>
+      </div>
+      <div class="p-5 overflow-auto flex-1">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-950 text-slate-400 font-medium border-b border-slate-800">
+              <th class="p-3">Thời gian</th>
+              <th class="p-3">Người thao tác</th>
+              <th class="p-3">Hành động</th>
+              <th class="p-3">Chi tiết nội dung dữ liệu thay đổi</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr><td colspan="4" class="text-center text-slate-500 py-6">Đang truy xuất dữ liệu nhật ký...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -202,7 +184,7 @@ tbody tr:hover{
   <div id="appNoticeBox" class="card p-5 border-amber-500/30 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4">
       <div>
-        <div id="appNoticeTitle" class="text-lg font-bold text-amber-400 uppercase">🔔 THÔNG BÁO</div>
+        <div id="appNoticeTitle" class="text-lg font-bold text-amber-400 uppercase">🔔 THÔNG BÁO THỜI GIAN THỰC</div>
         <div id="appNoticeMessage" class="text-slate-300 mt-1 text-sm"></div>
       </div>
       <button id="btnDismissNotice" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Đã xem</button>
@@ -215,11 +197,11 @@ tbody tr:hover{
       <div id="kpi-total-orders" class="text-4xl font-bold mt-2">0</div>
     </div>
     <div class="card p-5">
-      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">ĐƠN ĐỦ HÀNG</div>
+      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">ĐƠN ĐỦ HÀNG XUẤT</div>
       <div id="kpi-ready-orders" class="text-4xl font-bold mt-2 text-green-400">0</div>
     </div>
     <div class="card p-5">
-      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">ĐƠN THIẾU HÀNG</div>
+      <div class="text-slate-400 text-sm uppercase tracking-wider font-semibold">ĐƠN THIẾU HÀNG KHO</div>
       <div id="kpi-shortage-orders" class="text-4xl font-bold mt-2 text-red-400">0</div>
     </div>
     <div class="card p-5">
@@ -267,16 +249,63 @@ tbody tr:hover{
       </label>
     </div>
   </div>
+  
+  <div id="section-bb-rules" class="card p-6 border-violet-500/30 hideBox">
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-4">
+      <div>
+        <h2 class="text-xl font-bold text-violet-400 uppercase">⚙️ GHI NHỚ & QUẢN LÝ QUY TẮC MATCH BAO BÌ ĐÁM MÂY</h2>
+        <div class="text-slate-400 text-sm mt-1">Cấu hình độc lập. Khi xóa dữ liệu đơn hàng/tồn kho cũ, danh sách quy tắc này vẫn sẽ được GIỮ NGUYÊN.</div>
+      </div>
+      <div class="flex gap-3 text-sm">
+        <button onclick="toggleBBRulesContent()" id="btnToggleBBRules" class="btn bg-slate-700 hover:bg-slate-600">Thu gọn / Mở rộng</button>
+        <button onclick="toggleRuleForm()" class="btn bg-violet-600 hover:bg-violet-500 text-white">➕ Thêm Quy Tắc Mới</button>
+      </div>
+    </div>
+
+    <div id="bbRulesMainContent" class="space-y-5">
+      <div id="bbRuleFormBox" class="bg-slate-800 rounded-xl p-5 mb-5 text-sm space-y-4 hideBox border border-slate-700">
+        <div class="text-base font-bold text-yellow-400 uppercase">✨ KHAI BÁO QUY TẮC MỚI</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-slate-400 pl-1">1. Từ khóa nhận diện trong Đơn Hàng (Ví dụ: MS4A, NGỌCTHỊNH, JUMBO...):</label>
+            <input type="text" id="ruleKeywordInput" placeholder="Nhập từ khóa nhận diện..." class="input mt-1" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-400 pl-1">2. Mã Bao Bì chính xác trong Tồn Kho tương ứng cần map sang:</label>
+            <input type="text" id="ruleTargetInput" placeholder="Nhập tên mã bao bì chuẩn ở Sheet BB..." class="input mt-1" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-2">
+          <button onclick="toggleRuleForm()" class="btn bg-slate-700 hover:bg-slate-600 text-xs">Hủy bỏ</button>
+          <button onclick="saveCloudBBRule()" class="btn bg-emerald-600 hover:bg-emerald-500 text-white text-xs">💾 Lưu Lên Đám Mây</button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-xl overflow-auto max-h-[300px]">
+        <table id="cloudBBRulesTable">
+          <thead>
+            <tr>
+              <th>Từ khóa nhận diện</th>
+              <th>Mã Bao Bì quy đổi tương ứng</th>
+              <th>Ngày tạo</th>
+              <th class="text-center">Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="4" class="text-center text-slate-500 py-4">Chưa cấu hình quy tắc ghi nhớ nào</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <div id="section-import" class="card p-6 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4 mb-6">
       <div>
         <h2 class="text-xl font-bold uppercase">📁 IMPORT DỮ LIỆU LÊN ĐÁM MÂY MÁY CHỦ</h2>
-        <div class="text-slate-400 text-sm mt-1">Upload file dữ liệu mới, tất cả các máy tính của xưởng và văn phòng sẽ tự động tải dữ liệu đồng bộ</div>
+        <div class="text-slate-400 text-sm mt-1">Upload file dữ liệu mới, tất cả máy xưởng và văn phòng sẽ tự động cập nhật đồng bộ</div>
       </div>
-      <button class="btn bg-emerald-600 hover:bg-emerald-500 text-sm" onclick="processFiles()">
-        🚀 Xử lý & Đồng bộ đơn hàng
-      </button>
+      <button class="btn bg-emerald-600 hover:bg-emerald-500 text-black text-sm" onclick="processFiles()">🚀 Xử lý & Đồng bộ đám mây</button>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-sm">
       <div class="bg-slate-800 rounded-xl p-5">
@@ -294,30 +323,23 @@ tbody tr:hover{
   <div id="section-tomorrow" class="card p-6 border-yellow-500/20">
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-        <h2 class="text-xl font-bold text-yellow-400 uppercase">
-          ⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT (DANH SÁCH DUYỆT THIẾU KHO)
-          <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span>
-        </h2>
-        <div class="text-slate-400 text-sm mt-1">Quản đốc chỉ cần chọn những mã hàng bị THIẾU thực tế của cụm ghép, hệ thống sẽ tự nhận diện gom cả cụm đủ đi kèm</div>
+        <h2 class="text-xl font-bold text-yellow-400 uppercase">⚡ ĐƠN HÀNG MAI CÓ THỂ XUẤT (DANH SÁCH DUYỆT THIẾU KHO) <span class="bg-yellow-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span></h2>
+        <div class="text-slate-400 text-sm mt-1">Quản đốc tích chọn mã hàng thiếu thực tế của cụm ghép, hệ thống sẽ tự gom toàn bộ đơn trong cụm đó đi cùng</div>
       </div>
     </div>
 
     <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4 mb-5 text-sm">
       <div>
-        <div class="text-slate-400 mb-2">Chọn ngày giao</div>
+        <div class="text-slate-400 mb-2">Lọc theo ngày giao hàng:</div>
         <select id="tomorrowDateSelect" class="input" onchange="refreshAll()">
           <option value="ALL">ALL</option>
         </select>
       </div>
       <div class="flex items-end">
-        <button onclick="refreshAll()" class="btn w-full bg-yellow-500 hover:bg-yellow-400 text-black">
-          🔍 Xổ danh sách
-        </button>
+        <button onclick="refreshAll()" class="btn w-full bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700">🔍 Lọc danh sách</button>
       </div>
       <div id="btn-wrap-confirm-workshop" class="flex items-end">
-        <button id="btnWorkshopConfirm" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white">
-          ✅ Hoàn thành chọn đơn
-        </button>
+        <button id="btnWorkshopConfirm" class="btn w-full bg-yellow-500 hover:bg-yellow-400 text-black">✅ Xác nhận duyệt cụm đơn</button>
       </div>
     </div>
 
@@ -342,9 +364,7 @@ tbody tr:hover{
     </div>
 
     <div class="bg-yellow-500/5 border border-yellow-500/20 rounded-xl overflow-auto">
-      <div class="p-4 text-base font-bold text-yellow-400 border-b border-yellow-500/10 uppercase">
-        ✅ ĐÃ XÁC NHẬN "MAI CÓ THỂ XUẤT"
-      </div>
+      <div class="p-4 text-base font-bold text-yellow-400 border-b border-yellow-500/10 uppercase">✅ CÁC ĐƠN ĐÃ ĐƯỢC DUYỆT ĐIỀU PHỐI MAI XUẤT</div>
       <table id="tomorrowConfirmedTable">
         <thead>
           <tr>
@@ -353,7 +373,7 @@ tbody tr:hover{
             <th>Thiếu</th>
             <th>Ngày giao</th>
             <th>Trạng thái</th>
-            <th>Xóa</th>
+            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
@@ -366,55 +386,47 @@ tbody tr:hover{
   <div id="section-ready" class="card p-6 border-green-500/20 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-        <h2 class="text-xl font-bold text-green-400 uppercase">
-          ✅ ĐƠN HÀNG CÓ THỂ XUẤT
-          <span class="bg-green-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span>
-        </h2>
-        <div class="text-slate-400 text-sm mt-1">Luôn hiển thị ALL toàn bộ đơn có thể xuất</div>
+        <h2 class="text-xl font-bold text-green-400 uppercase">✅ DANH SÁCH ĐƠN ĐỦ ĐIỀU KIỆN XUẤT <span class="bg-green-500 text-black text-xs px-2 py-0.5 rounded-full ml-2 font-bold">0</span></h2>
+        <div class="text-slate-400 text-sm mt-1">Bao gồm toàn bộ đơn tự động đủ kho và các đơn đã được duyệt ép xuất ở mục trên</div>
       </div>
     </div>
 
     <div class="bg-violet-500/5 border border-violet-500/20 rounded-xl p-5 mb-5 text-sm">
-      <div class="text-lg font-bold text-violet-400 mb-4 uppercase">📅 BỘ LỌC XUẤT DỮ LIỆU KẾ HOẠCH</div>
+      <div class="text-lg font-bold text-violet-400 mb-4 uppercase">📅 BỘ LỌC XUẤT DỮ LIỆU EXCEL KẾ HOẠCH XUẤT HÀNG</div>
       <div class="grid xl:grid-cols-5 md:grid-cols-2 gap-4 mb-4">
         <div>
-          <div class="text-slate-400 mb-2">Chế độ export</div>
+          <div class="text-slate-400 mb-2">Chế độ xuất</div>
           <select id="readyExportMode" class="input">
-            <option value="ALL">ALL</option>
-            <option value="1 ngày">1 ngày</option>
-            <option value="Khoảng ngày">Khoảng ngày</option>
+            <option value="ALL">Toàn bộ đơn đủ điều kiện (ALL)</option>
+            <option value="1 ngày">Xem chính xác 1 ngày</option>
+            <option value="Khoảng ngày">Xem theo khoảng ngày giao</option>
           </select>
         </div>
         <div>
-          <div class="text-slate-400 mb-2">Từ ngày</div>
-          <input type="date" id="readyFromDate" class="input" />
+          <div class="text-slate-400 mb-2">Từ ngày giao:</div>
+          <input type="date" id="readyFromDate" value="2026-06-01" class="input" />
         </div>
         <div>
-          <div class="text-slate-400 mb-2">Đến ngày</div>
-          <input type="date" id="readyToDate" class="input" />
+          <div class="text-slate-400 mb-2">Đến ngày giao:</div>
+          <input type="date" id="readyToDate" value="2026-06-30" class="input" />
         </div>
         <div class="flex items-end">
-          <button id="btnPreviewReady" class="btn w-full bg-blue-600 hover:bg-blue-500 text-white">🔍 Xem trước xuất</button>
+          <button id="btnPreviewReady" class="btn w-full bg-blue-600 hover:bg-blue-500 text-white">🔍 Xem trước bảng</button>
         </div>
         <div class="flex items-end">
-          <button id="btnConfirmReady" class="btn w-full bg-violet-600 hover:bg-violet-500 text-white">📥 Xác nhận xuất Excel</button>
+          <button id="btnConfirmReady" class="btn w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white">📥 Tải File Excel Kế Hoạch</button>
         </div>
       </div>
     </div>
 
     <div class="bg-slate-800 rounded-xl overflow-auto mb-5" id="exportPreviewContainer">
-      <div class="p-5">
-        <div class="text-lg font-bold uppercase">📦 XEM TRƯỚC FILE XUẤT HÀNG</div>
-        <div class="text-slate-400 text-sm mt-1">Hiển thị chính xác bảng dữ liệu kế hoạch sắp tải về</div>
-      </div>
-      <div class="p-10 text-center text-slate-500 text-sm">Format Excel kế hoạch xuất hàng</div>
+      <div class="p-5 text-center text-slate-500 text-sm">Bảng xem trước định dạng tệp xuất hàng sẽ hiển thị tại đây...</div>
     </div>
 
     <div class="bg-slate-800 rounded-xl overflow-hidden">
       <div class="p-5 flex justify-between items-center flex-wrap gap-4 border-b border-slate-700">
         <div>
-          <div class="text-lg font-bold uppercase">📋 DANH SÁCH TOÀN BỘ ĐƠN CÓ THỂ XUẤT</div>
-          <div class="text-slate-400 text-sm mt-1">Hiển thị tất cả đơn hàng đủ điều kiện giao của hệ thống</div>
+          <div class="text-lg font-bold uppercase">📋 CHI TIẾT TOÀN BỘ ĐƠN SẴN SÀNG XUẤT HÀNG</div>
         </div>
         <button onclick="document.getElementById('fullExportTable').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Thu gọn / Mở rộng</button>
       </div>
@@ -425,8 +437,8 @@ tbody tr:hover{
   <div id="section-production" class="card p-6 border-red-500/20 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
-        <h2 class="text-xl font-bold text-red-400 uppercase">⚠️ THÀNH PHẨM CẦN SẢN XUẤT</h2>
-        <div class="text-slate-400 text-sm mt-1">Tổng hợp khối lượng thành phẩm thực sự thiếu hụt cần chạy lò gấp (Đơn đủ hàng ghép cont sẽ không xuất hiện tại đây)</div>
+        <h2 class="text-xl font-bold text-red-400 uppercase">⚠️ TỔNG HỢP THÀNH PHẨM THIẾU CẦN SẢN XUẤT</h2>
+        <div class="text-slate-400 text-sm mt-1">Tổng lượng thiếu hụt thực tế (Đơn đủ hàng ghép cont sẽ không xuất hiện gây nhiễu tại đây)</div>
       </div>
       <button onclick="document.getElementById('tpSanXuatBox').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Thu gọn / Mở rộng</button>
     </div>
@@ -435,20 +447,20 @@ tbody tr:hover{
       <div class="bg-slate-800 rounded-xl p-5 text-sm">
         <div class="grid xl:grid-cols-4 md:grid-cols-2 gap-4">
           <div>
-            <div class="text-slate-400 mb-2">Chế độ hiển thị</div>
+            <div class="text-slate-400 mb-2">Chế độ lọc dữ liệu sản xuất:</div>
             <select id="prodDisplayMode" class="input">
-              <option value="ALL">ALL</option>
-              <option value="1 ngày">1 ngày</option>
-              <option value="Khoảng ngày">Khoảng ngày</option>
+              <option value="ALL">Tất cả thời gian (ALL)</option>
+              <option value="1 ngày">Lọc theo 1 ngày</option>
+              <option value="Khoảng ngày">Lọc theo khoảng ngày</option>
             </select>
           </div>
           <div>
-            <div class="text-slate-400 mb-2">Từ ngày</div>
-            <input type="date" id="prodFromDate" class="input" />
+            <div class="text-slate-400 mb-2">Từ ngày:</div>
+            <input type="date" id="prodFromDate" value="2026-06-01" class="input" />
           </div>
           <div>
-            <div class="text-slate-400 mb-2">Đến ngày</div>
-            <input type="date" id="prodToDate" class="input" />
+            <div class="text-slate-400 mb-2">Đến ngày:</div>
+            <input type="date" id="prodToDate" value="2026-06-30" class="input" />
           </div>
           <div class="flex items-end">
             <button id="btnFilterProd" class="btn w-full bg-red-600 hover:bg-red-500 text-white">🔍 Lọc dữ liệu sản xuất</button>
@@ -460,13 +472,13 @@ tbody tr:hover{
         <table id="productionNeedTable">
           <thead>
             <tr>
-              <th>Tên đơn hàng</th>
-              <th>Tổng nhu cầu</th>
-              <th>Tồn TP</th>
-              <th>Thiếu</th>
-              <th>Cần SX</th>
-              <th>Số đơn</th>
-              <th>Ngày giao gần nhất</th>
+              <th>Tên đơn hàng (Sản phẩm)</th>
+              <th>Tổng nhu cầu đơn</th>
+              <th>Tồn hiện tại</th>
+              <th>Thiếu hụt</th>
+              <th class="text-yellow-400">Khối lượng cần SX bổ sung</th>
+              <th>Số lượng cont</th>
+              <th>Ngày giao hàng gần nhất</th>
             </tr>
           </thead>
           <tbody>
@@ -477,15 +489,45 @@ tbody tr:hover{
     </div>
   </div>
 
+  <div id="section-total-packaging" class="card p-6 border-orange-500/20 hideBox">
+    <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
+      <div>
+        <h2 class="text-xl font-bold text-orange-400 uppercase tracking-tight">📦 BẢNG TỔNG HỢP NHU CẦU BAO BÌ CỦA TẤT CẢ ĐƠN HÀNG</h2>
+        <div class="text-slate-400 text-sm mt-1">Tính toán gom tổng số lượng vỏ bao cần, số vỏ hiện có trên kệ và số lượng thiếu hụt thực tế cần bổ sung.</div>
+      </div>
+      <button onclick="document.getElementById('totalPackagingBox').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600 text-sm">Thu gọn / Mở rộng</button>
+    </div>
+
+    <div id="totalPackagingBox" class="space-y-5">
+      <div class="bg-slate-800 rounded-xl overflow-auto max-h-[550px]">
+        <table id="totalPackagingTable">
+          <thead>
+            <tr class="bg-slate-950">
+              <th>Mã Bao Bì Quy Đổi Chuẩn</th>
+              <th>Tổng Nhu Cầu Đơn Hàng (Cái)</th>
+              <th>Tồn Kho Trên Kệ Hiện Tại (Cái)</th>
+              <th class="text-red-400">Thiếu Hụt Thực Tế Cần Bổ Sung (Cái)</th>
+              <th class="text-center">Số Lượng Đơn Hàng Liên Quan</th>
+              <th class="text-center">Đã đặt bao chưa</th>
+            </tr>
+          </thead>
+          <tbody>
+             <tr><td colspan="6" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp phân tích bao bì</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div id="section-detail" class="card p-6 hideBox">
     <div class="flex justify-between items-center flex-wrap gap-4 mb-5">
       <div>
         <h2 class="text-xl font-bold uppercase">📋 CHI TIẾT TOÀN BỘ ĐƠN HÀNG TRÊN HỆ THỐNG</h2>
-        <div class="text-slate-400 text-sm mt-1">Theo dõi tổng quan dữ liệu toàn bộ danh sách đơn hàng đã nhập</div>
+        <div class="text-slate-400 text-sm mt-1">Bảng tổng hợp chi tiết phân bổ tự động cho cả Thành Phẩm và Bao Bì (Vỏ bao)</div>
       </div>
       <div class="flex gap-3 text-sm">
         <button onclick="document.getElementById('chiTietDonHangBox').classList.toggle('hideBox')" class="btn bg-slate-700 hover:bg-slate-600">Thu gọn / Mở rộng</button>
-        <button id="captureDetailBtn" class="btn bg-blue-600 hover:bg-blue-500 text-white">📸 Chụp màn hình gửi Zalo</button>
+        <button id="captureDetailBtn" class="btn bg-blue-600 hover:bg-blue-500 text-white">📸 Chụp ảnh gửi nhanh Zalo</button>
       </div>
     </div>
 
@@ -493,27 +535,27 @@ tbody tr:hover{
       <div class="bg-slate-800 rounded-xl p-5 text-sm">
         <div class="grid xl:grid-cols-5 md:grid-cols-2 gap-4">
           <div>
-            <div class="text-slate-400 mb-2">Chế độ hiển thị</div>
+            <div class="text-slate-400 mb-2">Chế độ hiển thị:</div>
             <select id="detailDisplayMode" class="input">
-              <option value="ALL">ALL</option>
-              <option value="1 ngày">1 ngày</option>
-              <option value="Khoảng ngày">Khoảng ngày</option>
+              <option value="ALL">Tất cả đơn hàng (ALL)</option>
+              <option value="1 ngày">Xem theo 1 ngày giao</option>
+              <option value="Khoảng ngày">Xem theo khoảng ngày giao</option>
             </select>
           </div>
           <div>
-            <div class="text-slate-400 mb-2">Từ ngày</div>
-            <input type="date" id="detailFromDate" class="input" />
+            <div class="text-slate-400 mb-2">Từ ngày:</div>
+            <input type="date" id="detailFromDate" value="2026-06-01" class="input" />
           </div>
           <div>
-            <div class="text-slate-400 mb-2">Đến ngày</div>
-            <input type="date" id="detailToDate" class="input" />
+            <div class="text-slate-400 mb-2">Đến ngày:</div>
+            <input type="date" id="detailToDate" value="2026-06-30" class="input" />
           </div>
           <div>
-            <div class="text-slate-400 mb-2">Tìm kiếm nhanh</div>
-            <input type="text" id="detailSearchInput" placeholder="Nhập mã đơn / tên khách..." class="input" />
+            <div class="text-slate-400 mb-2">Tìm kiếm thông minh:</div>
+            <input type="text" id="detailSearchInput" placeholder="Nhập mã đơn, tên khách, hãng VC..." class="input" />
           </div>
           <div class="flex items-end">
-            <button id="btnSearchDetail" class="btn w-full bg-slate-700 hover:bg-slate-600">🔍 Bắt đầu tìm</button>
+            <button id="btnSearchDetail" class="btn w-full bg-slate-700 hover:bg-slate-600">🔍 Tìm kiếm</button>
           </div>
         </div>
       </div>
@@ -525,17 +567,18 @@ tbody tr:hover{
               <th>Đơn hàng</th>
               <th>Khách hàng</th>
               <th>Số cont</th>
-              <th>SL đơn</th>
-              <th>Tồn TP</th>
-              <th>Thiếu TP</th>
-              <th class="text-orange-400">Tồn Bao Bì (Vỏ)</th>
-              <th class="text-orange-400">Thiếu Bao Bì (Vỏ)</th>
+              <th class="text-cyan-400">Hãng VC</th>
+              <th>SL đơn (Tấn)</th>
+              <th>Tồn TP hiện có</th>
+              <th>Thiếu hụt TP</th>
+              <th class="text-orange-400">Tồn Bao Bì</th>
+              <th class="text-orange-400">Thiếu Bao Bì</th>
               <th>Ngày giao</th>
               <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
-             <tr><td colspan="10" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp</td></tr>
+             <tr><td colspan="11" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp</td></tr>
           </tbody>
         </table>
       </div>
@@ -545,11 +588,12 @@ tbody tr:hover{
 </div>
 
 <script>
+// Cấu hình kết nối cơ sở dữ liệu Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyB9F9oHqiyQHS3-5r1IsQiGvl1nbAClNY4",
   authDomain: "hethongthanhpham.firebaseapp.com",
-  projectId: "hethongthanhpham",
-  storageBucket: "hethongthanhpham.firebasestorage.app",
+  projectId: "hethongthpham",
+  storageBucket: "hethongthpham.firebasestorage.app",
   messagingSenderId: "522347739695",
   appId: "1:522347739695:web:a743523d3c67fb5a3964da",
   measurementId: "G-MEKJL605EF",
@@ -560,15 +604,18 @@ try {
   firebase.initializeApp(firebaseConfig);
   var database = firebase.database();
 } catch (e) {
-  console.error("Lỗi kết nối mạng gốc:", e);
+  console.error("Lỗi khởi tạo Firebase mạng:", e);
 }
 
+// Khởi tạo trạng thái ứng dụng toàn cục
 const appState = {
   orders: [],
   details: [],
   production: [],
   confirmedTomorrow: [],
   exportPreview: [],
+  bbRules: [],
+  packagingOrdered: {},
   stockMap: new Map(),
   bbMap: new Map(),
   productionView: {
@@ -580,37 +627,148 @@ const appState = {
   latestNotice: null
 };
 
-const SECURITY_ACC = "omotobike";
-const SECURITY_PSW = "hoilamchi";
+// DANH SÁCH TÀI KHOẢN BẢO MẬT HỆ THỐNG
+const SECURITY_ACC = "omotobike"; 
+const SECURITY_PSW = "hoilamchi"; 
 
-const MANUAL_MAP = {
-  'PM-400目-25KG(HẠT42)BỎBAOJB1,3TẤN': 'PM-400目-25KG(HẠT37)',
-  'PM-400目-25KG(HẠT42)BỎBAOJB1,35TẤN': 'PM-400目-25KG(HẠT37)',
-  'SN10-25KGSƠN': 'SN10-25KG(52*76)',
-  'SN10-25KGKEO': 'SN10-25KG(52*76)',
-  'SN10-25KG': 'SN10-25KG(52*76)',
-  'SN20-25KG(ĐẸP)': 'SN20-25KG(50*73)',
-  'SN25(500#)-(BỘT33)BỎBAOJB1.2T': 'SN25(500目)-25KG',
-  'SN25(500#)-(BỘT33)XẾPLẾT': 'SN25(500目)-25KG',
-  'BỘT45-25KGBAOTRẮNG': 'BAOTRẮNGK45VAN(BỘT45+70)',
-  'MS2A-25KG(HẠT15)': 'MS2A-25KG'
+// Danh sách tài khoản Quản Đốc Sản Xuất
+const WORKSHOP_USERS = {
+  "hiepquandoc": { password: "123", fullName: "Hiệp Quản đốc" },
+  "dungquandoc": { password: "456", fullName: "Dũng Quản đốc" }
 };
 
-function selectUserRole(role) {
+// HÀM XỬ LÝ ĐĂNG NHẬP MỚI KIỂM TRA TÀI KHOẢN MẬT KHẨU
+function handleLogin(role) {
+  const user = document.getElementById('userInput').value.trim();
+  const pass = document.getElementById('passInput').value.trim();
+  const alertEl = document.getElementById('loginAlert');
+
+  if (!user || !pass) {
+    alertEl.textContent = "❌ Vui lòng nhập đầy đủ Tài khoản và Mật khẩu!";
+    return;
+  }
+
   if (role === 'admin') {
-    const user = document.getElementById('userInput').value.trim();
-    const pass = document.getElementById('passInput').value.trim();
     if (user === SECURITY_ACC && pass === SECURITY_PSW) {
       localStorage.setItem('tp_user_role', 'admin');
+      localStorage.setItem('tp_user_fullname', 'Chủ quản văn phòng');
       applyRoleView('admin');
     } else {
-      document.getElementById('loginAlert').textContent = "Sai tài khoản hoặc mật khẩu máy chủ!";
+      alertEl.textContent = "❌ Sai tài khoản hoặc mật khẩu máy chủ văn phòng!";
+    }
+  } else if (role === 'production') {
+    if (WORKSHOP_USERS[user] && WORKSHOP_USERS[user].password === pass) {
+      localStorage.setItem('tp_user_role', 'production');
+      localStorage.setItem('tp_user_fullname', WORKSHOP_USERS[user].fullName);
+      applyRoleView('production');
+    } else {
+      alertEl.textContent = "❌ Tài khoản hoặc Mật khẩu Quản đốc không chính xác!";
+    }
+  }
+}
+
+// HÀM GHI NHẬT KÝ LỊCH SỬ THAO TÁC TRUY VẾT LỖI (AUDIT LOG)
+function writeAuditLog(action, targetDetails) {
+  if (!database) return;
+  const username = localStorage.getItem('tp_user_fullname') || 'Ẩn danh';
+  const logRef = database.ref("thanhpham_system/audit_logs").push();
+  
+  logRef.set({
+    timestamp: new Date().toLocaleString('vi-VN'),
+    user: username,
+    action: action,
+    details: targetDetails
+  });
+}
+
+// HÀM TẢI DỮ LIỆU LỊCH SỬ TỪ FIREBASE RA BẢNG TRÊN PHẦN MỀM
+function loadAuditLogsToTable() {
+  const tbody = document.getElementById('historyTableBody');
+  if (!tbody || !database) return;
+
+  tbody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-400 py-6">🔄 Đang đồng bộ lịch sử thời gian thực...</td></tr>`;
+
+  database.ref("thanhpham_system/audit_logs").limitToLast(100).once("value", function(snapshot) {
+    tbody.innerHTML = "";
+    const data = snapshot.val();
+    if (!data) {
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-500 py-6">Chưa ghi nhận lịch sử chỉnh sửa nào trên hệ thống.</td></tr>`;
       return;
     }
-  } else {
-    localStorage.setItem('tp_user_role', 'production');
-    applyRoleView('production');
+
+    // Đảo thứ tự để thao tác mới nhất hiện lên đầu
+    const list = Object.values(data).reverse();
+    tbody.innerHTML = list.map(log => {
+      const isCancel = log.action.includes("Hủy");
+      const badgeClass = isCancel ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-emerald-500/20 text-green-400 border border-green-500/30";
+      return `
+        <tr class="border-b border-slate-800/50 hover:bg-slate-900/40">
+          <td class="text-slate-400 text-xs p-3 font-mono">${escapeHtml(log.timestamp)}</td>
+          <td class="p-3"><span class="px-2 py-0.5 bg-slate-800 text-yellow-400 rounded-md text-xs font-semibold border border-slate-700">${escapeHtml(log.user)}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-md text-xs font-bold ${badgeClass}">${escapeHtml(log.action)}</span></td>
+          <td class="p-3 text-slate-300 break-words whitespace-pre-line max-w-md">${escapeHtml(log.details)}</td>
+        </tr>
+      `;
+    }).join('');
+  });
+}
+
+// HÀM XÓA LỊCH SỬ THEO NGÀY ĐƯỢC CHỈ ĐỊNH (CHUẨN HÓA ĐỊNH DẠNG NGÀY)
+function deleteHistoryByDate() {
+  const dateInput = document.getElementById('deleteHistoryDateInput').value.trim();
+  if (!dateInput) {
+    alert("⚠️ Vui lòng nhập ngày cần xóa! Ví dụ: 1/6/2026 hoặc 01/06/2026");
+    return;
   }
+  
+  if (!confirm(`⚠️ Bạn có chắc chắn muốn xóa TOÀN BỘ lịch sử thao tác của ngày [${dateInput}] không?\nHành động này sẽ xóa vĩnh viễn trên đám mây và không thể khôi phục!`)) {
+    return;
+  }
+
+  const normalizeDate = (str) => {
+    try {
+      const cleanStr = str.split(',')[0].trim();
+      return cleanStr.split('/').map(p => parseInt(p, 10)).join('/');
+    } catch (e) {
+      return str;
+    }
+  };
+
+  const targetNormalized = normalizeDate(dateInput);
+
+  database.ref("thanhpham_system/audit_logs").once("value", function(snapshot) {
+    const data = snapshot.val();
+    if (!data) {
+      alert("❌ Không có dữ liệu lịch sử nào trên hệ thống.");
+      return;
+    }
+
+    let deleteCount = 0;
+    const promises = [];
+
+    Object.keys(data).forEach(key => {
+      const log = data[key];
+      if (log.timestamp) {
+        const logNormalized = normalizeDate(log.timestamp);
+        if (logNormalized === targetNormalized || log.timestamp.includes(dateInput)) {
+          promises.push(database.ref(`thanhpham_system/audit_logs/${key}`).remove());
+          deleteCount++;
+        }
+      }
+    });
+
+    if (deleteCount === 0) {
+      alert(`ℹ️ Không tìm thấy bản ghi lịch sử nào trùng khớp với ngày: ${dateInput}`);
+    } else {
+      Promise.all(promises).then(() => {
+        alert(`🎉 Thành công! Đã xóa sạch toàn bộ ${deleteCount} bản ghi lịch sử của ngày ${dateInput}.`);
+        document.getElementById('deleteHistoryDateInput').value = "";
+        loadAuditLogsToTable();
+      }).catch(err => {
+        alert("❌ Lỗi xảy ra trong quá trình xóa dữ liệu: " + err.message);
+      });
+    }
+  });
 }
 
 function applyRoleView(role) {
@@ -620,21 +778,27 @@ function applyRoleView(role) {
   }
   
   document.getElementById('loginSection').classList.add('hideBox');
+  const fullName = localStorage.getItem('tp_user_fullname') || 'Người dùng';
+  document.getElementById('currentUserLabel').textContent = fullName;
+
   if (role === 'admin') {
-    document.getElementById('currentRoleLabel').textContent = "💻 Chủ quản văn phòng (Máy chủ)";
+    document.getElementById('currentRoleLabel').textContent = "💻 Chủ quan văn phòng (Máy chủ)";
     document.getElementById('section-tomorrow').classList.remove('hideBox');
     document.getElementById('section-production-permissions').classList.remove('hideBox');
+    document.getElementById('section-bb-rules').classList.remove('hideBox');
     document.getElementById('section-import').classList.remove('hideBox');
     document.getElementById('section-ready').classList.remove('hideBox');
     document.getElementById('section-production').classList.remove('hideBox');
+    document.getElementById('section-total-packaging').classList.remove('hideBox');
     document.getElementById('section-detail').classList.remove('hideBox');
     document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
     document.getElementById('btnResetStorage').classList.remove('hideBox');
   } else {
     document.getElementById('currentRoleLabel').textContent = "🏭 Quản đốc sản xuất (Xưởng)";
     document.getElementById('section-production-permissions').classList.add('hideBox');
+    document.getElementById('section-bb-rules').classList.add('hideBox');
     document.getElementById('section-import').classList.add('hideBox');
-    document.getElementById('btnNotifyWorkshop').classList.add('addBox');
+    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
     document.getElementById('btnResetStorage').classList.add('hideBox');
     applyProductionViewSettings();
   }
@@ -645,6 +809,7 @@ function applyRoleView(role) {
 
 function switchRole() {
   localStorage.removeItem('tp_user_role');
+  localStorage.removeItem('tp_user_fullname');
   location.reload();
 }
 
@@ -656,11 +821,11 @@ function applyProductionViewSettings(){
   const role = currentRole();
   if(role === 'admin' || !role) return;
   const view = appState.productionView || {};
-  const showTomorrow = view.tomorrow !== false;
-
-  document.getElementById('section-tomorrow').classList.toggle('hideBox', !showTomorrow);
+  
+  document.getElementById('section-tomorrow').classList.toggle('hideBox', !(view.tomorrow !== false));
   document.getElementById('section-ready').classList.toggle('hideBox', !view.ready);
   document.getElementById('section-production').classList.toggle('hideBox', !view.production);
+  document.getElementById('section-total-packaging').classList.toggle('hideBox', !view.detail);
   document.getElementById('section-detail').classList.toggle('hideBox', !view.detail);
 }
 
@@ -688,11 +853,11 @@ function saveProductionViewSettings(){
   };
   if(database) database.ref("thanhpham_system/production_view").set(appState.productionView);
   renderProductionViewSettings();
-  alert('Đã lưu quyền xem thành công.');
+  alert('🎉 Đã cập nhật và lưu cấu hình phân quyền xem cho xưởng thành công!');
 }
 
 function sendAppNotice(targetRole, message){
-  if(!database) return alert('Chưa kết nối đám mây.');
+  if(!database) return;
   const notice = {
     id: Date.now(),
     targetRole,
@@ -734,11 +899,21 @@ function setupFirebaseListeners() {
   database.ref(".info/connected").on("value", function(snap) {
     const statusEl = document.getElementById("syncStatus");
     if (snap.val() === true) {
-      statusEl.textContent = "🟢 Đồng bộ đám mây tự động";
+      statusEl.textContent = "🟢 Đang kết nối đám mây (Thời gian thực)";
       statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-green-400 border border-green-500/30 font-medium";
     } else {
-      statusEl.textContent = "🟡 Đang kết nối mạng...";
+      statusEl.textContent = "🟡 Đang kết nối mạng đám mây...";
       statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-medium";
+    }
+  });
+
+  database.ref("thanhpham_system/bb_rules").on("value", function(snapshot) {
+    const rulesObj = snapshot.val() || {};
+    appState.bbRules = Object.entries(rulesObj).map(([id, item]) => ({ id, ...item }));
+    renderCloudBBRulesTable();
+    if (appState.orders.length > 0) {
+      processAllocation();
+      refreshAll();
     }
   });
 
@@ -746,16 +921,8 @@ function setupFirebaseListeners() {
     const data = snapshot.val();
     if (data) {
       appState.orders = data.orders || [];
-      if (data.stockMapArray) {
-        appState.stockMap = new Map(data.stockMapArray);
-      } else {
-        appState.stockMap = new Map();
-      }
-      if (data.bbMapArray) {
-        appState.bbMap = new Map(data.bbMapArray);
-      } else {
-        appState.bbMap = new Map();
-      }
+      appState.stockMap = data.stockMapArray ? new Map(data.stockMapArray) : new Map();
+      appState.bbMap = data.bbMapArray ? new Map(data.bbMapArray) : new Map();
       
       processAllocation();
       fillAllDateSelects();
@@ -774,12 +941,20 @@ function setupFirebaseListeners() {
     refreshAll();
   });
 
+  database.ref("thanhpham_system/packaging_ordered").on("value", function(snapshot) {
+    const data = snapshot.val() || {};
+    appState.packagingOrdered = {};
+    Object.values(data).forEach(item => {
+      if (item && item.code) {
+        appState.packagingOrdered[item.code] = item.ordered;
+      }
+    });
+    renderTotalPackaging();
+  });
+
   database.ref("thanhpham_system/production_view").on("value", function(snapshot) {
     appState.productionView = {
-      tomorrow: true,
-      ready: false,
-      production: false,
-      detail: false,
+      tomorrow: true, ready: false, production: false, detail: false,
       ...(snapshot.val() || {})
     };
     renderProductionViewSettings();
@@ -799,6 +974,7 @@ function resetAppState() {
   appState.confirmedTomorrow = [];
   appState.stockMap = new Map();
   appState.bbMap = new Map();
+  appState.packagingOrdered = {};
 }
 
 function uploadDataToFirebase() {
@@ -816,10 +992,16 @@ function uploadConfirmedToFirebase() {
 }
 
 function clearSystemCache() {
-  if (confirm("Xóa toàn bộ dữ liệu trên hệ thống đám mây trung tâm?")) {
+  if (confirm("⚠️ Chú ý: Bạn có chắc chắn muốn xóa toàn bộ dữ liệu đơn hàng và tồn kho hiện tại không?\n\n(DANH SÁCH CÁC QUY TẮC MATCH BAO BÌ ĐÃ LƯU TRÊN ĐÁM MÂY VẪN SẼ ĐƯỢC GIỮ LẠI NGUYÊN VẸN, KHÔNG BỊ MẤT)")) {
     if (database) {
-      database.ref("thanhpham_system").remove().then(() => {
-        alert("Đã làm trống trung tâm thành công.");
+      const promises = [
+        database.ref("thanhpham_system/cloud_data").remove(),
+        database.ref("thanhpham_system/confirmed_tomorrow").remove(),
+        database.ref("thanhpham_system/notices").remove()
+      ];
+      
+      Promise.all(promises).then(() => {
+        alert("Đã làm trống dữ liệu vận hành thành công! Toàn bộ quy tắc match bao bì vẫn được bảo toàn.");
         location.reload();
       });
     }
@@ -847,11 +1029,7 @@ function normalizeCode(value){
 }
 
 function cleanTextBB(v){
-  return String(v || '')
-    .normalize('NFC')
-    .toUpperCase()
-    .replace(/\s+/g,'')
-    .trim();
+  return String(v || '').normalize('NFC').toUpperCase().replace(/\s+/g,'').trim();
 }
 
 function baseProductCode(value){
@@ -864,42 +1042,89 @@ function findBBCode(orderCode, donHang) {
   const cleaned = cleanTextBB(orderCode);
   const don = cleanTextBB(donHang);
 
-  if (cleaned.includes("MS4A") && cleaned.includes("25KG") && cleaned.includes("HẠT37") && don.includes("NGỌCTHỊNH")) {
-    return cleanTextBB("MS4A-25KG(BAO KHÁCH)");
+  if (appState.bbRules && appState.bbRules.length > 0) {
+    for (const rule of appState.bbRules) {
+      const kw = cleanTextBB(rule.keyword);
+      if (kw && (cleaned.includes(kw) || don.includes(kw))) {
+        return cleanTextBB(rule.targetCode);
+      }
+    }
   }
-  if (cleaned.includes("MS6A") && cleaned.includes("25KG") && cleaned.includes("CHỮĐỎ") && don.includes("NGỌCTHỊNH")) {
-    return cleanTextBB("MS6A-25KG (CHỮ ĐỎ) BAO KHÁCH");
-  }
-  if (cleaned.includes("JUMBOMS2A") && cleaned.includes("1,15TẤN") && cleaned.includes("HẠT12")) {
-    return cleanTextBB("JB 90X90X134 KO IN, CÓ TRÁNG,");
-  }
-  if (cleaned.includes("JUMBREAT15") || (cleaned.includes("AT15") && cleaned.includes("1T"))) {
-    return cleanTextBB("JB AT15 (90*90*120)");
-  }
+
+  if (cleaned.includes("MS4A") && cleaned.includes("25KG") && cleaned.includes("HẠT37") && don.includes("NGỌCTHỊNH")) return cleanTextBB("MS4A-25KG(BAO KHÁCH)");
+  if (cleaned.includes("MS6A") && cleaned.includes("25KG") && cleaned.includes("CHỮĐỎ") && don.includes("NGỌCTHỊNH")) return cleanTextBB("MS6A-25KG (CHỮ ĐỎ) BAO KHÁCH");
+  if (cleaned.includes("JUMBOMS2A") && cleaned.includes("1,15TẤN") && cleaned.includes("HẠT12")) return cleanTextBB("JB 90X90X134 KO IN, CÓ TRÁNG,");
+  if (cleaned.includes("JUMBREAT15") || (cleaned.includes("AT15") && cleaned.includes("1T"))) return cleanTextBB("JB AT15 (90*90*120)");
   if (cleaned.includes("SN10") && cleaned.includes("25KG")) return cleanTextBB("SN10 - 25KG (52*76)");
   if (cleaned.includes("SN15") && cleaned.includes("25KG")) return cleanTextBB("SN15 - 25KG (50*74)");
   if (cleaned.includes("SN20") && cleaned.includes("25KG")) return cleanTextBB("SN20 - 25KG (50*73)");
-  if (cleaned.includes("SN05") && cleaned.includes("25KG")) return cleanTextBB("SN05 - 25KG");
-  if (cleaned.includes("SN06") && cleaned.includes("25KG")) return cleanTextBB("SN06 - 25KG");
-  if (cleaned.includes("SN08") && cleaned.includes("25KG")) return cleanTextBB("SN08 - 25KG");
-  if (cleaned.includes("SN30") && cleaned.includes("25KG")) return cleanTextBB("SN30 - 25KG");
-  if (cleaned.includes("SN45") && cleaned.includes("25KG")) return cleanTextBB("SN45 - 25KG");
-  if (cleaned.includes("SN70") && cleaned.includes("50KG")) return cleanTextBB("SN70 - 50KG");
-  if (cleaned.includes("BỘT45") && cleaned.includes("25KG") && cleaned.includes("BAOTRẮNG")) return cleanTextBB("Bao Trắng K45  van (Bột 45+70)");
-  if (cleaned.includes("BỘT70") && cleaned.includes("50KG") && (cleaned.includes("BT") || cleaned.includes("BAOTRẮNG"))) return cleanTextBB("Bao Trắng K55");
-  if (cleaned.includes("BỘT90") && cleaned.includes("50KG") && cleaned.includes("BAO")) return cleanTextBB("Bao Trắng K55");
-  if (cleaned.includes("CPĐ04") && cleaned.includes("25KG") && cleaned.includes("HẠT20")) return cleanTextBB("CPĐ04-25KG(BỘT 20 SƠN)");
-  if (cleaned.includes("CPĐ07") && cleaned.includes("25KG") && cleaned.includes("HẠT45")) return cleanTextBB("CPĐ07-25KG(BỘT 45)");
-  if (cleaned.includes("DC10") && cleaned.includes("25KG")) return cleanTextBB("DC-10-25KG");
-  if (cleaned.includes("DC65") && cleaned.includes("50KG")) return cleanTextBB("DC-65-50KG(BỘT 65)");
-  if (cleaned.includes("GRADE800") && cleaned.includes("25KG") && (cleaned.includes("BỘT45") || cleaned.includes("HẠT45"))) return cleanTextBB("Grade 800-25KG(HẠT 45)");
+  return cleaned;
+}
 
-  for (const key in MANUAL_MAP) {
-    if (cleaned.includes(cleanTextBB(key))) {
-      return cleanTextBB(MANUAL_MAP[key]);
+function toggleRuleForm() {
+  const box = document.getElementById('bbRuleFormBox');
+  if (box) {
+    box.classList.toggle('hideBox');
+    document.getElementById('ruleKeywordInput').value = '';
+    document.getElementById('ruleTargetInput').value = '';
+  }
+}
+
+function toggleBBRulesContent() {
+  const content = document.getElementById('bbRulesMainContent');
+  const btn = document.getElementById('btnToggleBBRules');
+  if (content) {
+    const isHidden = content.toggleAttribute('data-collapsed');
+    if (isHidden) {
+      content.classList.add('hideBox');
+      btn.textContent = 'Mở rộng quy tắc đám mây 🔽';
+    } else {
+      content.classList.remove('hideBox');
+      btn.textContent = 'Thu gọn quy tắc đám mây 🔼';
     }
   }
-  return cleaned;
+}
+
+function saveCloudBBRule() {
+  if (!database) return alert('Chưa kết nối dữ liệu mạng.');
+  const keyword = document.getElementById('ruleKeywordInput').value.trim();
+  const targetCode = document.getElementById('ruleTargetInput').value.trim();
+
+  if (!keyword || !targetCode) return alert('Vui lòng điền đầy đủ cả từ khóa và mã bao bì tương ứng!');
+
+  const newRule = {
+    keyword: keyword,
+    targetCode: targetCode,
+    createdAt: new Date().toLocaleString('vi-VN')
+  };
+
+  database.ref("thanhpham_system/bb_rules").push(newRule).then(() => {
+    alert('🎉 Đã lưu quy tắc bao bì đồng bộ lên đám mây máy chủ thành công!');
+    toggleRuleForm();
+  });
+}
+
+function deleteCloudBBRule(id) {
+  if (!database) return;
+  if (confirm('Bạn có chắc chắn muốn xóa quy tắc ghi nhớ bao bì này khỏi hệ thống đám mây?')) {
+    database.ref(`thanhpham_system/bb_rules/${id}`).remove();
+  }
+}
+
+function renderCloudBBRulesTable() {
+  const tableBody = document.querySelector('#cloudBBRulesTable tbody');
+  if (!tableBody) return;
+  if (!appState.bbRules || appState.bbRules.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-500 py-6">Chưa cấu hình quy tắc ghi nhớ đám mây nào.</td></tr>`;
+    return;
+  }
+  tableBody.innerHTML = appState.bbRules.map(rule => `
+    <tr>
+      <td class="font-bold text-yellow-400">${escapeHtml(rule.keyword)}</td>
+      <td class="font-semibold text-violet-400">${escapeHtml(rule.targetCode)}</td>
+      <td class="text-slate-400 text-xs">${escapeHtml(rule.createdAt || '')}</td>
+      <td class="text-center"><button onclick="deleteCloudBBRule('${rule.id}')" class="bg-red-500/20 hover:bg-red-600 text-red-300 px-3 py-1 rounded-lg text-xs">❌ Xóa</button></td>
+    </tr>`).join('');
 }
 
 function parseNumber(value){
@@ -912,57 +1137,48 @@ function parseNumber(value){
   return match ? Number(match[0]) : 0;
 }
 
-function toExcelDate(value){
-  if(value instanceof Date && !Number.isNaN(value.getTime())) return value;
-  if(typeof value === 'number'){
+function toExcelDate(value) {
+  if (value === null || value === undefined || value === '') return null;
+  let year, month, day;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    if (value.getUTCHours() === 0 && value.getUTCMinutes() === 0) {
+      year = value.getUTCFullYear(); month = value.getUTCMonth() + 1; day = value.getUTCDate();
+    } else {
+      year = value.getFullYear(); month = value.getMonth() + 1; day = value.getDate();
+    }
+    return { year, month, day };
+  }
+  if (typeof value === 'number') {
     const date = new Date(Math.round((value - 25569) * 86400 * 1000));
-    return Number.isNaN(date.getTime()) ? null : date;
+    if (!Number.isNaN(date.getTime())) {
+      return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
+    }
+    return null;
   }
-
-  const raw = textOf(value);
-  if(!raw) return null;
-
-  const slash = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
-  if(slash){
-    const day = Number(slash[1]);
-    const month = Number(slash[2]);
-    const year = Number(slash[3].length === 2 ? '20' + slash[3] : slash[3]);
-    const date = new Date(year, month - 1, day);
-    return Number.isNaN(date.getTime()) ? null : date;
-  }
-
-  const parsed = new Date(raw);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
+  const raw = String(value).trim();
+  const dmyMatch = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+  if (dmyMatch) return { day: Number(dmyMatch[1]), month: Number(dmyMatch[2]), year: Number(dmyMatch[3]) };
+  return null;
 }
 
-function dateKey(value){
-  const date = toExcelDate(value);
-  if(!date) return '';
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
+function dateKey(value) {
+  const info = toExcelDate(value);
+  if (!info) return '';
+  return `${info.year}-${String(info.month).padStart(2, '0')}-${String(info.day).padStart(2, '0')}`;
 }
 
-function displayDate(value){
-  const key = dateKey(value);
-  if(!key) return '';
-  const [year, month, day] = key.split('-');
-  return `${day}/${month}/${year}`;
+function displayDate(value) {
+  const info = toExcelDate(value);
+  if (!info) return '';
+  return `${String(info.day).padStart(2, '0')}/${String(info.month).padStart(2, '0')}/${info.year}`;
 }
 
 function formatNumber(value, digits = 2){
-  const number = Number(value) || 0;
-  return number.toLocaleString('vi-VN', { maximumFractionDigits: digits });
+  return (Number(value) || 0).toLocaleString('vi-VN', { maximumFractionDigits: digits });
 }
 
 function escapeHtml(value){
-  return textOf(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return textOf(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 function readExcel(file){
@@ -973,16 +1189,10 @@ function readExcel(file){
         const workbook = XLSX.read(new Uint8Array(event.target.result), { type:'array', cellDates:true });
         const result = { SheetNames: workbook.SheetNames };
         workbook.SheetNames.forEach((sheetName)=>{
-          result[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
-            header:1,
-            defval:'',
-            raw:true
-          });
+          result[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header:1, defval:'', raw:true });
         });
         resolve(result);
-      }catch(error){
-        reject(error);
-      }
+      }catch(error){ reject(error); }
     };
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
@@ -990,24 +1200,22 @@ function readExcel(file){
 }
 
 function findSheet(workbook, words){
-  return workbook.SheetNames.find((sheetName)=>{
-    const normalized = normalizeText(sheetName);
-    return words.every((word)=>normalized.includes(word));
+  return workbook.SheetNames.find((name)=>{
+    const norm = normalizeText(name);
+    return words.every((word)=>norm.includes(word));
   });
 }
 
 function findHeaderIndex(rows, requiredHeaders){
   return rows.findIndex((row)=>{
-    const normalized = row.map(normalizeText);
-    return requiredHeaders.every((header)=>normalized.includes(normalizeText(header)));
+    const normRow = row.map(normalizeText);
+    return requiredHeaders.every((h)=>normRow.includes(normalizeText(h)));
   });
 }
 
 function columnMap(headerRow){
   const map = {};
-  headerRow.forEach((cell, index)=>{
-    map[normalizeText(cell)] = index;
-  });
+  headerRow.forEach((cell, index)=>{ map[normalizeText(cell)] = index; });
   return map;
 }
 
@@ -1021,87 +1229,56 @@ function getByHeader(row, map, names){
 
 function parseOrders(orderRows){
   const headerIndex = findHeaderIndex(orderRows, ['DonHang', 'MaBao']);
-  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề dữ liệu mẫu Excel đơn hàng');
+  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề cột chuẩn!');
   const map = columnMap(orderRows[headerIndex]);
 
-  let lastValidSoCont = 0;
-  let lastValidHangVanChuyen = "";
-  let virtualGroupCounter = 0;
+  let lastValidSoCont = 0; let lastValidHangVanChuyen = ""; let virtualGroupCounter = 0;
 
-  const rawParsed = orderRows.slice(headerIndex + 1).map((row, index)=>{
-    const donHang = textOf(getByHeader(row, map, ['DonHang', 'Đơn hàng', 'Don Hang']));
-    const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang', 'Tên đơn hàng', 'Ten Don Hang', 'Khách hàng', 'Khach Hang']));
-    const maBao = textOf(getByHeader(row, map, ['MaBao', 'Mã Bao', 'Mã TP', 'Ma TP']));
+  return orderRows.slice(headerIndex + 1).map((row, index)=>{
+    const donHang = textOf(getByHeader(row, map, ['DonHang', 'Đơn hàng']));
+    const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang', 'Khách hàng']));
+    const maBao = textOf(getByHeader(row, map, ['MaBao', 'Mã Bao']));
     if(!donHang || !maBao) return null;
 
-    let soContRaw = getByHeader(row, map, ['So Cont', 'Số Cont', 'SoCont']);
+    let soContRaw = getByHeader(row, map, ['So Cont', 'Số Cont']);
     let soCont = parseNumber(soContRaw);
-    let hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển', 'Hang Van Chuyen', 'Hãng VC', 'Hang VC']));
+    let hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển']));
 
     if (soContRaw !== '' && soCont > 0) {
-      lastValidSoCont = soCont;
-      lastValidHangVanChuyen = hangVanChuyen;
-      virtualGroupCounter++;
+      lastValidSoCont = soCont; lastValidHangVanChuyen = hangVanChuyen; virtualGroupCounter++;
     } else {
-      soCont = lastValidSoCont;
-      if (!hangVanChuyen) {
-        hangVanChuyen = lastValidHangVanChuyen;
-      }
+      soCont = lastValidSoCont; if (!hangVanChuyen) hangVanChuyen = lastValidHangVanChuyen;
     }
 
-    const tanCont = parseNumber(getByHeader(row, map, ['Tan/cont', 'Tấn/cont', 'Tan Cont'])) || 0;
+    const tanCont = parseNumber(getByHeader(row, map, ['Tan/cont', 'Tấn/cont'])) || 0;
     const soLuongKg = parseNumber(getByHeader(row, map, ['SoLuongKg', 'Số lượng Kg']));
     const quyCachBao = parseNumber(getByHeader(row, map, ['QuyCachBao', 'Quy Cách Bao']));
-    const ghiChu = textOf(getByHeader(row, map, ['GhiChu', 'Ghi chú', 'Ghi Chu']));
-    const ngayRaw = getByHeader(row, map, ['Ngay', 'Ngày', 'Ngày giao']);
+    const ghiChu = textOf(getByHeader(row, map, ['GhiChu', 'Ghi chú']));
+    const ngayRaw = getByHeader(row, map, ['Ngay', 'Ngày']);
 
     return {
-      id: `${donHang}__${index}`,
-      donHang,
-      tenDonHang,
-      maBao,
-      code: maBao,
-      stockKey: normalizeCode(maBao),
-      baseCode: baseProductCode(maBao),
-      soCont,
-      tanCont,
-      needTon: soCont * tanCont,
-      soLuongKg,
-      quyCachBao,
-      hangVanChuyen,
-      ghiChu,
-      ngayKey: dateKey(ngayRaw),
-      ngay: displayDate(ngayRaw),
-      contGroupId: `CONT_GRP_${virtualGroupCounter}`
+      id: `${donHang}__${index}`, donHang, tenDonHang, maBao, code: maBao,
+      stockKey: normalizeCode(maBao), baseCode: baseProductCode(maBao), soCont, tanCont,
+      needTon: soCont * tanCont, soLuongKg, quyCachBao, hangVanChuyen, ghiChu,
+      ngayKey: dateKey(ngayRaw), ngay: displayDate(ngayRaw), contGroupId: `CONT_GRP_${virtualGroupCounter}`
     };
   }).filter(Boolean);
-
-  return rawParsed;
 }
 
 function parseStockAndPackaging(stockWorkbook){
-  let tpSheetName = null;
-  let bbSheetName = null;
-
+  let tpSheetName = null; let bbSheetName = null;
   stockWorkbook.SheetNames.forEach((name) => {
-    const upper = name.toUpperCase();
-    if (upper.includes('TP')) tpSheetName = name;
-    if (upper.includes('BB')) bbSheetName = name;
+    if (name.toUpperCase().includes('TP')) tpSheetName = name;
+    if (name.toUpperCase().includes('BB')) bbSheetName = name;
   });
-
   if (!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO TP');
 
   const stockMap = new Map();
   stockWorkbook[tpSheetName].forEach((row) => {
-    const values = Object.values(row);
-    if (values.length < 13) return;
-    const productName = textOf(values[2]);
-    const stockTon = Math.max(0, parseNumber(values[12]));
-    const exactKey = normalizeCode(productName);
-    const baseKey = 'BASE:' + baseProductCode(productName);
-
+    const values = Object.values(row); if (values.length < 13) return;
+    const productName = textOf(values[2]); const stockTon = Math.max(0, parseNumber(values[12]));
+    const exactKey = normalizeCode(productName); const baseKey = 'BASE:' + baseProductCode(productName);
     if (!productName || !exactKey || normalizeText(productName).includes('TEN THANH PHAM')) return;
-    
     stockMap.set(exactKey, (stockMap.get(exactKey) || 0) + stockTon);
     stockMap.set(baseKey, (stockMap.get(baseKey) || 0) + stockTon);
   });
@@ -1109,16 +1286,12 @@ function parseStockAndPackaging(stockWorkbook){
   const bbMap = new Map();
   if (bbSheetName) {
     stockWorkbook[bbSheetName].forEach((row) => {
-      const values = Object.values(row);
-      if (values.length < 10) return;
-      const bbName = cleanTextBB(values[2]);
-      const stockPcs = Math.max(0, parseNumber(values[9]));
+      const values = Object.values(row); if (values.length < 10) return;
+      const bbName = cleanTextBB(values[2]); const stockPcs = Math.max(0, parseNumber(values[9]));
       if (!bbName || normalizeText(bbName).includes('TENBAOBI')) return;
-      
       bbMap.set(bbName, (bbMap.get(bbName) || 0) + stockPcs);
     });
   }
-
   return { stockMap, bbMap };
 }
 
@@ -1128,78 +1301,47 @@ function processAllocation(){
   const remainingBB = new Map(appState.bbMap || new Map());
   const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
 
-  // Bước 1: Tính toán trừ tồn kho thực tế cho từng dòng đơn lẻ
   const temporaryDetails = appState.orders.map((order)=>{
     const lookupKey = remainingTP.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
     const stockBefore = remainingTP.get(lookupKey) || 0;
     const canExportTon = Math.min(stockBefore, order.needTon);
     const shortage = Math.max(0, order.needTon - stockBefore);
-    const stockAfter = stockBefore - canExportTon;
-    remainingTP.set(lookupKey, stockAfter);
+    remainingTP.set(lookupKey, stockBefore - canExportTon);
 
     const matchBBCode = findBBCode(order.maBao, order.donHang);
     const bbStockBefore = remainingBB.get(matchBBCode) || 0;
-    
     const bagWeight = order.quyCachBao || 0;
     const bbNeedPcs = bagWeight > 0 ? (order.soLuongKg / bagWeight) : 0;
+    const tpQuyDoiPcs = (bagWeight > 0 && stockBefore > 0) ? ((stockBefore * 1000) / bagWeight) : 0;
+    const bbShortage = Math.max(0, bbNeedPcs - (bbStockBefore + tpQuyDoiPcs));
     
-    const bbShortage = Math.max(0, bbNeedPcs - bbStockBefore);
-    const bbStockAfter = Math.max(0, bbStockBefore - bbNeedPcs);
-    remainingBB.set(matchBBCode, bbStockAfter);
+    const netBBNeedFromShelf = Math.max(0, bbNeedPcs - tpQuyDoiPcs);
+    remainingBB.set(matchBBCode, Math.max(0, bbStockBefore - netBBNeedFromShelf));
 
-    return {
-      ...order,
-      stockBefore,
-      stockAfter,
-      canExportTon,
-      shortage,
-      isRowShortage: shortage > 0,
-      matchBBCode,
-      bbStockBefore,
-      bbNeedPcs,
-      bbShortage
-    };
+    return { ...order, stockBefore, canExportTon, shortage, isRowShortage: shortage > 0, matchBBCode, bbStockBefore, bbNeedPcs, bbShortage };
   });
 
-  // MỚI: Quét xem những nhóm cont nào có chứa ít nhất 1 dòng nằm trong danh sách Quản đốc ĐÃ CỨU (confirmedTomorrow)
   const groupHasConfirmedShortageMap = new Map();
   temporaryDetails.forEach((row) => {
-    if (confirmedIds.has(row.id)) {
-      groupHasConfirmedShortageMap.set(row.contGroupId, true);
-    }
+    if (confirmedIds.has(row.id)) groupHasConfirmedShortageMap.set(row.contGroupId, true);
   });
 
-  // Bước 2: Tạo bản đồ kiểm tra thiếu hụt tự nhiên của Container (Phục vụ logic ngầm)
   const groupNaturalShortageMap = new Map();
   temporaryDetails.forEach((row) => {
-    if (row.isRowShortage) {
-      groupNaturalShortageMap.set(row.contGroupId, true);
-    }
+    if (row.isRowShortage) groupNaturalShortageMap.set(row.contGroupId, true);
   });
 
-  // Bước 3: Áp dụng quy tắc đồng bộ Container
   appState.details = temporaryDetails.map((row) => {
     const isContGroupNaturallyShortage = !!groupNaturalShortageMap.get(row.contGroupId);
     const isContGroupSavedByWorkshop = !!groupHasConfirmedShortageMap.get(row.contGroupId);
     
-    // LOGIC CHẠY NGẦM HỆ THỐNG XUẤT HÀNG: 
-    // Container có thể xuất nếu: Tự nhiên nó đủ (không thiếu dòng nào) HOẶC nó được Quản đốc bấm cứu dòng thiếu đi kèm!
     let logicStatus = 'THIẾU TP';
-    if (!isContGroupNaturallyShortage || isContGroupSavedByWorkshop) {
-      logicStatus = 'ĐỦ XUẤT';
-    }
+    if (!isContGroupNaturallyShortage || isContGroupSavedByWorkshop) logicStatus = 'ĐỦ XUẤT';
 
-    // ĐỐI VỚI HIỂN THỊ CHI TIẾT VÀ TRẠNG THÁI RIÊNG LẺ:
     let displayStatus = row.isRowShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
-    if (isContGroupSavedByWorkshop) {
-      displayStatus = 'MAI CÓ THỂ XUẤT';
-    }
+    if (isContGroupSavedByWorkshop) displayStatus = 'MAI CÓ THỂ XUẤT';
 
-    return {
-      ...row,
-      status: logicStatus,         // Dùng lọc Đơn có thể xuất và xuất Excel (Đơn ghép tự động đi chung)
-      displayStatus: displayStatus // Dùng để hiển thị màu sắc trên bảng Chi tiết hệ thống
-    };
+    return { ...row, status: logicStatus, displayStatus: displayStatus };
   });
 
   buildProductionSummary();
@@ -1207,71 +1349,44 @@ function processAllocation(){
 
 function buildProductionSummary(){
   const map = new Map();
-  // CHỈ HIỆN CÁC DÒNG THỰC TẾ THIẾU và Container đó CHƯA ĐƯỢC Quản đốc bấm xác nhận cứu đơn
   appState.details.forEach((item)=>{
     if (item.isRowShortage && item.status === 'THIẾU TP') {
-      const current = map.get(item.code) || {
-        code:item.code,
-        demand:0,
-        stock:0,
-        shortage:0,
-        orders:0,
-        nearestKey:item.ngayKey,
-        nearest:item.ngay
-      };
-
-      current.demand += item.needTon;
-      current.stock += Math.max(0, item.stockBefore);
-      current.shortage += item.shortage;
-      current.orders += 1;
+      const current = map.get(item.code) || { code:item.code, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
+      current.demand += item.needTon; current.stock += Math.max(0, item.stockBefore); current.shortage += item.shortage; current.orders += 1;
       if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
-        current.nearestKey = item.ngayKey;
-        current.nearest = item.ngay;
+        current.nearestKey = item.ngayKey; current.nearest = item.ngay;
       }
       map.set(item.code, current);
     }
   });
-
   appState.production = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
 }
 
 function setBadgeCount(card, count){
-  const badge = card?.querySelector('h2 span');
-  if(badge) badge.textContent = count;
+  const badge = card?.querySelector('h2 span'); if(badge) badge.textContent = count;
 }
 
 function setTable(card, headers, rowsHtml, tableIndex = 0){
-  const table = card?.querySelectorAll('table')[tableIndex];
-  if(!table) return;
-
-  table.innerHTML = `
-    <thead>
-      <tr>${headers.map((header)=>`<th>${header}</th>`).join('')}</tr>
-    </thead>
-    <tbody>${rowsHtml || `<tr><td colspan="${headers.length}" class="text-center text-slate-500 py-8">Chưa có dữ liệu</td></tr>`}</tbody>`;
+  const table = card?.querySelectorAll('table')[tableIndex]; if(!table) return;
+  table.innerHTML = `<thead><tr>${headers.map((h)=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rowsHtml || `<tr><td colspan="${headers.length}" class="text-center text-slate-500 py-8">Chưa có dữ liệu</td></tr>`}</tbody>`;
 }
 
 function rowsByDateMode(rows, mode, from, to){
   if(mode === 'ALL') return rows;
-  if(mode === '1 ngày') return rows.filter((row)=>row.ngayKey === from);
-  if(mode === 'Khoảng ngày') return rows.filter((row)=>row.ngayKey && (!from || row.ngayKey >= from) && (!to || row.ngayKey <= to));
+  if(mode === '1 ngày') return rows.filter((r)=>r.ngayKey === from);
+  if(mode === 'Khoảng ngày') return rows.filter((r)=>r.ngayKey && (!from || r.ngayKey >= from) && (!to || r.ngayKey <= to));
   return rows;
 }
 
 function getFilterControls(card){
-  const select = card?.querySelector('select');
-  const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
-  return {
-    mode: select?.value || 'ALL',
-    from: dates[0]?.value || '',
-    to: dates[1]?.value || dates[0]?.value || ''
-  };
+  const select = card?.querySelector('select'); const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
+  return { mode: select?.value || 'ALL', from: dates[0]?.value || '', to: dates[1]?.value || dates[0]?.value || '' };
 }
 
 function fillDateSelect(select){
   if(!select) return;
-  const dates = Array.from(new Set(appState.orders.map((order)=>order.ngayKey).filter(Boolean))).sort();
-  select.innerHTML = '<option value="ALL">ALL</option>' + dates.map((key)=>`<option value="${key}">${displayDate(key)}</option>`).join('');
+  const dates = Array.from(new Set(appState.orders.map((o)=>o.ngayKey).filter(Boolean))).sort();
+  select.innerHTML = '<option value="ALL">Tất cả ngày giao hàng (ALL)</option>' + dates.map((key)=>`<option value="${key}">${displayDate(key)}</option>`).join('');
 }
 
 function fillAllDateSelects() {
@@ -1279,32 +1394,18 @@ function fillAllDateSelects() {
 }
 
 function statusBadge(status){
-  const isOk = status === 'ĐỦ XUẤT';
-  const isOverride = status === 'MAI CÓ THỂ XUẤT';
-  const cls = isOk ? 'bg-green-600 text-white' : isOverride ? 'bg-yellow-500 text-black' : 'bg-red-500 text-white';
-  const textLabel = isOverride ? 'ƯU TIÊN' : status;
-  return `<span class="${cls} px-2.5 py-0.5 rounded-full text-xs font-semibold">${textLabel}</span>`;
+  const isOk = status === 'ĐỦ XUẤT'; const isOverride = status === 'MAI CÓ THỂ XUẤT';
+  const cls = isOk ? 'bg-green-600 text-white' : isOverride ? 'bg-yellow-500 text-black font-bold' : 'bg-red-500 text-white';
+  return `<span class="${cls} px-2.5 py-0.5 rounded-full text-xs font-semibold">${isOverride ? 'ƯU TIÊN XUẤT' : status}</span>`;
 }
 
-function tomorrowDate(){
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  return date;
-}
-
+function tomorrowDate(){ const d = new Date(); d.setDate(d.getDate() + 1); return d; }
 function planDateKey(){ return dateKey(tomorrowDate()); }
 function planDateDisplay(){ return displayDate(tomorrowDate()); }
-function shortPlanDate(){
-  const date = tomorrowDate();
-  return `${date.getDate()}/${date.getMonth() + 1}`;
-}
 
 function shortOrderDate(item){
-  if(item?.ngayKey){
-    const [, month, day] = item.ngayKey.split('-');
-    return `${Number(day)}/${Number(month)}`;
-  }
-  return shortPlanDate();
+  if(item?.ngayKey){ const parts = item.ngayKey.split('-'); return `${Number(parts[2])}/${Number(parts[1])}`; }
+  const d = tomorrowDate(); return `${d.getDate()}/${d.getMonth() + 1}`;
 }
 
 function isManualLoading(item){
@@ -1312,74 +1413,33 @@ function isManualLoading(item){
   return bag >= 25 && bag <= 50;
 }
 
-function formatPlanTime(slot){
-  const prefix = slot.period === 'morning' ? 'Sáng' : 'Chiều';
-  const hour = slot.hour;
-  const minute = slot.minute;
-  return `${prefix} ${hour}h${minute ? String(minute).padStart(2, '0') : ''}`;
-}
+function formatPlanTime(slot){ return `${slot.period === 'morning' ? 'Sáng' : 'Chiều'} ${slot.hour}h${slot.minute ? String(slot.minute).padStart(2, '0') : ''}`; }
 
 function buildSlots(startHour, startMinute, count){
-  const slots = [];
-  let hour = startHour;
-  let minute = startMinute;
-  for(let index = 0; index < count; index += 1){
-    slots.push({ hour, minute });
-    minute += 30;
-    if(minute >= 60){
-      hour += 1;
-      minute -= 60;
-    }
-  }
+  const slots = []; let hour = startHour; let minute = startMinute;
+  for(let index = 0; index < count; index++){ slots.push({ hour, minute }); minute += 30; if(minute >= 60){ hour += 1; minute -= 60; } }
   return slots;
 }
 
 function assignPlanTimes(rows){
-  const manualSlots = [
-    { period:'morning', hour:6, minute:15 },
-    { period:'morning', hour:6, minute:15 },
-    { period:'morning', hour:7, minute:0 },
-    { period:'morning', hour:7, minute:30 },
-    { period:'morning', hour:8, minute:0 },
-    ...buildSlots(13, 0, 40).map((slot)=>({ ...slot, period:'afternoon' }))
-  ];
-  const otherSlots = buildSlots(13, 0, 60).map((slot)=>({ ...slot, period:'afternoon' }));
-  let manualIndex = 0;
-  let otherIndex = 0;
-
+  const manualSlots = [ { period:'morning', hour:6, minute:15 }, { period:'morning', hour:6, minute:15 }, { period:'morning', hour:7, minute:0 }, { period:'morning', hour:7, minute:30 }, { period:'morning', hour:8, minute:0 }, ...buildSlots(13, 0, 40).map((s)=>({ ...s, period:'afternoon' })) ];
+  const otherSlots = buildSlots(13, 0, 60).map((s)=>({ ...s, period:'afternoon' })); let mIdx = 0; let oIdx = 0;
   return rows.map((item)=>{
-    const manual = isManualLoading(item);
-    const slot = manual
-      ? (manualSlots[manualIndex++] || otherSlots[otherIndex++])
-      : (otherSlots[otherIndex++] || manualSlots[manualIndex++]);
-    return {
-      ...item,
-      planDate: planDateDisplay(),
-      planDateKey: planDateKey(),
-      planTime: formatPlanTime(slot || { period:'afternoon', hour:13, minute:0 })
-    };
+    const manual = isManualLoading(item); const slot = manual ? (manualSlots[mIdx++] || otherSlots[oIdx++]) : (otherSlots[oIdx++] || manualSlots[mIdx++]);
+    return { ...item, planDate: planDateDisplay(), planDateKey: planDateKey(), planTime: formatPlanTime(slot || { period:'afternoon', hour:13, minute:0 }) };
   });
 }
 
 function planNote(item){
-  const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : '';
-  const date = shortOrderDate(item);
-  if(isManualLoading(item)){
-    return `Bốc tay tàu${ship} ngày ${date}`;
-  }
-  const handling = item.ghiChu || 'bốc hầm chồng đôi không pallet';
-  return `${handling} + tàu${ship} ngày ${date}`;
+  const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : ''; const d = shortOrderDate(item);
+  if(isManualLoading(item)) return `Bốc tay tàu${ship} ngày ${d}`;
+  return `${item.ghiChu || 'bốc hầm chồng đôi không pallet'} + tàu${ship} ngày ${d}`;
 }
 
-function getReadyOrders(){
-  return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT');
-}
+function getReadyOrders() { return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT'); }
 
 function planRows(){
-  const ready = getReadyOrders();
-  const manual = ready.filter(isManualLoading);
-  const other = ready.filter((item)=>!isManualLoading(item));
-  return assignPlanTimes([...manual, ...other]);
+  const ready = getReadyOrders(); return assignPlanTimes(ready.filter(isManualLoading).concat(ready.filter((i)=>!isManualLoading(i))));
 }
 
 function planTableHtml(rows){
@@ -1387,38 +1447,18 @@ function planTableHtml(rows){
   const totalOrder = rows.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
   return `
     <table class="w-full bg-slate-900 rounded-xl">
-      <thead>
-        <tr>
-          <th>Ngày xuất</th>
-          <th>Khách hàng</th>
-          <th>Loại hàng</th>
-          <th>Số lượng (cont)</th>
-          <th>Số lượng tấn/cont</th>
-          <th>SL đơn hàng</th>
-          <th>Hãng VC</th>
-          <th>Thời gian</th>
-          <th>Ghi chú</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Ngày xuất</th><th>Khách hàng</th><th>Loại hàng</th><th>Số lượng (cont)</th><th>số lượng tấn /cont</th><th>SL đơn hàng</th><th>Hãng VC</th><th>Thời Gian</th><th>Ghi chú</th></tr></thead>
       <tbody>
         ${rows.map((item, index)=>`
           <tr>
-            <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td>
-            <td>${escapeHtml(item.donHang)}</td>
-            <td>${escapeHtml(item.tenDonHang)}</td>
-            <td class="text-center font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td>
-            <td class="text-center">${formatNumber(item.tanCont)}</td>
-            <td class="text-center font-semibold">${formatNumber(item.tanCont)}</td>
-            <td class="text-center font-semibold">${escapeHtml(item.hangVanChuyen)}</td>
-            <td class="text-center font-bold text-violet-400">${escapeHtml(item.planTime)}</td>
-            <td class="font-medium">${escapeHtml(planNote(item))}</td>
+            <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td><td>${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
+            <td class="text-center font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td><td class="text-center">${formatNumber(item.tanCont)}</td>
+            <td class="text-center font-semibold">${formatNumber(item.tanCont)}</td><td class="text-center font-semibold">${escapeHtml(item.hangVanChuyen)}</td>
+            <td class="text-center font-bold text-violet-400">${escapeHtml(item.planTime)}</td><td class="font-medium">${escapeHtml(planNote(item))}</td>
           </tr>`).join('') || '<tr><td colspan="9" class="text-center text-slate-500 py-8">Không có dữ liệu kế hoạch xuất</td></tr>'}
         <tr class="bg-slate-950 font-bold">
-          <td colspan="3" class="text-right">Tổng cộng</td>
-          <td class="text-center text-green-400">${formatNumber(totalCont, 0)}</td>
-          <td></td>
-          <td class="text-center text-green-400">${formatNumber(totalOrder)}</td>
-          <td colspan="3"></td>
+          <td colspan="3" class="text-right text-slate-400">Tổng cộng hệ thống:</td><td class="text-center text-green-400 text-lg">${formatNumber(totalCont, 0)}</td>
+          <td></td><td class="text-center text-green-400 text-lg">${formatNumber(totalOrder)}</td><td colspan="3"></td>
         </tr>
       </tbody>
     </table>`;
@@ -1427,29 +1467,20 @@ function planTableHtml(rows){
 async function processFiles(){
   const orderFile = document.getElementById('orderFileInput').files[0];
   const stockFile = document.getElementById('stockFileInput').files[0];
-  if(!orderFile || !stockFile) return alert('Hãy chọn đầy đủ cả 2 file đơn hàng và file tồn kho!');
-
+  if(!orderFile || !stockFile) return alert('Vui lòng chọn đầy đủ cả File Đơn Hàng và File Tồn Kho!');
   try{
-    const orderWb = await readExcel(orderFile);
-    const stockWb = await readExcel(stockFile);
-
+    const orderWb = await readExcel(orderFile); const stockWb = await readExcel(stockFile);
     const sheetOrderName = findSheet(orderWb, ['KE', 'HOACH', 'GIAO', 'HANG']) || orderWb.SheetNames[0];
     appState.orders = parseOrders(orderWb[sheetOrderName]);
-    
     const parsedData = parseStockAndPackaging(stockWb);
-    appState.stockMap = parsedData.stockMap;
-    appState.bbMap = parsedData.bbMap;
-
+    appState.stockMap = parsedData.stockMap; appState.bbMap = parsedData.bbMap;
     uploadDataToFirebase();
-    alert('Đã import và đồng bộ hóa đám mây trung tâm thành công!');
-  }catch(error){
-    alert('Có lỗi định dạng Excel: ' + error.message);
-  }
+    alert('🎉 Đã import thành công và tự động đồng bộ hóa dữ liệu đám mây toàn hệ thống!');
+  }catch(error){ alert('Có lỗi cấu trúc Excel: ' + error.message); }
 }
 
 function refreshAll(){
   applyProductionViewSettings();
-  
   const allReadyOrders = getReadyOrders();
   const allShortageOrders = appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP');
   const totalProductionTon = appState.production.reduce((sum, item)=>sum + item.shortage, 0);
@@ -1462,108 +1493,70 @@ function refreshAll(){
   const tomorrowCard = document.getElementById('section-tomorrow');
   const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
   
-  // ỨNG VIÊN CỨU ĐƠN: Chỉ hiện những dòng THỰC SỰ THIẾU HỤT TỰ NHIÊN và cụm cont đó chưa từng được duyệt cứu
   let candidates = appState.details.filter((item) => item.isRowShortage && item.status === 'THIẾU TP');
   if(tomSelectVal !== 'ALL') candidates = candidates.filter((item)=>item.ngayKey === tomSelectVal);
 
   const candHtml = candidates.map((item)=>`
     <tr>
       <td><input type="checkbox" data-candidate-id="${item.id}" class="w-5 h-5 accent-yellow-500 cursor-pointer"/></td>
-      <td class="font-bold text-yellow-400">${escapeHtml(item.donHang)}</td>
-      <td>${escapeHtml(item.tenDonHang)}</td>
-      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td>
-      <td>${formatNumber(item.needTon, 1)}T</td>
-      <td>${formatNumber(item.stockBefore, 1)}T</td>
-      <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="font-bold text-yellow-400">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
+      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td><td>${formatNumber(item.needTon, 1)}T</td>
+      <td>${formatNumber(item.stockBefore, 1)}T</td><td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
       <td>${escapeHtml(item.ngay)}</td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
 
   const confHtml = appState.confirmedTomorrow.map((item)=>`
     <tr class="flash">
-      <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td>
-      <td>${escapeHtml(item.maBao)}</td>
-      <td class="text-yellow-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
-      <td>${escapeHtml(item.ngay)}</td>
+      <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.maBao)}</td>
+      <td class="text-yellow-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
-      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white px-3 py-1 rounded-lg text-xs font-semibold transition">Xóa</button></td>
+      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-500 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold">❌ Hủy</button></td>
     </tr>`).join('');
-  setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Xóa'], confHtml, 1);
+  setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Hành động'], confHtml, 1);
   setBadgeCount(tomorrowCard, appState.confirmedTomorrow.length);
 
   const readyCard = document.getElementById('section-ready');
   if (readyCard) {
-    const rows = planRows();
-    setBadgeCount(readyCard, rows.length);
+    const rows = planRows(); setBadgeCount(readyCard, rows.length);
     const fullTableEl = document.getElementById('fullExportTable');
     if (fullTableEl) fullTableEl.innerHTML = planTableHtml(rows);
     renderExportPreview();
   }
-
-  renderProduction();
+  renderProduction(); 
   renderDetails();
+  renderTotalPackaging();
 }
 
 function renderExportPreview(){
-  const card = document.getElementById('section-ready');
-  if(!card) return;
-  const { mode, from, to } = getFilterControls(card);
-  const ready = getReadyOrders();
+  const card = document.getElementById('section-ready'); if(!card) return;
+  const { mode, from, to } = getFilterControls(card); const ready = getReadyOrders();
   const filtered = rowsByDateMode(ready, mode, from, to);
   appState.exportPreview = assignPlanTimes(filtered.filter(isManualLoading).concat(filtered.filter((item)=>!isManualLoading(item))));
-  const container = document.getElementById('exportPreviewContainer');
-  if(!container) return;
-  container.innerHTML = `
-    <div class="p-5 flex justify-between items-center flex-wrap gap-4">
-      <div>
-        <div class="text-lg font-bold uppercase">📦 XEM TRƯỚC FILE XUẤT HÀNG</div>
-        <div class="text-slate-400 text-sm mt-1">${appState.exportPreview.length} đơn sẽ được xuất hàng khi xác nhận • Ngày xuất ${planDateDisplay()}</div>
-      </div>
-    </div>
-    <div class="overflow-auto max-h-[520px]">
-      ${planTableHtml(appState.exportPreview)}
-    </div>`;
+  const container = document.getElementById('exportPreviewContainer'); if(!container) return;
+  container.innerHTML = `<div class="p-5"><div class="text-lg font-bold text-emerald-400 uppercase">📦 BẢNG XEM TRƯỚC FORMAT FILE EXCEL KẾ HOẠCH (${appState.exportPreview.length} đơn)</div></div><div class="overflow-auto max-h-[520px] p-2">${planTableHtml(appState.exportPreview)}</div>`;
 }
 
 function exportExcel(){
   renderExportPreview();
-  if(!appState.exportPreview.length) return alert('Không có dữ liệu phù hợp để xuất file Excel!');
+  if(!appState.exportPreview.length) return alert('Không tìm thấy dữ liệu đơn hàng phù hợp bộ lọc để xuất Excel!');
   const totalCont = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
   const totalOrder = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
   const rows = [
-    ['KẾ HOẠCH XUẤT HÀNG'],
-    [],
+    ['KẾ HOẠCH XUẤT HÀNG'], [],
     ['Ngày xuất','Khách hàng','Loại hàng','Số lượng (cont)','số lượng tấn /cont','SL đơn hàng','Hãng VC','Thời Gian','Ghi chú'],
-    ...appState.exportPreview.map((item, index)=>[
-      index === 0 ? item.planDate : '',
-      item.donHang,
-      item.tenDonHang,
-      item.soCont > 0 ? item.soCont : 'Ghép',
-      item.tanCont,
-      item.tanCont,
-      item.hangVanChuyen,
-      item.planTime,
-      planNote(item)
-    ]),
+    ...appState.exportPreview.map((item, index)=>[index === 0 ? item.planDate : '', item.donHang, item.tenDonHang, item.soCont > 0 ? item.soCont : 'Gem', item.tanCont, item.tanCont, item.hangVanChuyen, item.planTime, planNote(item)]),
     ['TỔNG','','',totalCont,'',totalOrder,'','','']
   ];
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!merges'] = [{ s:{ r:0, c:0 }, e:{ r:0, c:8 } }];
-  ws['!cols'] = [
-    { wch:12 }, { wch:28 }, { wch:32 }, { wch:14 }, { wch:16 },
-    { wch:12 }, { wch:12 }, { wch:14 }, { wch:42 }
-  ];
-  XLSX.utils.book_append_sheet(wb, ws, "KE HOACH XUAT HANG");
-  XLSX.writeFile(wb, "KE_HOACH_XUAT_HANG.xlsx");
+  const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!merges'] = [{ s:{ r:0, c:0 }, e:{ r:0, c:8 } }]; ws['!cols'] = [ { wch:12 }, { wch:28 }, { wch:32 }, { wch:14 }, { wch:16 }, { wch:12 }, { wch:12 }, { wch:14 }, { wch:42 } ];
+  XLSX.utils.book_append_sheet(wb, ws, "KE HOACH XUAT HANG"); XLSX.writeFile(wb, `KE_HOACH_XUAT_HANG_${planDateKey()}.xlsx`);
 }
 
 function renderProduction(){
   const productionCard = document.getElementById('section-production');
   const tableBody = document.querySelector('#productionNeedTable tbody');
   if (!tableBody || !productionCard) return;
-  
   const { mode, from, to } = getFilterControls(productionCard);
   const filteredOrders = rowsByDateMode(appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP'), mode, from, to);
   
@@ -1571,144 +1564,181 @@ function renderProduction(){
   filteredOrders.forEach((item)=>{
     const productionKey = item.tenDonHang || item.code;
     const current = map.get(productionKey) || { code:productionKey, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
-    current.demand += item.needTon;
-    current.stock += Math.max(0, item.stockBefore);
-    current.shortage += item.shortage;
-    current.orders += 1;
-    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
-      current.nearestKey = item.ngayKey;
-      current.nearest = item.ngay;
-    }
+    current.demand += item.needTon; current.stock += Math.max(0, item.stockBefore); current.shortage += item.shortage; current.orders += 1;
+    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){ current.nearestKey = item.ngayKey; current.nearest = item.ngay; }
     map.set(productionKey, current);
   });
+  tableBody.innerHTML = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey)).map((item)=>`<tr><td class="font-bold text-red-400">${escapeHtml(item.code)}</td><td>${formatNumber(item.demand, 1)}T</td><td>${formatNumber(item.stock, 1)}T</td><td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td class="text-yellow-400 font-bold text-base">${formatNumber(item.shortage, 1)}T</td><td class="text-center font-semibold text-slate-300">${item.orders}</td><td><span class="bg-slate-900 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${escapeHtml(item.nearest)}</span></td></tr>`).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">🎉 Không có thành phẩm nào thiếu hụt!</td></tr>';
+}
 
-  const prodList = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
+function renderTotalPackaging() {
+  const tableBody = document.querySelector('#totalPackagingTable tbody');
+  if (!tableBody) return;
 
-  tableBody.innerHTML = prodList.map((item)=>`
-    <tr>
-      <td class="font-bold text-red-400">${escapeHtml(item.code)}</td>
-      <td>${formatNumber(item.demand, 1)}T</td>
-      <td>${formatNumber(item.stock, 1)}T</td>
-      <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
-      <td class="text-yellow-400 font-bold text-base">${formatNumber(item.shortage, 1)}T</td>
-      <td class="text-center font-semibold text-slate-300">${item.orders}</td>
-      <td><span class="bg-slate-900 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${escapeHtml(item.nearest)}</span></td>
-    </tr>`).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">Không có thành phẩm cần sản xuất</td></tr>';
+  const section = document.getElementById('section-total-packaging');
+  if (section && appState.details.length > 0) {
+    if (currentRole() === 'admin') {
+      section.classList.remove('hideBox');
+    } else if (currentRole() === 'production' && appState.productionView?.detail) {
+      section.classList.remove('hideBox');
+    } else {
+      section.classList.add('hideBox');
+    }
+  }
+
+  const packagingSummaryMap = new Map();
+
+  appState.details.forEach((item) => {
+    const bbCode = findBBCode(item.maBao, item.donHang) || item.maBao || "CHƯA PHÂN LOẠI";
+    const needPcs = Number(item.bbNeedPcs) || 0;
+    const shortagePcs = Number(item.bbShortage) || 0;
+
+    if (!packagingSummaryMap.has(bbCode)) {
+      packagingSummaryMap.set(bbCode, {
+        code: bbCode,
+        demand: 0,
+        stock: appState.bbMap?.get(bbCode) || 0,
+        shortage: 0,
+        orderCount: 0
+      });
+    }
+
+    const currentData = packagingSummaryMap.get(bbCode);
+    currentData.demand += needPcs;
+    currentData.shortage += shortagePcs;
+    currentData.orderCount += 1;
+    
+    packagingSummaryMap.set(bbCode, currentData);
+  });
+
+  const summaryList = Array.from(packagingSummaryMap.values()).sort((a, b) => {
+    return b.shortage - a.shortage || a.code.localeCompare(b.code);
+  });
+
+  tableBody.innerHTML = summaryList.map((item) => {
+    const isOrdered = !!appState.packagingOrdered?.[item.code];
+    return `
+    <tr class="border-b border-slate-800 hover:bg-slate-900/40">
+      <td class="font-bold text-orange-400">${escapeHtml(item.code)}</td>
+      <td class="font-semibold text-slate-100">${formatNumber(item.demand, 0)}</td>
+      <td class="text-blue-400 font-semibold">${formatNumber(item.stock, 0)}</td>
+      <td class="font-bold ${item.shortage > 0 ? 'text-red-400 text-base' : 'text-green-400'}">
+        ${item.shortage > 0 ? formatNumber(item.shortage, 0) : '0 (Đủ vỏ)'}
+      </td>
+      <td class="text-center font-medium text-violet-400"><span class="bg-slate-900 px-2.5 py-1 rounded-md border border-slate-700">${item.orderCount} Đơn</span></td>
+      <td class="text-center">
+        <input type="checkbox" data-bb-code="${escapeHtml(item.code)}" class="bb-ordered-checkbox w-5 h-5 accent-orange-500 cursor-pointer" ${isOrdered ? 'checked' : ''}/>
+      </td>
+    </tr>
+  `}).join('') || '<tr><td colspan="6" class="text-center text-slate-500 py-8">🎉 Không có nhu cầu bao bì nào phát sinh!</td></tr>';
 }
 
 function renderDetails(){
-  const detailCard = document.getElementById('section-detail');
-  const tableBody = document.querySelector('#detailAllOrdersTable tbody');
+  const detailCard = document.getElementById('section-detail'); const tableBody = document.querySelector('#detailAllOrdersTable tbody');
   if (!tableBody || !detailCard) return;
-
-  const { mode, from, to } = getFilterControls(detailCard);
-  const searchInputEl = document.getElementById('detailSearchInput');
-  const searchTxt = searchInputEl ? normalizeText(searchInputEl.value) : '';
+  const { mode, from, to } = getFilterControls(detailCard); const searchTxt = normalizeText(document.getElementById('detailSearchInput')?.value || '');
 
   let filtered = rowsByDateMode(appState.details, mode, from, to);
   if(searchTxt){
     filtered = filtered.filter((item)=>
       normalizeText(item.donHang).includes(searchTxt) || 
       normalizeText(item.tenDonHang).includes(searchTxt) || 
-      normalizeText(item.maBao).includes(searchTxt)
+      normalizeText(item.maBao).includes(searchTxt) ||
+      normalizeText(item.hangVanChuyen || '').includes(searchTxt)
     );
   }
-
-  tableBody.innerHTML = filtered.map((item)=>`
-    <tr>
-      <td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td>
-      <td>${escapeHtml(item.tenDonHang)}</td>
-      <td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td>
-      <td>${formatNumber(item.tanCont)}T</td>
-      <td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td>
-      <td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td>
-      
-      <td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td>
-      <td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td>
-      
-      <td>${escapeHtml(item.ngay)}</td>
-      <td>${statusBadge(item.displayStatus)}</td>
-    </tr>`).join('') || '<tr><td colspan="10" class="text-center text-slate-500 py-8">Không có dữ liệu chi tiết</td></tr>';
+  tableBody.innerHTML = filtered.map((item)=>`<tr><td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td><td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td><td class="text-cyan-400 font-medium">${escapeHtml(item.hangVanChuyen || '---')}</td><td>${formatNumber(item.tanCont)}T</td><td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td><td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td><td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td><td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td><td>${escapeHtml(item.ngay)}</td><td>${statusBadge(item.displayStatus)}</td></tr>`).join('') || '<tr><td colspan="11" class="text-center text-slate-500 py-8">Không tìm thấy dữ liệu đơn hàng phù hợp</td></tr>';
 }
 
-function captureDetailImage(){
-  const btn = document.getElementById('captureDetailBtn');
-  const box = document.getElementById('chiTietDonHangBox');
-  btn.textContent = '📸 Đang chụp...';
-  btn.disabled = true;
+function captureDetailImage() {
+  const sectionElement = document.getElementById('section-detail'); const tableElement = document.getElementById('detailAllOrdersTable'); const tableContainer = tableElement ? tableElement.parentElement : null;
+  if (!sectionElement || !tableContainer) return alert('Không tìm thấy vùng dữ liệu chi tiết để chụp!');
 
-  const originalMaxHeight = box.style.maxHeight;
-  box.style.maxHeight = 'none'; 
+  const btn = document.getElementById('captureDetailBtn'); const originalBtnHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.innerHTML = '⏳ Hệ thống đang dựng ảnh cuộn full...'; btn.disabled = true; }
 
-  html2canvas(document.getElementById('section-detail'), {
-    backgroundColor: '#020617',
-    scale: 2,
-    logging: false,
-    useCORS: true
-  }).then((canvas)=>{
-    box.style.maxHeight = originalMaxHeight;
-    btn.textContent = '📸 Chụp màn hình gửi Zalo';
-    btn.disabled = false;
+  const originalMaxHeight = tableContainer.style.maxHeight; const originalOverflowY = tableContainer.style.overflowY; const originalOverflowX = tableContainer.style.overflowX;
+  tableContainer.style.maxHeight = 'none'; tableContainer.style.overflowY = 'visible'; tableContainer.style.overflowX = 'visible';
+  if (btn) btn.style.visibility = 'hidden';
 
-    canvas.toBlob((blob)=>{
-      if(!blob) return alert('Lỗi xuất ảnh!');
-      try{
-        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-        alert('🎉 Đã chụp xong bảng chi tiết và lưu vào bộ nhớ tạm! Bạn chỉ cần vào Zalo và nhấn Ctrl + V là gửi được ngay.');
-      }catch(err){
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `CHI_TIET_DON_HANG_${dateKey(new Date())}.png`;
-        a.click();
-      }
-    }, 'image/png');
-  }).catch(()=>{
-    box.style.maxHeight = originalMaxHeight;
-    btn.textContent = '📸 Chụp màn hình gửi Zalo';
-    btn.disabled = false;
-    alert('Lỗi chụp màn hình!');
-  });
+  setTimeout(() => {
+    const fullWidth = sectionElement.scrollWidth; const fullHeight = sectionElement.scrollHeight;
+    html2canvas(sectionElement, { backgroundColor: '#020617', scale: 2, useCORS: true, logging: false, width: fullWidth, height: fullHeight, windowWidth: fullWidth, windowHeight: fullHeight, x: 0, y: 0, scrollX: 0, scrollY: 0 }).then(canvas => {
+      tableContainer.style.maxHeight = originalMaxHeight; tableContainer.style.overflowY = originalOverflowY; tableContainer.style.overflowX = originalOverflowX;
+      if (btn) { btn.style.visibility = 'visible'; btn.innerHTML = originalBtnHtml; btn.disabled = false; }
+      const now = new Date(); const formatTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
+      const link = document.createElement('a'); link.download = `Bao_Cao_Chi_Tiet_Don_Hang_${formatTime}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+    }).catch(err => {
+      tableContainer.style.maxHeight = originalMaxHeight; tableContainer.style.overflowY = originalOverflowY; tableContainer.style.overflowX = originalOverflowX;
+      if (btn) { btn.style.visibility = 'visible'; btn.innerHTML = originalBtnHtml; btn.disabled = false; }
+      alert('Không thể thực hiện chụp ảnh cuộn: ' + err.message);
+    });
+  }, 400);
 }
 
 function bindEvents(){
   document.getElementById('btnWorkshopConfirm')?.addEventListener('click', ()=>{
     const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked');
-    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một đơn hàng!');
+    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một mã hàng bị thiếu trong danh sách!');
 
     const candidateIds = Array.from(checkedBoxes).map((cb)=>cb.dataset.candidateId);
     const selectedItems = appState.details.filter((item)=>candidateIds.includes(item.id));
 
+    let logsText = [];
     selectedItems.forEach((item)=>{
-      const exists = appState.confirmedTomorrow.some((c)=>c.id === item.id);
-      if(!exists){
+      if(!appState.confirmedTomorrow.some((c)=>c.id === item.id)){
         appState.confirmedTomorrow.push({
-          id: item.id,
-          donHang: item.donHang,
-          maBao: item.maBao,
-          shortage: item.shortage,
-          ngay: item.ngay,
-          ngayKey: item.ngayKey
+          id: item.id, donHang: item.donHang, maBao: item.maBao, shortage: item.shortage, ngay: item.ngay, ngayKey: item.ngayKey
         });
+        logsText.push(`Đơn: ${item.donHang} (${item.maBao}) - Thiếu: ${item.shortage}T`);
       }
     });
 
     uploadConfirmedToFirebase();
-    
+    writeAuditLog("Xác nhận duyệt ưu tiên cụm đơn ngày mai", logsText.join(" | "));
+
     const nextRole = currentRole() === 'admin' ? 'production' : 'admin';
-    const sourceLabel = currentRole() === 'admin' ? 'Văn phòng' : 'Quản đốc sản xuất';
-    sendAppNotice(nextRole, `${sourceLabel} đã cập nhật danh sách đơn hàng mai có thể xuất.`);
-    
-    alert('Đã xác nhận và đồng bộ danh sách ưu tiên thành công lên hệ thống mạng đám mây!');
+    const sourceLabel = localStorage.getItem('tp_user_fullname') || 'Quản đốc sản xuất';
+    sendAppNotice(nextRole, `${sourceLabel} đã duyệt điều phối một số đơn hàng mai có thể xuất.`);
+    alert('🎉 Đã xác nhận duyệt ưu tiên cho cụm đơn hàng thành công lên mạng đám mây!');
   });
 
   document.getElementById('tomorrowConfirmedTable').addEventListener('click', (e)=>{
     const button = e.target.closest('[data-remove-tomorrow]');
     if(!button) return;
-    if(!confirm('Xóa đơn này khỏi danh sách ngày mai?')) return;
+    if(!confirm('Xóa bỏ duyệt điều phối đơn này khỏi danh sách ngày mai?')) return;
     
+    const targetItem = appState.confirmedTomorrow.find((item)=>item.id === button.dataset.removeTomorrow);
     appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== button.dataset.removeTomorrow);
     uploadConfirmedToFirebase();
+    
+    if(targetItem) {
+       writeAuditLog("Hủy duyệt đơn hàng ngày mai", `Mã ĐH: ${targetItem.donHang} | Mã bao bì: ${targetItem.maBao} | Thiếu hụt quy đổi: ${targetItem.shortage}T`);
+    }
+  });
+
+  document.getElementById('totalPackagingTable')?.addEventListener('change', (e) => {
+    if (e.target.classList.contains('bb-ordered-checkbox')) {
+      const bbCode = e.target.dataset.bbCode;
+      const isChecked = e.target.checked;
+      if (database) {
+        const safeKey = btoa(encodeURIComponent(bbCode)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+        database.ref("thanhpham_system/packaging_ordered/" + safeKey).set({
+          code: bbCode,
+          ordered: isChecked,
+          updatedAt: new Date().toLocaleString('vi-VN')
+        });
+        writeAuditLog("Cập nhật trạng thái đặt bao bì", `Mã bao bì: ${bbCode} -> ${isChecked ? 'Đia ĐẶT' : 'CHƯA ĐẶT'}`);
+      }
+    }
+  });
+
+  document.getElementById('btnOpenHistory')?.addEventListener('click', ()=>{
+    document.getElementById('historyPopup').classList.remove('hideBox');
+    loadAuditLogsToTable();
+  });
+  document.getElementById('btnCloseHistory')?.addEventListener('click', ()=>{
+    document.getElementById('historyPopup').classList.add('hideBox');
   });
 
   document.getElementById('tomorrowDateSelect').addEventListener('change', refreshAll);
@@ -1732,8 +1762,8 @@ function bindEvents(){
   document.getElementById('captureDetailBtn')?.addEventListener('click', captureDetailImage);
   document.getElementById('btnSaveProductionView')?.addEventListener('click', saveProductionViewSettings);
   document.getElementById('btnNotifyWorkshop')?.addEventListener('click', ()=>{
-    sendAppNotice('production', 'Văn phòng đã cập nhật dữ liệu đơn hàng mới. Vui lòng kiểm tra.');
-    alert('Đã gửi thông báo đến giao diện xưởng.');
+    sendAppNotice('production', '🚀 Văn phòng đã hoàn tất cập nhật dữ liệu đơn hàng và tồn kho mới nhất. Xin mời kiểm tra!');
+    alert('🔔 Đã gửi tín hiệu thông báo thông minh thời gian thực đến màn hình xưởng!');
   });
   document.getElementById('btnDismissNotice')?.addEventListener('click', dismissLatestNotice);
 }
@@ -1741,7 +1771,6 @@ function bindEvents(){
 document.addEventListener('DOMContentLoaded', ()=>{
   const savedRole = localStorage.getItem('tp_user_role');
   applyRoleView(savedRole);
-  
   setupFirebaseListeners();
   bindEvents();
 });
