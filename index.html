@@ -91,10 +91,6 @@ tbody tr:hover{
   font-weight: 600;
   transition: 0.2s;
 }
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 </style>
 </head>
 
@@ -118,10 +114,10 @@ tbody tr:hover{
     </div>
 
     <div class="grid grid-cols-2 gap-3 pt-2">
-      <button id="btnLoginProduction" onclick="handleLogin('production')" class="btn bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-sm">
+      <button onclick="handleLogin('production')" class="btn bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-sm">
         🏭 Xưởng Sản Xuất
       </button>
-      <button id="btnLoginAdmin" onclick="handleLogin('admin')" class="btn bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
+      <button onclick="handleLogin('admin')" class="btn bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
         💻 Máy Chủ Văn Phòng
       </button>
     </div>
@@ -309,7 +305,7 @@ tbody tr:hover{
         <h2 class="text-xl font-bold uppercase">📁 IMPORT DỮ LIỆU LÊN ĐÁM MÂY MÁY CHỦ</h2>
         <div class="text-slate-400 text-sm mt-1">Upload file dữ liệu mới, tất cả máy xưởng và văn phòng sẽ tự động cập nhật đồng bộ</div>
       </div>
-      <button id="btnProcessCloudSync" class="btn bg-emerald-600 hover:bg-emerald-500 text-black text-sm" onclick="processFiles()">🚀 Xử lý & Đồng bộ đám mây</button>
+      <button class="btn bg-emerald-600 hover:bg-emerald-500 text-black text-sm" onclick="processFiles()">🚀 Xử lý & Đồng bộ đám mây</button>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 text-sm">
       <div class="bg-slate-800 rounded-xl p-5">
@@ -512,11 +508,10 @@ tbody tr:hover{
               <th>Tồn Kho Trên Kệ Hiện Tại (Cái)</th>
               <th class="text-red-400">Thiếu Hụt Thực Tế Cần Bổ Sung (Cái)</th>
               <th class="text-center">Số Lượng Đơn Hàng Liên Quan</th>
-              <th class="text-center">Đã đặt bao chưa</th>
             </tr>
           </thead>
           <tbody>
-             <tr><td colspan="6" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp phân tích bao bì</td></tr>
+             <tr><td colspan="5" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp phân tích bao bì</td></tr>
           </tbody>
         </table>
       </div>
@@ -601,7 +596,7 @@ const firebaseConfig = {
   messagingSenderId: "522347739695",
   appId: "1:522347739695:web:a743523d3c67fb5a3964da",
   measurementId: "G-MEKJL605EF",
-  databaseURL: "https://hethongthpham-default-rtdb.firebaseio.com/"
+  databaseURL: "https://hethongthanhpham-default-rtdb.firebaseio.com/"
 };
 
 try {
@@ -619,7 +614,6 @@ const appState = {
   confirmedTomorrow: [],
   exportPreview: [],
   bbRules: [],
-  packagingOrdered: {},
   stockMap: new Map(),
   bbMap: new Map(),
   productionView: {
@@ -631,7 +625,17 @@ const appState = {
   latestNotice: null
 };
 
-// HÀM XỬ LÝ ĐĂNG NHẬP MỚI AN TOÀN TRÊN CLOUD - KHÔNG HARDCODE
+// DANH SÁCH TÀI KHOẢN BẢO MẬT HỆ THỐNG
+const SECURITY_ACC = "omotobike"; 
+const SECURITY_PSW = "hoilamchi"; 
+
+// Danh sách tài khoản Quản Đốc Sản Xuất
+const WORKSHOP_USERS = {
+  "hiepquandoc": { password: "123", fullName: "Hiệp Quản đốc" },
+  "dungquandoc": { password: "456", fullName: "Dũng Quản đốc" }
+};
+
+// HÀM XỬ LÝ ĐĂNG NHẬP MỚI KIỂM TRA TÀI KHOẢN MẬT KHẨU
 function handleLogin(role) {
   const user = document.getElementById('userInput').value.trim();
   const pass = document.getElementById('passInput').value.trim();
@@ -642,70 +646,23 @@ function handleLogin(role) {
     return;
   }
 
-  alertEl.textContent = "⏳ Đang xác thực tài khoản đám mây...";
-
-  if (!database) {
-    // Dự phòng cục bộ nếu mất kết nối Firebase khi khởi tạo tài khoản ban đầu trên Database
-    if (role === 'admin' && user === 'omotobike' && pass === 'hoilamchi') {
-       executeLoginSuccess('admin', 'Chủ quản văn phòng');
-       return;
-    }
-    alertEl.textContent = "❌ Mất kết nối máy chủ Firebase. Không thể xác thực!";
-    return;
-  }
-
-  // Đọc danh sách tài khoản được băm nhỏ lưu trên node an toàn của DB đám mây
-  database.ref("thanhpham_system/system_users").once("value").then((snapshot) => {
-    const cloudUsers = snapshot.val();
-    
-    // Nếu đám mây chưa khởi tạo danh sách, tạo cấu hình mặc định ban đầu để vận hành
-    if (!cloudUsers) {
-      const defaultUsers = {
-        "admin": { "username": "omotobike", "password": "hoilamchi", "fullName": "Chủ quản văn phòng" },
-        "hiepquandoc": { "username": "hiepquandoc", "password": "123", "fullName": "Hiệp Quản đốc", "role": "production" },
-        "dungquandoc": { "username": "dungquandoc", "password": "456", "fullName": "Dũng Quản đốc", "role": "production" }
-      };
-      database.ref("thanhpham_system/system_users").set(defaultUsers);
-      
-      // Check nhanh bằng dữ liệu gốc mẫu
-      verifyCredentials(role, user, pass, defaultUsers, alertEl);
+  if (role === 'admin') {
+    if (user === SECURITY_ACC && pass === SECURITY_PSW) {
+      localStorage.setItem('tp_user_role', 'admin');
+      localStorage.setItem('tp_user_fullname', 'Chủ quản văn phòng');
+      applyRoleView('admin');
     } else {
-      verifyCredentials(role, user, pass, cloudUsers, alertEl);
+      alertEl.textContent = "❌ Sai tài khoản hoặc mật khẩu máy chủ văn phòng!";
     }
-  }).catch((err) => {
-    console.error(err);
-    alertEl.textContent = "❌ Lỗi hệ thống xác thực: " + err.message;
-  });
-}
-
-function verifyCredentials(role, user, pass, usersList, alertEl) {
-  let matchedUser = null;
-  
-  Object.keys(usersList).forEach(k => {
-    const u = usersList[k];
-    if (u.username === user && u.password === pass) {
-      matchedUser = u;
-    }
-  });
-
-  if (matchedUser) {
-    if (role === 'admin' && (!matchedUser.role || matchedUser.role === 'admin')) {
-      executeLoginSuccess('admin', matchedUser.fullName);
-    } else if (role === 'production' && matchedUser.role === 'production') {
-      executeLoginSuccess('production', matchedUser.fullName);
+  } else if (role === 'production') {
+    if (WORKSHOP_USERS[user] && WORKSHOP_USERS[user].password === pass) {
+      localStorage.setItem('tp_user_role', 'production');
+      localStorage.setItem('tp_user_fullname', WORKSHOP_USERS[user].fullName);
+      applyRoleView('production');
     } else {
-      alertEl.textContent = "❌ Tài khoản này không thuộc thẩm quyền phân vùng đăng nhập!";
+      alertEl.textContent = "❌ Tài khoản hoặc Mật khẩu Quản đốc không chính xác!";
     }
-  } else {
-    alertEl.textContent = "❌ Tài khoản hoặc Mật khẩu không chính xác trên đám mây!";
   }
-}
-
-function executeLoginSuccess(role, fullName) {
-  document.getElementById('loginAlert').textContent = "";
-  localStorage.setItem('tp_user_role', role);
-  localStorage.setItem('tp_user_fullname', fullName);
-  applyRoleView(role);
 }
 
 // HÀM GHI NHẬT KÝ LỊCH SỬ THAO TÁC TRUY VẾT LỖI (AUDIT LOG)
@@ -727,34 +684,45 @@ function loadAuditLogsToTable() {
   const tbody = document.getElementById('historyTableBody');
   if (!tbody || !database) return;
 
-  database.ref("thanhpham_system/audit_logs").limitToLast(150).on("value", function(snapshot) {
+  tbody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-400 py-6">🔄 Đang đồng bộ lịch sử thời gian thực...</td></tr>`;
+
+  database.ref("thanhpham_system/audit_logs").limitToLast(100).once("value", function(snapshot) {
+    tbody.innerHTML = "";
     const data = snapshot.val();
     if (!data) {
-      tbody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-500 py-6">Chưa ghi nhận thao tác nào.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center text-slate-500 py-6">Chưa ghi nhận lịch sử chỉnh sửa nào trên hệ thống.</td></tr>`;
       return;
     }
-    const html = Object.keys(data).reverse().map(key => {
-      const log = data[key];
-      return `<tr class="border-b border-slate-800">
-        <td class="text-slate-400 font-mono text-xs">${escapeHtml(log.timestamp)}</td>
-        <td class="font-bold text-violet-400 text-xs">${escapeHtml(log.user)}</td>
-        <td class="text-yellow-400 font-medium text-xs">${escapeHtml(log.action)}</td>
-        <td class="max-w-md break-words text-slate-300 text-xs">${escapeHtml(log.details)}</td>
-      </tr>`;
+
+    // Đảo thứ tự để thao tác mới nhất hiện lên đầu
+    const list = Object.values(data).reverse();
+    tbody.innerHTML = list.map(log => {
+      const isCancel = log.action.includes("Hủy");
+      const badgeClass = isCancel ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-emerald-500/20 text-green-400 border border-green-500/30";
+      return `
+        <tr class="border-b border-slate-800/50 hover:bg-slate-900/40">
+          <td class="text-slate-400 text-xs p-3 font-mono">${escapeHtml(log.timestamp)}</td>
+          <td class="p-3"><span class="px-2 py-0.5 bg-slate-800 text-yellow-400 rounded-md text-xs font-semibold border border-slate-700">${escapeHtml(log.user)}</span></td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded-md text-xs font-bold ${badgeClass}">${escapeHtml(log.action)}</span></td>
+          <td class="p-3 text-slate-300 break-words whitespace-pre-line max-w-md">${escapeHtml(log.details)}</td>
+        </tr>
+      `;
     }).join('');
-    tbody.innerHTML = html;
   });
 }
 
+// HÀM XÓA LỊCH SỬ THEO NGÀY ĐƯỢC CHỈ ĐỊNH (CHUẨN HÓA ĐỊNH DẠNG NGÀY)
 function deleteHistoryByDate() {
   const dateInput = document.getElementById('deleteHistoryDateInput').value.trim();
   if (!dateInput) {
     alert("⚠️ Vui lòng nhập ngày cần xóa! Ví dụ: 1/6/2026 hoặc 01/06/2026");
     return;
   }
+  
   if (!confirm(`⚠️ Bạn có chắc chắn muốn xóa TOÀN BỘ lịch sử thao tác của ngày [${dateInput}] không?\nHành động này sẽ xóa vĩnh viễn trên đám mây và không thể khôi phục!`)) {
     return;
   }
+
   const normalizeDate = (str) => {
     try {
       const cleanStr = str.split(',')[0].trim();
@@ -763,15 +731,19 @@ function deleteHistoryByDate() {
       return str;
     }
   };
+
   const targetNormalized = normalizeDate(dateInput);
+
   database.ref("thanhpham_system/audit_logs").once("value", function(snapshot) {
     const data = snapshot.val();
     if (!data) {
       alert("❌ Không có dữ liệu lịch sử nào trên hệ thống.");
       return;
     }
+
     let deleteCount = 0;
     const promises = [];
+
     Object.keys(data).forEach(key => {
       const log = data[key];
       if (log.timestamp) {
@@ -782,6 +754,7 @@ function deleteHistoryByDate() {
         }
       }
     });
+
     if (deleteCount === 0) {
       alert(`ℹ️ Không tìm thấy bản ghi lịch sử nào trùng khớp với ngày: ${dateInput}`);
     } else {
@@ -801,16 +774,14 @@ function applyRoleView(role) {
     document.getElementById('loginSection').classList.remove('hideBox');
     return;
   }
+  
   document.getElementById('loginSection').classList.add('hideBox');
   const fullName = localStorage.getItem('tp_user_fullname') || 'Người dùng';
   document.getElementById('currentUserLabel').textContent = fullName;
-  
-  const labelEl = document.getElementById('currentRoleLabel');
+
   if (role === 'admin') {
-    labelEl.textContent = 'MÁY CHỦ VĂN PHÒNG';
-    labelEl.className = "text-violet-400 font-bold uppercase";
-    document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
-    document.getElementById('btnResetStorage').classList.remove('hideBox');
+    document.getElementById('currentRoleLabel').textContent = "💻 Chủ quan văn phòng (Máy chủ)";
+    document.getElementById('section-tomorrow').classList.remove('hideBox');
     document.getElementById('section-production-permissions').classList.remove('hideBox');
     document.getElementById('section-bb-rules').classList.remove('hideBox');
     document.getElementById('section-import').classList.remove('hideBox');
@@ -818,15 +789,19 @@ function applyRoleView(role) {
     document.getElementById('section-production').classList.remove('hideBox');
     document.getElementById('section-total-packaging').classList.remove('hideBox');
     document.getElementById('section-detail').classList.remove('hideBox');
+    document.getElementById('btnNotifyWorkshop').classList.remove('hideBox');
+    document.getElementById('btnResetStorage').classList.remove('hideBox');
   } else {
-    labelEl.textContent = 'XƯỞNG SẢN XUẤT';
-    labelEl.className = "text-yellow-400 font-bold uppercase";
-    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
-    document.getElementById('btnResetStorage').classList.add('hideBox');
+    document.getElementById('currentRoleLabel').textContent = "🏭 Quản đốc sản xuất (Xưởng)";
     document.getElementById('section-production-permissions').classList.add('hideBox');
     document.getElementById('section-bb-rules').classList.add('hideBox');
     document.getElementById('section-import').classList.add('hideBox');
+    document.getElementById('btnNotifyWorkshop').classList.add('hideBox');
+    document.getElementById('btnResetStorage').classList.add('hideBox');
+    applyProductionViewSettings();
   }
+  renderProductionViewSettings();
+  renderLatestNotice();
   refreshAll();
 }
 
@@ -836,33 +811,281 @@ function switchRole() {
   location.reload();
 }
 
-function currentRole() {
+function currentRole(){
   return localStorage.getItem('tp_user_role') || '';
 }
 
-function toggleBBRulesContent() {
-  document.getElementById('bbRulesMainContent').classList.toggle('hideBox');
+function applyProductionViewSettings(){
+  const role = currentRole();
+  if(role === 'admin' || !role) return;
+  const view = appState.productionView || {};
+  
+  document.getElementById('section-tomorrow').classList.toggle('hideBox', !(view.tomorrow !== false));
+  document.getElementById('section-ready').classList.toggle('hideBox', !view.ready);
+  document.getElementById('section-production').classList.toggle('hideBox', !view.production);
+  document.getElementById('section-total-packaging').classList.toggle('hideBox', !view.detail);
+  document.getElementById('section-detail').classList.toggle('hideBox', !view.detail);
+}
+
+function renderProductionViewSettings(){
+  const view = appState.productionView || {};
+  const controls = {
+    permTomorrow: view.tomorrow !== false,
+    permReady: !!view.ready,
+    permProduction: !!view.production,
+    permDetail: !!view.detail
+  };
+
+  Object.entries(controls).forEach(([id, checked]) => {
+    const el = document.getElementById(id);
+    if(el) el.checked = checked;
+  });
+}
+
+function saveProductionViewSettings(){
+  appState.productionView = {
+    tomorrow: document.getElementById('permTomorrow')?.checked !== false,
+    ready: !!document.getElementById('permReady')?.checked,
+    production: !!document.getElementById('permProduction')?.checked,
+    detail: !!document.getElementById('permDetail')?.checked
+  };
+  if(database) database.ref("thanhpham_system/production_view").set(appState.productionView);
+  renderProductionViewSettings();
+  alert('🎉 Đã cập nhật và lưu cấu hình phân quyền xem cho xưởng thành công!');
+}
+
+function sendAppNotice(targetRole, message){
+  if(!database) return;
+  const notice = {
+    id: Date.now(),
+    targetRole,
+    message,
+    createdAt: new Date().toLocaleString('vi-VN'),
+    fromRole: currentRole()
+  };
+  database.ref("thanhpham_system/notices/latest").set(notice);
+}
+
+function renderLatestNotice(){
+  const box = document.getElementById('appNoticeBox');
+  const notice = appState.latestNotice;
+  if(!box || !notice || notice.targetRole !== currentRole()){
+    box?.classList.add('hideBox');
+    return;
+  }
+
+  const seenId = localStorage.getItem(`tp_notice_seen_${currentRole()}`);
+  if(String(notice.id) === seenId){
+    box.classList.add('hideBox');
+    return;
+  }
+
+  document.getElementById('appNoticeMessage').textContent = `${notice.message} (${notice.createdAt || ''})`;
+  box.classList.remove('hideBox');
+}
+
+function dismissLatestNotice(){
+  if(appState.latestNotice?.id){
+    localStorage.setItem(`tp_notice_seen_${currentRole()}`, String(appState.latestNotice.id));
+  }
+  renderLatestNotice();
+}
+
+function setupFirebaseListeners() {
+  if (!database) return;
+  
+  database.ref(".info/connected").on("value", function(snap) {
+    const statusEl = document.getElementById("syncStatus");
+    if (snap.val() === true) {
+      statusEl.textContent = "🟢 Đang kết nối đám mây (Thời gian thực)";
+      statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-green-400 border border-green-500/30 font-medium";
+    } else {
+      statusEl.textContent = "🟡 Đang kết nối mạng đám mây...";
+      statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-medium";
+    }
+  });
+
+  database.ref("thanhpham_system/bb_rules").on("value", function(snapshot) {
+    const rulesObj = snapshot.val() || {};
+    appState.bbRules = Object.entries(rulesObj).map(([id, item]) => ({ id, ...item }));
+    renderCloudBBRulesTable();
+    if (appState.orders.length > 0) {
+      processAllocation();
+      refreshAll();
+    }
+  });
+
+  database.ref("thanhpham_system/cloud_data").on("value", function(snapshot) {
+    const data = snapshot.val();
+    if (data) {
+      appState.orders = data.orders || [];
+      appState.stockMap = data.stockMapArray ? new Map(data.stockMapArray) : new Map();
+      appState.bbMap = data.bbMapArray ? new Map(data.bbMapArray) : new Map();
+      
+      processAllocation();
+      fillAllDateSelects();
+      refreshAll();
+    } else {
+      resetAppState();
+      refreshAll();
+    }
+  });
+
+  database.ref("thanhpham_system/confirmed_tomorrow").on("value", function(snapshot) {
+    appState.confirmedTomorrow = snapshot.val() || [];
+    if (appState.orders.length > 0) {
+      processAllocation();
+    }
+    refreshAll();
+  });
+
+  database.ref("thanhpham_system/production_view").on("value", function(snapshot) {
+    appState.productionView = {
+      tomorrow: true, ready: false, production: false, detail: false,
+      ...(snapshot.val() || {})
+    };
+    renderProductionViewSettings();
+    if(currentRole()) applyRoleView(currentRole());
+  });
+
+  database.ref("thanhpham_system/notices/latest").on("value", function(snapshot) {
+    appState.latestNotice = snapshot.val();
+    renderLatestNotice();
+  });
+}
+
+function resetAppState() {
+  appState.orders = [];
+  appState.details = [];
+  appState.production = [];
+  appState.confirmedTomorrow = [];
+  appState.stockMap = new Map();
+  appState.bbMap = new Map();
+}
+
+function uploadDataToFirebase() {
+  if (!database) return;
+  database.ref("thanhpham_system/cloud_data").set({
+    orders: appState.orders,
+    stockMapArray: Array.from(appState.stockMap.entries()),
+    bbMapArray: Array.from(appState.bbMap.entries())
+  });
+}
+
+function uploadConfirmedToFirebase() {
+  if (!database) return;
+  database.ref("thanhpham_system/confirmed_tomorrow").set(appState.confirmedTomorrow);
+}
+
+function clearSystemCache() {
+  if (confirm("⚠️ Chú ý: Bạn có chắc chắn muốn xóa toàn bộ dữ liệu đơn hàng và tồn kho hiện tại không?\n\n(DANH SÁCH CÁC QUY TẮC MATCH BAO BÌ ĐÃ LƯU TRÊN ĐÁM MÂY VẪN SẼ ĐƯỢC GIỮ LẠI NGUYÊN VẸN, KHÔNG BỊ MẤT)")) {
+    if (database) {
+      const promises = [
+        database.ref("thanhpham_system/cloud_data").remove(),
+        database.ref("thanhpham_system/confirmed_tomorrow").remove(),
+        database.ref("thanhpham_system/notices").remove()
+      ];
+      
+      Promise.all(promises).then(() => {
+        alert("Đã làm trống dữ liệu vận hành thành công! Toàn bộ quy tắc match bao bì vẫn được bảo toàn.");
+        location.reload();
+      });
+    }
+  }
+}
+
+function textOf(value){
+  return String(value ?? '').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeText(value){
+  return textOf(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toUpperCase();
+}
+
+function normalizeCode(value){
+  return normalizeText(value)
+    .replace(/\s+/g, '')
+    .replace(/[–—]/g, '-')
+    .replace(/KG/g, 'KG');
+}
+
+function cleanTextBB(v){
+  return String(v || '').normalize('NFC').toUpperCase().replace(/\s+/g,'').trim();
+}
+
+function baseProductCode(value){
+  const clean = normalizeCode(value);
+  const match = clean.match(/[A-Z]+\d+[A-Z]*/);
+  return match ? match[0] : clean.split('-')[0];
+}
+
+function findBBCode(orderCode, donHang) {
+  const cleaned = cleanTextBB(orderCode);
+  const don = cleanTextBB(donHang);
+
+  if (appState.bbRules && appState.bbRules.length > 0) {
+    for (const rule of appState.bbRules) {
+      const kw = cleanTextBB(rule.keyword);
+      if (kw && (cleaned.includes(kw) || don.includes(kw))) {
+        return cleanTextBB(rule.targetCode);
+      }
+    }
+  }
+
+  if (cleaned.includes("MS4A") && cleaned.includes("25KG") && cleaned.includes("HẠT37") && don.includes("NGỌCTHỊNH")) return cleanTextBB("MS4A-25KG(BAO KHÁCH)");
+  if (cleaned.includes("MS6A") && cleaned.includes("25KG") && cleaned.includes("CHỮĐỎ") && don.includes("NGỌCTHỊNH")) return cleanTextBB("MS6A-25KG (CHỮ ĐỎ) BAO KHÁCH");
+  if (cleaned.includes("JUMBOMS2A") && cleaned.includes("1,15TẤN") && cleaned.includes("HẠT12")) return cleanTextBB("JB 90X90X134 KO IN, CÓ TRÁNG,");
+  if (cleaned.includes("JUMBREAT15") || (cleaned.includes("AT15") && cleaned.includes("1T"))) return cleanTextBB("JB AT15 (90*90*120)");
+  if (cleaned.includes("SN10") && cleaned.includes("25KG")) return cleanTextBB("SN10 - 25KG (52*76)");
+  if (cleaned.includes("SN15") && cleaned.includes("25KG")) return cleanTextBB("SN15 - 25KG (50*74)");
+  if (cleaned.includes("SN20") && cleaned.includes("25KG")) return cleanTextBB("SN20 - 25KG (50*73)");
+  return cleaned;
 }
 
 function toggleRuleForm() {
-  document.getElementById('bbRuleFormBox').classList.toggle('hideBox');
+  const box = document.getElementById('bbRuleFormBox');
+  if (box) {
+    box.classList.toggle('hideBox');
+    document.getElementById('ruleKeywordInput').value = '';
+    document.getElementById('ruleTargetInput').value = '';
+  }
+}
+
+function toggleBBRulesContent() {
+  const content = document.getElementById('bbRulesMainContent');
+  const btn = document.getElementById('btnToggleBBRules');
+  if (content) {
+    const isHidden = content.toggleAttribute('data-collapsed');
+    if (isHidden) {
+      content.classList.add('hideBox');
+      btn.textContent = 'Mở rộng quy tắc đám mây 🔽';
+    } else {
+      content.classList.remove('hideBox');
+      btn.textContent = 'Thu gọn quy tắc đám mây 🔼';
+    }
+  }
 }
 
 function saveCloudBBRule() {
-  if (!database) return;
+  if (!database) return alert('Chưa kết nối dữ liệu mạng.');
   const keyword = document.getElementById('ruleKeywordInput').value.trim();
   const targetCode = document.getElementById('ruleTargetInput').value.trim();
+
   if (!keyword || !targetCode) return alert('Vui lòng điền đầy đủ cả từ khóa và mã bao bì tương ứng!');
-  
+
   const newRule = {
     keyword: keyword,
     targetCode: targetCode,
     createdAt: new Date().toLocaleString('vi-VN')
   };
+
   database.ref("thanhpham_system/bb_rules").push(newRule).then(() => {
     alert('🎉 Đã lưu quy tắc bao bì đồng bộ lên đám mây máy chủ thành công!');
-    document.getElementById('ruleKeywordInput').value = "";
-    document.getElementById('ruleTargetInput').value = "";
     toggleRuleForm();
   });
 }
@@ -887,31 +1110,53 @@ function renderCloudBBRulesTable() {
       <td class="font-semibold text-violet-400">${escapeHtml(rule.targetCode)}</td>
       <td class="text-slate-400 text-xs">${escapeHtml(rule.createdAt || '')}</td>
       <td class="text-center"><button onclick="deleteCloudBBRule('${rule.id}')" class="bg-red-500/20 hover:bg-red-600 text-red-300 px-3 py-1 rounded-lg text-xs">❌ Xóa</button></td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
-// LOẠI BỎ TOÀN BỘ HARDCODE - TRA CỨU MÃ BAO BÌ THEO QUY TẮC ĐỘNG TRÊN DATABASE
-function findBBCode(productName, orderBaoBiCode) {
-  const cleanProd = String(productName || '').normalize('NFC').toUpperCase().replace(/\s+/g, '');
-  const cleanBao = String(orderBaoBiCode || '').normalize('NFC').toUpperCase().replace(/\s+/g, '');
-  
-  // Trích xuất ưu tiên từ danh sách quy tắc đám mây do người dùng tự khai báo
-  if (appState.bbRules && appState.bbRules.length > 0) {
-    for (const rule of appState.bbRules) {
-      const kw = String(rule.keyword || '').normalize('NFC').toUpperCase().replace(/\s+/g, '').trim();
-      if (kw && (cleanProd.includes(kw) || cleanBao.includes(kw))) {
-        return rule.targetCode; 
-      }
-    }
-  }
+function parseNumber(value){
+  if(value === null || value === undefined || value === '') return 0;
+  if(typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  const raw = String(value).trim();
+  if(/^\([\d\s,.-]+\)$/.test(raw)) return 0;
+  const text = raw.replace(/\s/g, '').replace(/,/g, '.');
+  const match = text.match(/-?\d+(\.\d+)?/);
+  return match ? Number(match[0]) : 0;
+}
 
-  // Dự phòng thông minh tự động nếu không có rule cấu hình trùng khớp
-  if (cleanProd.includes("MS4A") || cleanBao.includes("MS4A")) return "BB_MS4A";
-  if (cleanProd.includes("MS6A") || cleanBao.includes("MS6A")) return "BB_MS6A";
-  if (cleanProd.includes("JUMBOMS2A") || cleanBao.includes("JUMBOMS2A")) return "BB_JUMBO_MS2A";
-  
-  return orderBaoBiCode || 'CHƯA PHÂN LOẠI';
+function toExcelDate(value) {
+  if (value === null || value === undefined || value === '') return null;
+  let year, month, day;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    if (value.getUTCHours() === 0 && value.getUTCMinutes() === 0) {
+      year = value.getUTCFullYear(); month = value.getUTCMonth() + 1; day = value.getUTCDate();
+    } else {
+      year = value.getFullYear(); month = value.getMonth() + 1; day = value.getDate();
+    }
+    return { year, month, day };
+  }
+  if (typeof value === 'number') {
+    const date = new Date(Math.round((value - 25569) * 86400 * 1000));
+    if (!Number.isNaN(date.getTime())) {
+      return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
+    }
+    return null;
+  }
+  const raw = String(value).trim();
+  const dmyMatch = raw.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+  if (dmyMatch) return { day: Number(dmyMatch[1]), month: Number(dmyMatch[2]), year: Number(dmyMatch[3]) };
+  return null;
+}
+
+function dateKey(value) {
+  const info = toExcelDate(value);
+  if (!info) return '';
+  return `${info.year}-${String(info.month).padStart(2, '0')}-${String(info.day).padStart(2, '0')}`;
+}
+
+function displayDate(value) {
+  const info = toExcelDate(value);
+  if (!info) return '';
+  return `${String(info.day).padStart(2, '0')}/${String(info.month).padStart(2, '0')}/${info.year}`;
 }
 
 function formatNumber(value, digits = 2){
@@ -919,7 +1164,7 @@ function formatNumber(value, digits = 2){
 }
 
 function escapeHtml(value){
-  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  return textOf(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 function readExcel(file){
@@ -933,9 +1178,7 @@ function readExcel(file){
           result[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header:1, defval:'', raw:true });
         });
         resolve(result);
-      }catch(error){
-        reject(error);
-      }
+      }catch(error){ reject(error); }
     };
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
@@ -958,9 +1201,7 @@ function findHeaderIndex(rows, requiredHeaders){
 
 function columnMap(headerRow){
   const map = {};
-  headerRow.forEach((cell, index)=>{
-    map[normalizeText(cell)] = index;
-  });
+  headerRow.forEach((cell, index)=>{ map[normalizeText(cell)] = index; });
   return map;
 }
 
@@ -972,154 +1213,72 @@ function getByHeader(row, map, names){
   return '';
 }
 
-function normalizeText(value){
-  return String(value ?? '').replace(/\s+/g, ' ').trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toUpperCase();
-}
-
-function normalizeCode(value){
-  return normalizeText(value)
-    .replace(/\s+/g, '')
-    .replace(/[–—]/g, '-')
-    .replace(/KG/g, 'KG');
-}
-
-function cleanTextBB(v){
-  return String(v || '').normalize('NFC').toUpperCase().replace(/\s+/g,'').trim();
-}
-
-function baseProductCode(value){
-  const clean = normalizeCode(value);
-  const match = clean.match(/[A-Z]+\d+[A-Z]*/);
-  return match ? match[0] : clean;
-}
-
-function parseNumber(val){
-  if(!val) return 0;
-  if(typeof val === 'number') return val;
-  const s = String(val).replace(/,/g,'').trim();
-  return parseFloat(s) || 0;
-}
-
 function parseOrders(orderRows){
   const headerIndex = findHeaderIndex(orderRows, ['DonHang', 'MaBao']);
-  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề cột chuẩn của File Đơn Hàng!');
-  
+  if(headerIndex < 0) throw new Error('Không tìm thấy dòng tiêu đề cột chuẩn!');
   const map = columnMap(orderRows[headerIndex]);
-  const list = [];
-  
-  for(let i = headerIndex + 1; i < orderRows.length; i++){
-    const r = orderRows[i];
-    const donHang = String(getByHeader(r, map, ['DonHang', 'Mã đơn hàng'])).trim();
-    if(!donHang) continue;
-    
-    const tenDonHang = String(getByHeader(r, map, ['TenDonHang', 'Tên đơn hàng'])).trim();
-    const maBao = String(getByHeader(r, map, ['MaBao', 'Mã bao bì'])).trim();
-    const tanCont = parseNumber(getByHeader(r, map, ['TanCont', 'Khối lượng', 'Số lượng']));
-    const soCont = parseNumber(getByHeader(r, map, ['SoCont', 'Số cont']));
-    const hangVanChuyen = String(getByHeader(r, map, ['HangVanChuyen', 'Hãng vận chuyển'])).trim();
-    const ghiChu = String(getByHeader(r, map, ['GhiChu', 'Ghi chú'])).trim();
-    
-    let ngayGiao = getByHeader(r, map, ['NgayGiao', 'Ngày giao hàng']);
-    let ngayStr = '---';
-    let ngayKey = '9999-12-31';
-    
-    if(ngayGiao){
-      if(ngayGiao instanceof Date && !isNaN(ngayGiao)){
-        ngayStr = ngayGiao.toLocaleDateString('vi-VN');
-        ngayKey = `${ngayGiao.getFullYear()}-${String(ngayGiao.getMonth()+1).padStart(2,'0')}-${String(ngayGiao.getDate()).padStart(2,'0')}`;
-      } else {
-        ngayStr = String(ngayGiao).trim();
-        ngayKey = ngayStr;
-      }
+
+  let lastValidSoCont = 0; let lastValidHangVanChuyen = ""; let virtualGroupCounter = 0;
+
+  return orderRows.slice(headerIndex + 1).map((row, index)=>{
+    const donHang = textOf(getByHeader(row, map, ['DonHang', 'Đơn hàng']));
+    const tenDonHang = textOf(getByHeader(row, map, ['TenDonHang', 'Khách hàng']));
+    const maBao = textOf(getByHeader(row, map, ['MaBao', 'Mã Bao']));
+    if(!donHang || !maBao) return null;
+
+    let soContRaw = getByHeader(row, map, ['So Cont', 'Số Cont']);
+    let soCont = parseNumber(soContRaw);
+    let hangVanChuyen = textOf(getByHeader(row, map, ['HangVanChuyen', 'Hãng vận chuyển']));
+
+    if (soContRaw !== '' && soCont > 0) {
+      lastValidSoCont = soCont; lastValidHangVanChuyen = hangVanChuyen; virtualGroupCounter++;
+    } else {
+      soCont = lastValidSoCont; if (!hangVanChuyen) hangVanChuyen = lastValidHangVanChuyen;
     }
-    
-    list.push({
-      id: 'ORD_' + i + '_' + Date.now(),
-      donHang, tenDonHang, maBao, tanCont, soCont, hangVanChuyen, ghiChu,
-      ngay: ngayStr, ngayKey,
-      stockKey: normalizeCode(tenDonHang),
-      baseCode: baseProductCode(tenDonHang)
-    });
-  }
-  return list;
+
+    const tanCont = parseNumber(getByHeader(row, map, ['Tan/cont', 'Tấn/cont'])) || 0;
+    const soLuongKg = parseNumber(getByHeader(row, map, ['SoLuongKg', 'Số lượng Kg']));
+    const quyCachBao = parseNumber(getByHeader(row, map, ['QuyCachBao', 'Quy Cách Bao']));
+    const ghiChu = textOf(getByHeader(row, map, ['GhiChu', 'Ghi chú']));
+    const ngayRaw = getByHeader(row, map, ['Ngay', 'Ngày']);
+
+    return {
+      id: `${donHang}__${index}`, donHang, tenDonHang, maBao, code: maBao,
+      stockKey: normalizeCode(maBao), baseCode: baseProductCode(maBao), soCont, tanCont,
+      needTon: soCont * tanCont, soLuongKg, quyCachBao, hangVanChuyen, ghiChu,
+      ngayKey: dateKey(ngayRaw), ngay: displayDate(ngayRaw), contGroupId: `CONT_GRP_${virtualGroupCounter}`
+    };
+  }).filter(Boolean);
 }
 
-// NÂNG CẤP TRẠNG THÁI LOADING STATE KHI ĐỒNG BỘ FILE EXCEL
-function processFiles() {
-  const orderFile = document.getElementById('orderFileInput').files[0];
-  const stockFile = document.getElementById('stockFileInput').files[0];
-  const syncBtn = document.getElementById('btnProcessCloudSync');
-
-  if (!orderFile || !stockFile) {
-    alert('⚠️ Vui lòng chọn đầy đủ cả 2 Tệp dữ liệu Đơn Hàng và Tồn Kho!');
-    return;
-  }
-
-  // Bật trạng thái Loading
-  syncBtn.disabled = true;
-  syncBtn.textContent = "⏳ Đang đọc dữ liệu & Đồng bộ...";
-  syncBtn.className = "btn bg-slate-600 text-slate-400 text-sm";
-
-  Promise.all([readExcel(orderFile), readExcel(stockFile)]).then(([orderWb, stockWb]) => {
-    const orderSheetName = orderWb.SheetNames[0];
-    const tpSheetName = findSheet(stockWb, ['TP', 'THANH PHAM']);
-    const bbSheetName = findSheet(stockWb, ['BB', 'BAO BI']);
-    
-    if (!tpSheetName) throw new Error('Không tìm thấy Sheet chứa thông tin Thành Phẩm (TP)!');
-    
-    const parsedOrders = parseOrders(orderWb[orderSheetName]);
-    
-    const stockMapArray = [];
-    stockWb[tpSheetName].forEach((row) => {
-      const values = Object.values(row);
-      if (values.length < 13) return;
-      stockMapArray.push([textOf(values[2]), parseNumber(values[12])]);
-    });
-
-    const bbMapArray = [];
-    if (bbSheetName) {
-      stockWb[bbSheetName].forEach((row) => {
-        const values = Object.values(row);
-        if (values.length < 10) return;
-        bbMapArray.push([cleanTextBB(values[2]), parseNumber(values[9])]);
-      });
-    }
-
-    if (database) {
-      database.ref("thanhpham_system/cloud_data").set({
-        orders: parsedOrders,
-        stockMapArray,
-        bbMapArray
-      }).then(() => {
-        writeAuditLog("Import tệp dữ liệu mới", `Đồng bộ ${parsedOrders.length} đơn hàng lên mạng máy chủ`);
-        alert('🎉 Tuyệt vời! Hệ thống đã phân tích Excel thành công và đồng bộ thời gian thực lên toàn bộ các thiết bị!');
-        
-        // Khôi phục nút bấm sau khi hoàn tất
-        resetSyncButton();
-      });
-    }
-  }).catch((err) => {
-    alert('❌ Lỗi xử lý dữ liệu: ' + err.message);
-    resetSyncButton();
+function parseStockAndPackaging(stockWorkbook){
+  let tpSheetName = null; let bbSheetName = null;
+  stockWorkbook.SheetNames.forEach((name) => {
+    if (name.toUpperCase().includes('TP')) tpSheetName = name;
+    if (name.toUpperCase().includes('BB')) bbSheetName = name;
   });
-}
+  if (!tpSheetName) throw new Error('Không tìm thấy dữ liệu Sheet TỒN KHO TP');
 
-function resetSyncButton() {
-  const syncBtn = document.getElementById('btnProcessCloudSync');
-  if(syncBtn) {
-    syncBtn.disabled = false;
-    syncBtn.textContent = "🚀 Xử lý & Đồng bộ đám mây";
-    syncBtn.className = "btn bg-emerald-600 hover:bg-emerald-500 text-black text-sm";
+  const stockMap = new Map();
+  stockWorkbook[tpSheetName].forEach((row) => {
+    const values = Object.values(row); if (values.length < 13) return;
+    const productName = textOf(values[2]); const stockTon = Math.max(0, parseNumber(values[12]));
+    const exactKey = normalizeCode(productName); const baseKey = 'BASE:' + baseProductCode(productName);
+    if (!productName || !exactKey || normalizeText(productName).includes('TEN THANH PHAM')) return;
+    stockMap.set(exactKey, (stockMap.get(exactKey) || 0) + stockTon);
+    stockMap.set(baseKey, (stockMap.get(baseKey) || 0) + stockTon);
+  });
+
+  const bbMap = new Map();
+  if (bbSheetName) {
+    stockWorkbook[bbSheetName].forEach((row) => {
+      const values = Object.values(row); if (values.length < 10) return;
+      const bbName = cleanTextBB(values[2]); const stockPcs = Math.max(0, parseNumber(values[9]));
+      if (!bbName || normalizeText(bbName).includes('TENBAOBI')) return;
+      bbMap.set(bbName, (bbMap.get(bbName) || 0) + stockPcs);
+    });
   }
-}
-
-function textOf(value){
-  return String(value ?? '').replace(/\s+/g, ' ').trim();
+  return { stockMap, bbMap };
 }
 
 function processAllocation(){
@@ -1127,69 +1286,74 @@ function processAllocation(){
   const remainingTP = new Map(appState.stockMap);
   const remainingBB = new Map(appState.bbMap || new Map());
   const confirmedIds = new Set(appState.confirmedTomorrow.map((item)=>item.id));
-  
+
   const temporaryDetails = appState.orders.map((order)=>{
     const lookupKey = remainingTP.has(order.stockKey) ? order.stockKey : 'BASE:' + order.baseCode;
     const stockBefore = remainingTP.get(lookupKey) || 0;
-    const canExportTon = Math.min(order.tanCont, stockBefore);
+    const canExportTon = Math.min(stockBefore, order.needTon);
+    const shortage = Math.max(0, order.needTon - stockBefore);
+    remainingTP.set(lookupKey, stockBefore - canExportTon);
+
+    const matchBBCode = findBBCode(order.maBao, order.donHang);
+    const bbStockBefore = remainingBB.get(matchBBCode) || 0;
+    const bagWeight = order.quyCachBao || 0;
+    const bbNeedPcs = bagWeight > 0 ? (order.soLuongKg / bagWeight) : 0;
+    const tpQuyDoiPcs = (bagWeight > 0 && stockBefore > 0) ? ((stockBefore * 1000) / bagWeight) : 0;
+    const bbShortage = Math.max(0, bbNeedPcs - (bbStockBefore + tpQuyDoiPcs));
     
-    const isRowShortage = order.tanCont > stockBefore;
-    const shortage = isRowShortage ? (order.tanCont - stockBefore) : 0;
-    
-    // Áp dụng tìm kiếm mã bao bì động đã loại bỏ hardcode
-    const standardBBKey = findBBCode(order.tenDonHang, order.maBao);
-    const bbStockBefore = remainingBB.get(standardBBKey) || 0;
-    
-    const needBBPcs = order.tanCont * 20; 
-    const isBBShortage = bbStockBefore < needBBPcs;
-    const bbShortage = isBBShortage ? (needBBPcs - bbStockBefore) : 0;
-    
-    let status = 'ĐỦ XUẤT';
-    if(isRowShortage) status = 'THIẾU TP';
-    if(confirmedIds.has(order.id)) status = 'MAI CÓ THỂ XUẤT';
-    
-    if(status === 'ĐỦ XUẤT' || status === 'MAI CÓ THỂ XUẤT'){
-      remainingTP.set(lookupKey, Math.max(0, stockBefore - order.tanCont));
-      remainingBB.set(standardBBKey, Math.max(0, bbStockBefore - needBBPcs));
-    }
-    
-    return {
-      ...order,
-      stockBefore, shortage, isRowShortage,
-      bbStockBefore, bbShortage, isBBShortage, needBBPcs, standardBBKey,
-      status,
-      displayStatus: status
-    };
+    const netBBNeedFromShelf = Math.max(0, bbNeedPcs - tpQuyDoiPcs);
+    remainingBB.set(matchBBCode, Math.max(0, bbStockBefore - netBBNeedFromShelf));
+
+    return { ...order, stockBefore, canExportTon, shortage, isRowShortage: shortage > 0, matchBBCode, bbStockBefore, bbNeedPcs, bbShortage };
   });
-  
-  appState.details = temporaryDetails;
-  
+
+  const groupHasConfirmedShortageMap = new Map();
+  temporaryDetails.forEach((row) => {
+    if (confirmedIds.has(row.id)) groupHasConfirmedShortageMap.set(row.contGroupId, true);
+  });
+
+  const groupNaturalShortageMap = new Map();
+  temporaryDetails.forEach((row) => {
+    if (row.isRowShortage) groupNaturalShortageMap.set(row.contGroupId, true);
+  });
+
+  appState.details = temporaryDetails.map((row) => {
+    const isContGroupNaturallyShortage = !!groupNaturalShortageMap.get(row.contGroupId);
+    const isContGroupSavedByWorkshop = !!groupHasConfirmedShortageMap.get(row.contGroupId);
+    
+    let logicStatus = 'THIẾU TP';
+    if (!isContGroupNaturallyShortage || isContGroupSavedByWorkshop) logicStatus = 'ĐỦ XUẤT';
+
+    let displayStatus = row.isRowShortage ? 'THIẾU TP' : 'ĐỦ XUẤT';
+    if (isContGroupSavedByWorkshop) displayStatus = 'MAI CÓ THỂ XUẤT';
+
+    return { ...row, status: logicStatus, displayStatus: displayStatus };
+  });
+
+  buildProductionSummary();
+}
+
+function buildProductionSummary(){
   const map = new Map();
   appState.details.forEach((item)=>{
-    if(item.isRowShortage && item.status === 'THIẾU TP'){
-      const current = map.get(item.tenDonHang) || { code:item.tenDonHang, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
-      current.demand += item.needTon || item.tanCont;
-      current.stock += Math.max(0, item.stockBefore);
-      current.shortage += item.shortage;
-      current.orders += 1;
+    if (item.isRowShortage && item.status === 'THIẾU TP') {
+      const current = map.get(item.code) || { code:item.code, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
+      current.demand += item.needTon; current.stock += Math.max(0, item.stockBefore); current.shortage += item.shortage; current.orders += 1;
       if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
-        current.nearestKey = item.ngayKey;
-        current.nearest = item.ngay;
+        current.nearestKey = item.ngayKey; current.nearest = item.ngay;
       }
-      map.set(item.tenDonHang, current);
+      map.set(item.code, current);
     }
   });
   appState.production = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey));
 }
 
 function setBadgeCount(card, count){
-  const badge = card?.querySelector('h2 span');
-  if(badge) badge.textContent = count;
+  const badge = card?.querySelector('h2 span'); if(badge) badge.textContent = count;
 }
 
 function setTable(card, headers, rowsHtml, tableIndex = 0){
-  const table = card?.querySelectorAll('table')[tableIndex];
-  if(!table) return;
+  const table = card?.querySelectorAll('table')[tableIndex]; if(!table) return;
   table.innerHTML = `<thead><tr>${headers.map((h)=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rowsHtml || `<tr><td colspan="${headers.length}" class="text-center text-slate-500 py-8">Chưa có dữ liệu</td></tr>`}</tbody>`;
 }
 
@@ -1201,249 +1365,178 @@ function rowsByDateMode(rows, mode, from, to){
 }
 
 function getFilterControls(card){
-  const select = card?.querySelector('select');
-  const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
-  return {
-    mode: select?.value || 'ALL',
-    from: dates[0]?.value || '',
-    to: dates[1]?.value || dates[0]?.value || ''
-  };
+  const select = card?.querySelector('select'); const dates = card ? Array.from(card.querySelectorAll('input[type="date"]')) : [];
+  return { mode: select?.value || 'ALL', from: dates[0]?.value || '', to: dates[1]?.value || dates[0]?.value || '' };
 }
 
 function fillDateSelect(select){
   if(!select) return;
-  const dates = Array.from(new Set(appState.orders.map(o => o.ngayKey))).filter(Boolean).sort();
-  const currentVal = select.value;
-  select.innerHTML = '<option value="ALL">ALL (Tất cả ngày)</option>' + dates.map(d => `<option value="${d}">${d}</option>`).join('');
-  if([...select.options].some(o => o.value === currentVal)) select.value = currentVal;
+  const dates = Array.from(new Set(appState.orders.map((o)=>o.ngayKey).filter(Boolean))).sort();
+  select.innerHTML = '<option value="ALL">Tất cả ngày giao hàng (ALL)</option>' + dates.map((key)=>`<option value="${key}">${displayDate(key)}</option>`).join('');
+}
+
+function fillAllDateSelects() {
+  fillDateSelect(document.getElementById('tomorrowDateSelect'));
 }
 
 function statusBadge(status){
-  if(status === 'ĐỦ XUẤT') return `<span class="px-2 py-1 rounded bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-bold">✅ ĐỦ XUẤT KHO</span>`;
-  if(status === 'MAI CÓ THỂ XUẤT') return `<span class="px-2 py-1 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 text-xs font-bold">⚡ MAI XUẤT HÀNG</span>`;
-  return `<span class="px-2 py-1 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-bold">⚠️ THIẾU THÀNH PHẨM</span>`;
+  const isOk = status === 'ĐỦ XUẤT'; const isOverride = status === 'MAI CÓ THỂ XUẤT';
+  const cls = isOk ? 'bg-green-600 text-white' : isOverride ? 'bg-yellow-500 text-black font-bold' : 'bg-red-500 text-white';
+  return `<span class="${cls} px-2.5 py-0.5 rounded-full text-xs font-semibold">${isOverride ? 'ƯU TIÊN XUẤT' : status}</span>`;
 }
 
-function refreshAll() {
-  processAllocation();
-  
-  const allReadyOrders = appState.details.filter(i => i.status === 'ĐỦ XUẤT' || i.status === 'MAI CÓ THỂ XUẤT');
-  const allShortageOrders = appState.details.filter(i => i.status === 'THIẾU TP');
-  const totalProductionTon = appState.production.reduce((sum, item)=> sum + item.shortage, 0);
-  
+function tomorrowDate(){ const d = new Date(); d.setDate(d.getDate() + 1); return d; }
+function planDateKey(){ return dateKey(tomorrowDate()); }
+function planDateDisplay(){ return displayDate(tomorrowDate()); }
+
+function shortOrderDate(item){
+  if(item?.ngayKey){ const parts = item.ngayKey.split('-'); return `${Number(parts[2])}/${Number(parts[1])}`; }
+  const d = tomorrowDate(); return `${d.getDate()}/${d.getMonth() + 1}`;
+}
+
+function isManualLoading(item){
+  const bag = item.quyCachBao || parseNumber((normalizeText(item.maBao).match(/(\d+)\s*KG/) || [])[1]);
+  return bag >= 25 && bag <= 50;
+}
+
+function formatPlanTime(slot){ return `${slot.period === 'morning' ? 'Sáng' : 'Chiều'} ${slot.hour}h${slot.minute ? String(slot.minute).padStart(2, '0') : ''}`; }
+
+function buildSlots(startHour, startMinute, count){
+  const slots = []; let hour = startHour; let minute = startMinute;
+  for(let index = 0; index < count; index++){ slots.push({ hour, minute }); minute += 30; if(minute >= 60){ hour += 1; minute -= 60; } }
+  return slots;
+}
+
+function assignPlanTimes(rows){
+  const manualSlots = [ { period:'morning', hour:6, minute:15 }, { period:'morning', hour:6, minute:15 }, { period:'morning', hour:7, minute:0 }, { period:'morning', hour:7, minute:30 }, { period:'morning', hour:8, minute:0 }, ...buildSlots(13, 0, 40).map((s)=>({ ...s, period:'afternoon' })) ];
+  const otherSlots = buildSlots(13, 0, 60).map((s)=>({ ...s, period:'afternoon' })); let mIdx = 0; let oIdx = 0;
+  return rows.map((item)=>{
+    const manual = isManualLoading(item); const slot = manual ? (manualSlots[mIdx++] || otherSlots[oIdx++]) : (otherSlots[oIdx++] || manualSlots[mIdx++]);
+    return { ...item, planDate: planDateDisplay(), planDateKey: planDateKey(), planTime: formatPlanTime(slot || { period:'afternoon', hour:13, minute:0 }) };
+  });
+}
+
+function planNote(item){
+  const ship = item.hangVanChuyen ? ` ${item.hangVanChuyen}` : ''; const d = shortOrderDate(item);
+  if(isManualLoading(item)) return `Bốc tay tàu${ship} ngày ${d}`;
+  return `${item.ghiChu || 'bốc hầm chồng đôi không pallet'} + tàu${ship} ngày ${d}`;
+}
+
+function getReadyOrders() { return appState.details.filter((item)=>item.status === 'ĐỦ XUẤT'); }
+
+function planRows(){
+  const ready = getReadyOrders(); return assignPlanTimes(ready.filter(isManualLoading).concat(ready.filter((i)=>!isManualLoading(i))));
+}
+
+function planTableHtml(rows){
+  const totalCont = rows.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
+  const totalOrder = rows.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
+  return `
+    <table class="w-full bg-slate-900 rounded-xl">
+      <thead><tr><th>Ngày xuất</th><th>Khách hàng</th><th>Loại hàng</th><th>Số lượng (cont)</th><th>số lượng tấn /cont</th><th>SL đơn hàng</th><th>Hãng VC</th><th>Thời Gian</th><th>Ghi chú</th></tr></thead>
+      <tbody>
+        ${rows.map((item, index)=>`
+          <tr>
+            <td>${index === 0 ? escapeHtml(item.planDate) : ''}</td><td>${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
+            <td class="text-center font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td><td class="text-center">${formatNumber(item.tanCont)}</td>
+            <td class="text-center font-semibold">${formatNumber(item.tanCont)}</td><td class="text-center font-semibold">${escapeHtml(item.hangVanChuyen)}</td>
+            <td class="text-center font-bold text-violet-400">${escapeHtml(item.planTime)}</td><td class="font-medium">${escapeHtml(planNote(item))}</td>
+          </tr>`).join('') || '<tr><td colspan="9" class="text-center text-slate-500 py-8">Không có dữ liệu kế hoạch xuất</td></tr>'}
+        <tr class="bg-slate-950 font-bold">
+          <td colspan="3" class="text-right text-slate-400">Tổng cộng hệ thống:</td><td class="text-center text-green-400 text-lg">${formatNumber(totalCont, 0)}</td>
+          <td></td><td class="text-center text-green-400 text-lg">${formatNumber(totalOrder)}</td><td colspan="3"></td>
+        </tr>
+      </tbody>
+    </table>`;
+}
+
+async function processFiles(){
+  const orderFile = document.getElementById('orderFileInput').files[0];
+  const stockFile = document.getElementById('stockFileInput').files[0];
+  if(!orderFile || !stockFile) return alert('Vui lòng chọn đầy đủ cả File Đơn Hàng và File Tồn Kho!');
+  try{
+    const orderWb = await readExcel(orderFile); const stockWb = await readExcel(stockFile);
+    const sheetOrderName = findSheet(orderWb, ['KE', 'HOACH', 'GIAO', 'HANG']) || orderWb.SheetNames[0];
+    appState.orders = parseOrders(orderWb[sheetOrderName]);
+    const parsedData = parseStockAndPackaging(stockWb);
+    appState.stockMap = parsedData.stockMap; appState.bbMap = parsedData.bbMap;
+    uploadDataToFirebase();
+    alert('🎉 Đã import thành công và tự động đồng bộ hóa dữ liệu đám mây toàn hệ thống!');
+  }catch(error){ alert('Có lỗi cấu trúc Excel: ' + error.message); }
+}
+
+function refreshAll(){
+  applyProductionViewSettings();
+  const allReadyOrders = getReadyOrders();
+  const allShortageOrders = appState.details.filter((item)=>item.isRowShortage && item.status === 'THIẾU TP');
+  const totalProductionTon = appState.production.reduce((sum, item)=>sum + item.shortage, 0);
+
   document.getElementById('kpi-total-orders').textContent = formatNumber(appState.orders.length, 0);
   document.getElementById('kpi-ready-orders').textContent = formatNumber(allReadyOrders.length, 0);
   document.getElementById('kpi-shortage-orders').textContent = formatNumber(allShortageOrders.length, 0);
   document.getElementById('kpi-total-production').textContent = formatNumber(totalProductionTon, 1) + 'T';
-  
+
   const tomorrowCard = document.getElementById('section-tomorrow');
   const tomSelectVal = document.getElementById('tomorrowDateSelect').value;
+  
   let candidates = appState.details.filter((item) => item.isRowShortage && item.status === 'THIẾU TP');
   if(tomSelectVal !== 'ALL') candidates = candidates.filter((item)=>item.ngayKey === tomSelectVal);
-  
+
   const candHtml = candidates.map((item)=>`
     <tr>
       <td><input type="checkbox" data-candidate-id="${item.id}" class="w-5 h-5 accent-yellow-500 cursor-pointer"/></td>
       <td class="font-bold text-yellow-400">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
-      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td><td>${formatNumber(item.tanCont, 1)}T</td>
+      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td><td>${formatNumber(item.needTon, 1)}T</td>
       <td>${formatNumber(item.stockBefore, 1)}T</td><td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
       <td>${escapeHtml(item.ngay)}</td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
   setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
-  
+
   const confHtml = appState.confirmedTomorrow.map((item)=>`
     <tr class="flash">
-      <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
+      <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.maBao)}</td>
       <td class="text-yellow-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td>${escapeHtml(item.ngay)}</td>
       <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
-      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/10 hover:bg-red-500/30 text-red-400 text-xs px-2.5 py-1 rounded-lg border border-red-500/20">❌ Gỡ bỏ</button></td>
-    </tr>
-  `).join('');
+      <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-500 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold">❌ Hủy</button></td>
+    </tr>`).join('');
   setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Hành động'], confHtml, 1);
-  
-  renderProduction();
+  setBadgeCount(tomorrowCard, appState.confirmedTomorrow.length);
+
+  const readyCard = document.getElementById('section-ready');
+  if (readyCard) {
+    const rows = planRows(); setBadgeCount(readyCard, rows.length);
+    const fullTableEl = document.getElementById('fullExportTable');
+    if (fullTableEl) fullTableEl.innerHTML = planTableHtml(rows);
+    renderExportPreview();
+  }
+  renderProduction(); 
   renderDetails();
-  renderTotalPackagingTable();
-  renderProductionViewSettings();
-  renderLatestNotice();
+  renderTotalPackaging();
 }
 
-function renderTotalPackagingTable(){
-  const tbody = document.querySelector('#totalPackagingTable tbody');
-  if(!tbody) return;
-  const map = new Map();
-  appState.details.forEach((item)=>{
-    if(!item.standardBBKey || item.standardBBKey === 'CHƯA PHÂN LOẠI') return;
-    const current = map.get(item.standardBBKey) || { key:item.standardBBKey, demand:0, stock:item.bbStockBefore, shortage:0, count:0 };
-    current.demand += item.needBBPcs;
-    current.count += 1;
-    map.set(item.standardBBKey, current);
-  });
-  
-  const arr = Array.from(map.values());
-  arr.forEach((item)=>{
-    if(item.stock < item.demand){
-      item.shortage = item.demand - item.stock;
-    }
-  });
-  
-  tbody.innerHTML = arr.map((item)=>{
-    const isChecked = appState.packagingOrdered[item.key] ? 'checked' : '';
-    return `<tr>
-      <td class="font-bold text-orange-400">${escapeHtml(item.key)}</td>
-      <td class="font-medium">${formatNumber(item.demand, 0)}</td>
-      <td class="text-blue-400 font-semibold">${formatNumber(item.stock, 0)}</td>
-      <td class="${item.shortage > 0 ? 'text-red-400 font-bold' : 'text-green-400'}">${formatNumber(item.shortage, 0)}</td>
-      <td class="text-center text-slate-400">${item.count} đơn</td>
-      <td class="text-center"><input type="checkbox" data-bb-order-key="${item.key}" ${isChecked} class="w-4 h-4 accent-orange-500 cursor-pointer" /></td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="6" class="text-center text-slate-500 py-8">Chưa có dữ liệu tổng hợp vỏ bao bì</td></tr>`;
+function renderExportPreview(){
+  const card = document.getElementById('section-ready'); if(!card) return;
+  const { mode, from, to } = getFilterControls(card); const ready = getReadyOrders();
+  const filtered = rowsByDateMode(ready, mode, from, to);
+  appState.exportPreview = assignPlanTimes(filtered.filter(isManualLoading).concat(filtered.filter((item)=>!isManualLoading(item))));
+  const container = document.getElementById('exportPreviewContainer'); if(!container) return;
+  container.innerHTML = `<div class="p-5"><div class="text-lg font-bold text-emerald-400 uppercase">📦 BẢNG XEM TRƯỚC FORMAT FILE EXCEL KẾ HOẠCH (${appState.exportPreview.length} đơn)</div></div><div class="overflow-auto max-h-[520px] p-2">${planTableHtml(appState.exportPreview)}</div>`;
 }
 
-function renderProductionViewSettings(){
-  const v = appState.productionView;
-  const current = currentRole();
-  if(current === 'production'){
-    if(v.tomorrow) document.getElementById('section-tomorrow')?.classList.remove('hideBox'); else document.getElementById('section-tomorrow')?.classList.add('hideBox');
-    if(v.ready) document.getElementById('section-ready')?.classList.remove('hideBox'); else document.getElementById('section-ready')?.classList.add('hideBox');
-    if(v.production) document.getElementById('section-production')?.classList.remove('hideBox'); else document.getElementById('section-production')?.classList.add('hideBox');
-    if(v.detail) document.getElementById('section-detail')?.classList.remove('hideBox'); else document.getElementById('section-detail')?.classList.add('hideBox');
-    document.getElementById('btn-wrap-confirm-workshop')?.classList.add('hideBox');
-  } else {
-    document.getElementById('btn-wrap-confirm-workshop')?.classList.remove('hideBox');
-  }
-  const ids = ['permTomorrow', 'permReady', 'permProduction', 'permDetail'];
-  const vals = [v.tomorrow, v.ready, v.production, v.detail];
-  ids.forEach((id, idx)=>{
-    const el = document.getElementById(id);
-    if(el) el.checked = vals[idx] !== false;
-  });
-}
-
-function saveProductionViewSettings(){
-  appState.productionView = {
-    tomorrow: document.getElementById('permTomorrow')?.checked !== false,
-    ready: !!document.getElementById('permReady')?.checked,
-    production: !!document.getElementById('permProduction')?.checked,
-    detail: !!document.getElementById('permDetail')?.checked
-  };
-  if(database) database.ref("thanhpham_system/production_view").set(appState.productionView);
-  renderProductionViewSettings();
-  alert('🎉 Đã cập nhật và lưu cấu hình phân quyền xem cho xưởng thành công!');
-}
-
-function sendAppNotice(targetRole, message){
-  if(!database) return;
-  const notice = {
-    id: Date.now(),
-    targetRole, message,
-    createdAt: new Date().toLocaleString('vi-VN'),
-    fromRole: currentRole()
-  };
-  database.ref("thanhpham_system/notices/latest").set(notice);
-}
-
-function renderLatestNotice(){
-  const box = document.getElementById('appNoticeBox');
-  const notice = appState.latestNotice;
-  if(!box || !notice || notice.targetRole !== currentRole()){
-    box?.classList.add('hideBox');
-    return;
-  }
-  const seenId = localStorage.getItem(`tp_notice_seen_${currentRole()}`);
-  if(String(notice.id) === seenId){
-    box.classList.add('hideBox');
-    return;
-  }
-  document.getElementById('appNoticeMessage').textContent = `${notice.message} (${notice.createdAt || ''})`;
-  box.classList.remove('hideBox');
-}
-
-function dismissLatestNotice(){
-  if(appState.latestNotice?.id){
-    localStorage.setItem(`tp_notice_seen_${currentRole()}`, String(appState.latestNotice.id));
-  }
-  renderLatestNotice();
-}
-
-function setupFirebaseListeners() {
-  if (!database) return;
-  database.ref(".info/connected").on("value", function(snap) {
-    const statusEl = document.getElementById("syncStatus");
-    if (snap.val() === true) {
-      statusEl.textContent = "🟢 Đang kết nối đám mây (Thời gian thực)";
-      statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-green-400 border border-green-500/30 font-medium";
-    } else {
-      statusEl.textContent = "🟡 Đang kết nối mạng...";
-      statusEl.className = "text-xs px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-medium";
-    }
-  });
-
-  database.ref("thanhpham_system/bb_rules").on("value", (snapshot) => {
-    const data = snapshot.val() || {};
-    appState.bbRules = Object.keys(data).map(k => ({ id: k, ...data[k] }));
-    renderCloudBBRulesTable();
-    refreshAll();
-  });
-
-  database.ref("thanhpham_system/cloud_data").on("value", (snapshot) => {
-    const val = snapshot.val();
-    if (val) {
-      appState.orders = val.orders || [];
-      const sm = new Map();
-      if(val.stockMapArray) val.stockMapArray.forEach(([k,v]) => sm.set(k,v));
-      appState.stockMap = sm;
-      const bm = new Map();
-      if(val.bbMapArray) val.bbMapArray.forEach(([k,v]) => bm.set(k,v));
-      appState.bbMap = bm;
-      fillDateSelect(document.getElementById('tomorrowDateSelect'));
-      refreshAll();
-    }
-  });
-
-  database.ref("thanhpham_system/confirmed_tomorrow").on("value", (snapshot) => {
-    appState.confirmedTomorrow = snapshot.val() || [];
-    refreshAll();
-  });
-
-  database.ref("thanhpham_system/packaging_ordered").on("value", (snapshot) => {
-    appState.packagingOrdered = snapshot.val() || {};
-    renderTotalPackagingTable();
-  });
-
-  database.ref("thanhpham_system/production_view").on("value", (snapshot) => {
-    if(snapshot.val()) {
-       appState.productionView = snapshot.val();
-       renderProductionViewSettings();
-    }
-  });
-
-  database.ref("thanhpham_system/notices/latest").on("value", (snapshot) => {
-    appState.latestNotice = snapshot.val();
-    renderLatestNotice();
-  });
-}
-
-function uploadConfirmedToFirebase() {
-  if (!database) return;
-  database.ref("thanhpham_system/confirmed_tomorrow").set(appState.confirmedTomorrow);
-}
-
-function clearSystemCache() {
-  if (confirm("⚠️ Bạn có chắc chắn muốn xóa toàn bộ dữ liệu vận hành không?\n\n(CÁC QUY TẮC MATCH BAO BÌ VÀ TÀI KHOẢN ĐÁM MÂY VẪN SẼ ĐƯỢC GIỮ LẠI NGUYÊN VẸN)")) {
-    if (database) {
-      const promises = [
-        database.ref("thanhpham_system/cloud_data").remove(),
-        database.ref("thanhpham_system/confirmed_tomorrow").remove(),
-        database.ref("thanhpham_system/notices").remove()
-      ];
-      Promise.all(promises).then(() => {
-        alert("Đã xóa sạch dữ liệu thành công!");
-        location.reload();
-      });
-    }
-  }
+function exportExcel(){
+  renderExportPreview();
+  if(!appState.exportPreview.length) return alert('Không tìm thấy dữ liệu đơn hàng phù hợp bộ lọc để xuất Excel!');
+  const totalCont = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.soCont) || 0), 0);
+  const totalOrder = appState.exportPreview.reduce((sum, item)=>sum + (Number(item.tanCont) || 0), 0);
+  const rows = [
+    ['KẾ HOẠCH XUẤT HÀNG'], [],
+    ['Ngày xuất','Khách hàng','Loại hàng','Số lượng (cont)','số lượng tấn /cont','SL đơn hàng','Hãng VC','Thời Gian','Ghi chú'],
+    ...appState.exportPreview.map((item, index)=>[index === 0 ? item.planDate : '', item.donHang, item.tenDonHang, item.soCont > 0 ? item.soCont : 'Ghép', item.tanCont, item.tanCont, item.hangVanChuyen, item.planTime, planNote(item)]),
+    ['TỔNG','','',totalCont,'',totalOrder,'','','']
+  ];
+  const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!merges'] = [{ s:{ r:0, c:0 }, e:{ r:0, c:8 } }]; ws['!cols'] = [ { wch:12 }, { wch:28 }, { wch:32 }, { wch:14 }, { wch:16 }, { wch:12 }, { wch:12 }, { wch:14 }, { wch:42 } ];
+  XLSX.utils.book_append_sheet(wb, ws, "KE HOACH XUAT HANG"); XLSX.writeFile(wb, `KE_HOACH_XUAT_HANG_${planDateKey()}.xlsx`);
 }
 
 function renderProduction(){
@@ -1455,149 +1548,172 @@ function renderProduction(){
   
   const map = new Map();
   filteredOrders.forEach((item)=>{
-    const productionKey = item.tenDonHang;
+    const productionKey = item.tenDonHang || item.code;
     const current = map.get(productionKey) || { code:productionKey, demand:0, stock:0, shortage:0, orders:0, nearestKey:item.ngayKey, nearest:item.ngay };
-    current.demand += item.tanCont;
-    current.stock += Math.max(0, item.stockBefore);
-    current.shortage += item.shortage;
-    current.orders += 1;
-    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){
-      current.nearestKey = item.ngayKey;
-      current.nearest = item.ngay;
-    }
+    current.demand += item.needTon; current.stock += Math.max(0, item.stockBefore); current.shortage += item.shortage; current.orders += 1;
+    if(item.ngayKey && (!current.nearestKey || item.ngayKey < current.nearestKey)){ current.nearestKey = item.ngayKey; current.nearest = item.ngay; }
     map.set(productionKey, current);
   });
-  
-  tableBody.innerHTML = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey)).map((item)=>`
-    <tr>
-      <td class="font-bold text-red-400">${escapeHtml(item.code)}</td>
-      <td>${formatNumber(item.demand, 1)}T</td>
-      <td>${formatNumber(item.stock, 1)}T</td>
-      <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
-      <td class="text-yellow-400 font-bold text-base">${formatNumber(item.shortage, 1)}T</td>
-      <td class="text-center font-semibold text-slate-300">${item.orders}</td>
-      <td><span class="bg-slate-900 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${escapeHtml(item.nearest)}</span></td>
+  tableBody.innerHTML = Array.from(map.values()).sort((a,b)=>a.nearestKey.localeCompare(b.nearestKey)).map((item)=>`<tr><td class="font-bold text-red-400">${escapeHtml(item.code)}</td><td>${formatNumber(item.demand, 1)}T</td><td>${formatNumber(item.stock, 1)}T</td><td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td class="text-yellow-400 font-bold text-base">${formatNumber(item.shortage, 1)}T</td><td class="text-center font-semibold text-slate-300">${item.orders}</td><td><span class="bg-slate-900 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${escapeHtml(item.nearest)}</span></td></tr>`).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">🎉 Không có thành phẩm nào thiếu hụt!</td></tr>';
+}
+
+function renderTotalPackaging() {
+  const tableBody = document.querySelector('#totalPackagingTable tbody');
+  if (!tableBody) return;
+
+  const section = document.getElementById('section-total-packaging');
+  if (section && appState.details.length > 0) {
+    if (currentRole() === 'admin') {
+      section.classList.remove('hideBox');
+    } else if (currentRole() === 'production' && appState.productionView?.detail) {
+      section.classList.remove('hideBox');
+    } else {
+      section.classList.add('hideBox');
+    }
+  }
+
+  const packagingSummaryMap = new Map();
+
+  appState.details.forEach((item) => {
+    const bbCode = findBBCode(item.maBao, item.donHang) || item.maBao || "CHƯA PHÂN LOẠI";
+    const needPcs = Number(item.bbNeedPcs) || 0;
+    const shortagePcs = Number(item.bbShortage) || 0;
+
+    if (!packagingSummaryMap.has(bbCode)) {
+      packagingSummaryMap.set(bbCode, {
+        code: bbCode,
+        demand: 0,
+        stock: appState.bbMap?.get(bbCode) || 0,
+        shortage: 0,
+        orderCount: 0
+      });
+    }
+
+    const currentData = packagingSummaryMap.get(bbCode);
+    currentData.demand += needPcs;
+    currentData.shortage += shortagePcs;
+    currentData.orderCount += 1;
+    
+    packagingSummaryMap.set(bbCode, currentData);
+  });
+
+  const summaryList = Array.from(packagingSummaryMap.values()).sort((a, b) => {
+    return b.shortage - a.shortage || a.code.localeCompare(b.code);
+  });
+
+  tableBody.innerHTML = summaryList.map((item) => `
+    <tr class="border-b border-slate-800 hover:bg-slate-900/40">
+      <td class="font-bold text-orange-400">${escapeHtml(item.code)}</td>
+      <td class="font-semibold text-slate-100">${formatNumber(item.demand, 0)}</td>
+      <td class="text-blue-400 font-semibold">${formatNumber(item.stock, 0)}</td>
+      <td class="font-bold ${item.shortage > 0 ? 'text-red-400 text-base' : 'text-green-400'}">
+        ${item.shortage > 0 ? formatNumber(item.shortage, 0) : '0 (Đủ vỏ)'}
+      </td>
+      <td class="text-center font-medium text-violet-400"><span class="bg-slate-900 px-2.5 py-1 rounded-md border border-slate-700">${item.orderCount} Đơn</span></td>
     </tr>
-  `).join('') || '<tr><td colspan="7" class="text-center text-slate-500 py-8">🎉 Không có mặt hàng thiếu hụt nào cần sản xuất</td></tr>';
+  `).join('') || '<tr><td colspan="5" class="text-center text-slate-500 py-8">🎉 Không có nhu cầu bao bì nào phát sinh!</td></tr>';
 }
 
 function renderDetails(){
-  const detailCard = document.getElementById('section-detail');
-  const tableBody = document.querySelector('#detailAllOrdersTable tbody');
+  const detailCard = document.getElementById('section-detail'); const tableBody = document.querySelector('#detailAllOrdersTable tbody');
   if (!tableBody || !detailCard) return;
-  
-  const { mode, from, to } = getFilterControls(detailCard);
-  const searchTxt = normalizeText(document.getElementById('detailSearchInput')?.value || '');
+  const { mode, from, to } = getFilterControls(detailCard); const searchTxt = normalizeText(document.getElementById('detailSearchInput')?.value || '');
+
   let filtered = rowsByDateMode(appState.details, mode, from, to);
-  
   if(searchTxt){
     filtered = filtered.filter((item)=>
-      normalizeText(item.donHang).includes(searchTxt) ||
-      normalizeText(item.tenDonHang).includes(searchTxt) ||
+      normalizeText(item.donHang).includes(searchTxt) || 
+      normalizeText(item.tenDonHang).includes(searchTxt) || 
       normalizeText(item.maBao).includes(searchTxt) ||
       normalizeText(item.hangVanChuyen || '').includes(searchTxt)
     );
   }
-  
-  tableBody.innerHTML = filtered.map((item)=>`
-    <tr>
-      <td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td>
-      <td>${escapeHtml(item.tenDonHang)}</td>
-      <td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td>
-      <td class="text-cyan-400 font-medium">${escapeHtml(item.hangVanChuyen || '---')}</td>
-      <td>${formatNumber(item.tanCont)}T</td>
-      <td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td>
-      <td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td>
-      <td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td>
-      <td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td>
-      <td>${escapeHtml(item.ngay)}</td>
-      <td>${statusBadge(item.displayStatus)}</td>
-    </tr>
-  `).join('') || '<tr><td colspan="11" class="text-center text-slate-500 py-8">Không tìm thấy dữ liệu đơn hàng phù hợp</td></tr>';
+  tableBody.innerHTML = filtered.map((item)=>`<tr><td class="font-bold text-slate-300">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td><td class="text-violet-400 font-semibold">${item.soCont > 0 ? formatNumber(item.soCont, 0) : 'Ghép'}</td><td class="text-cyan-400 font-medium">${escapeHtml(item.hangVanChuyen || '---')}</td><td>${formatNumber(item.tanCont)}T</td><td class="text-blue-400 font-semibold">${formatNumber(item.stockBefore)}T</td><td class="${item.shortage > 0 ? 'text-red-400' : 'text-green-400'} font-semibold">${formatNumber(item.shortage)}T</td><td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td><td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-slate-400'}">${formatNumber(item.bbShortage, 0)}</td><td>${escapeHtml(item.ngay)}</td><td>${statusBadge(item.displayStatus)}</td></tr>`).join('') || '<tr><td colspan="11" class="text-center text-slate-500 py-8">Không tìm thấy dữ liệu đơn hàng phù hợp</td></tr>';
 }
 
 function captureDetailImage() {
-  const sectionElement = document.getElementById('section-detail');
-  if (!sectionElement) return alert('Lỗi: Thẻ giao diện chụp ảnh không tồn tại.');
-  
-  html2canvas(sectionElement, { backgroundColor: '#020617', scale: 2 }).then((canvas) => {
-    const base64image = canvas.toDataURL("image/png");
-    const win = window.open();
-    if(win) {
-      win.document.write(`<iframe src="${base64image}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
-    } else {
-      alert('⚠️ Trình duyệt chặn Popup mở ảnh. Vui lòng cấp quyền mở Popup cho trang web này.');
-    }
-  });
+  const sectionElement = document.getElementById('section-detail'); const tableElement = document.getElementById('detailAllOrdersTable'); const tableContainer = tableElement ? tableElement.parentElement : null;
+  if (!sectionElement || !tableContainer) return alert('Không tìm thấy vùng dữ liệu chi tiết để chụp!');
+
+  const btn = document.getElementById('captureDetailBtn'); const originalBtnHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.innerHTML = '⏳ Hệ thống đang dựng ảnh cuộn full...'; btn.disabled = true; }
+
+  const originalMaxHeight = tableContainer.style.maxHeight; const originalOverflowY = tableContainer.style.overflowY; const originalOverflowX = tableContainer.style.overflowX;
+  tableContainer.style.maxHeight = 'none'; tableContainer.style.overflowY = 'visible'; tableContainer.style.overflowX = 'visible';
+  if (btn) btn.style.visibility = 'hidden';
+
+  setTimeout(() => {
+    const fullWidth = sectionElement.scrollWidth; const fullHeight = sectionElement.scrollHeight;
+    html2canvas(sectionElement, { backgroundColor: '#020617', scale: 2, useCORS: true, logging: false, width: fullWidth, height: fullHeight, windowWidth: fullWidth, windowHeight: fullHeight, x: 0, y: 0, scrollX: 0, scrollY: 0 }).then(canvas => {
+      tableContainer.style.maxHeight = originalMaxHeight; tableContainer.style.overflowY = originalOverflowY; tableContainer.style.overflowX = originalOverflowX;
+      if (btn) { btn.style.visibility = 'visible'; btn.innerHTML = originalBtnHtml; btn.disabled = false; }
+      const now = new Date(); const formatTime = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
+      const link = document.createElement('a'); link.download = `Bao_Cao_Chi_Tiet_Don_Hang_${formatTime}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+    }).catch(err => {
+      tableContainer.style.maxHeight = originalMaxHeight; tableContainer.style.overflowY = originalOverflowY; tableContainer.style.overflowX = originalOverflowX;
+      if (btn) { btn.style.visibility = 'visible'; btn.innerHTML = originalBtnHtml; btn.disabled = false; }
+      alert('Không thể thực hiện chụp ảnh cuộn: ' + err.message);
+    });
+  }, 400);
 }
 
-function bindEvents() {
-  // THÊM SỰ KIỆN KEYUP LẮNG NGHE PHÍM ENTER ĐỂ ĐĂNG NHẬP NHANH (UI/UX)
-  const loginTrigger = (e) => {
-    if (e.key === "Enter") {
-      const userVal = document.getElementById('userInput').value.trim();
-      // Nếu là tài khoản quản đốc thì đăng nhập theo nhánh production, ngược lại nhánh văn phòng (admin)
-      if (userVal.toLowerCase().includes("quandoc")) {
-        handleLogin('production');
-      } else {
-        handleLogin('admin');
-      }
-    }
-  };
-  document.getElementById('userInput')?.addEventListener('keyup', loginTrigger);
-  document.getElementById('passInput')?.addEventListener('keyup', loginTrigger);
-
-  document.querySelector('#totalPackagingTable tbody')?.addEventListener('change', (e)=>{
-    const checkbox = e.target.closest('[data-bb-order-key]');
-    if(!checkbox || !database) return;
-    const key = checkbox.dataset.bbOrderKey;
-    database.ref(`thanhpham_system/packaging_ordered/${key}`).set(checkbox.checked);
-  });
-
+function bindEvents(){
   document.getElementById('btnWorkshopConfirm')?.addEventListener('click', ()=>{
-    const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable tbody input[type="checkbox"]:checked');
-    if(checkedBoxes.length === 0) return alert('⚠️ Vui lòng tích chọn ít nhất một cụm hàng cần duyệt điều phối!');
-    
-    const logsText = [];
-    checkedBoxes.forEach((cb)=>{
-      const id = cb.dataset.candidateId;
-      const item = appState.details.find((d)=>d.id === id);
-      if(item && !appState.confirmedTomorrow.some((c)=>c.id === item.id)){
+    const checkedBoxes = document.querySelectorAll('#tomorrowCandidateTable input[type="checkbox"]:checked');
+    if(!checkedBoxes.length) return alert('Vui lòng tích chọn ít nhất một mã hàng bị thiếu trong danh sách!');
+
+    const candidateIds = Array.from(checkedBoxes).map((cb)=>cb.dataset.candidateId);
+    const selectedItems = appState.details.filter((item)=>candidateIds.includes(item.id));
+
+    let logsText = [];
+    selectedItems.forEach((item)=>{
+      if(!appState.confirmedTomorrow.some((c)=>c.id === item.id)){
         appState.confirmedTomorrow.push({
-          id: item.id, donHang: item.donHang, tenDonHang: item.tenDonHang,
-          maBao: item.maBao, shortage: item.shortage, ngay: item.ngay, ngayKey: item.ngayKey
+          id: item.id, donHang: item.donHang, maBao: item.maBao, shortage: item.shortage, ngay: item.ngay, ngayKey: item.ngayKey
         });
-        logsText.push(`Đơn: ${item.donHang} - Thiếu: ${item.shortage}T`);
+        logsText.push(`Đơn: ${item.donHang} (${item.maBao}) - Thiếu: ${item.shortage}T`);
       }
     });
+
     uploadConfirmedToFirebase();
     writeAuditLog("Xác nhận duyệt ưu tiên cụm đơn ngày mai", logsText.join(" | "));
-    
+
     const nextRole = currentRole() === 'admin' ? 'production' : 'admin';
     const sourceLabel = localStorage.getItem('tp_user_fullname') || 'Quản đốc sản xuất';
     sendAppNotice(nextRole, `${sourceLabel} đã duyệt điều phối một số đơn hàng mai có thể xuất.`);
     alert('🎉 Đã xác nhận duyệt ưu tiên cho cụm đơn hàng thành công lên mạng đám mây!');
   });
 
-  document.getElementById('tomorrowConfirmedTable')?.addEventListener('click', (e)=>{
+  document.getElementById('tomorrowConfirmedTable').addEventListener('click', (e)=>{
     const button = e.target.closest('[data-remove-tomorrow]');
     if(!button) return;
     if(!confirm('Xóa bỏ duyệt điều phối đơn này khỏi danh sách ngày mai?')) return;
     
-    const targetId = button.dataset.removeTomorrow;
-    appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== targetId);
+    const targetItem = appState.confirmedTomorrow.find((item)=>item.id === button.dataset.removeTomorrow);
+    appState.confirmedTomorrow = appState.confirmedTomorrow.filter((item)=>item.id !== button.dataset.removeTomorrow);
     uploadConfirmedToFirebase();
-    writeAuditLog("Xóa bỏ duyệt ưu tiên đơn ngày mai", `ID đơn gỡ: ${targetId}`);
+    
+    if(targetItem) {
+       writeAuditLog("Hủy duyệt đơn hàng ngày mai", `Mã ĐH: ${targetItem.donHang} | Mã bao bì: ${targetItem.maBao} | Thiếu hụt quy đổi: ${targetItem.shortage}T`);
+    }
   });
 
   document.getElementById('btnOpenHistory')?.addEventListener('click', ()=>{
-    document.getElementById('historyPopup')?.classList.remove('hideBox');
+    document.getElementById('historyPopup').classList.remove('hideBox');
     loadAuditLogsToTable();
   });
   document.getElementById('btnCloseHistory')?.addEventListener('click', ()=>{
-    document.getElementById('historyPopup')?.classList.add('hideBox');
+    document.getElementById('historyPopup').classList.add('hideBox');
   });
 
+  document.getElementById('tomorrowDateSelect').addEventListener('change', refreshAll);
+  document.getElementById('btnPreviewReady')?.addEventListener('click', renderExportPreview);
+  document.getElementById('btnConfirmReady')?.addEventListener('click', exportExcel);
+  document.getElementById('readyExportMode')?.addEventListener('change', renderExportPreview);
+  document.getElementById('readyFromDate')?.addEventListener('change', renderExportPreview);
+  document.getElementById('readyToDate')?.addEventListener('change', renderExportPreview);
+
+  document.getElementById('btnFilterProd')?.addEventListener('click', renderProduction);
   document.getElementById('prodDisplayMode')?.addEventListener('change', renderProduction);
   document.getElementById('prodFromDate')?.addEventListener('change', renderProduction);
   document.getElementById('prodToDate')?.addEventListener('change', renderProduction);
@@ -1610,7 +1726,6 @@ function bindEvents() {
   
   document.getElementById('captureDetailBtn')?.addEventListener('click', captureDetailImage);
   document.getElementById('btnSaveProductionView')?.addEventListener('click', saveProductionViewSettings);
-  
   document.getElementById('btnNotifyWorkshop')?.addEventListener('click', ()=>{
     sendAppNotice('production', '🚀 Văn phòng đã hoàn tất cập nhật dữ liệu đơn hàng và tồn kho mới nhất. Xin mời kiểm tra!');
     alert('🔔 Đã gửi tín hiệu thông báo thông minh thời gian thực đến màn hình xưởng!');
@@ -1620,9 +1735,9 @@ function bindEvents() {
 
 document.addEventListener('DOMContentLoaded', ()=>{
   const savedRole = localStorage.getItem('tp_user_role');
+  applyRoleView(savedRole);
   setupFirebaseListeners();
   bindEvents();
-  applyRoleView(savedRole);
 });
 </script>
 
