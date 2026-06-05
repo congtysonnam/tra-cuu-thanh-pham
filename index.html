@@ -15,7 +15,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
+<!-- GIỮ LẠI BỘ THƯ VIỆN FIREBASE CHUẨN - KHÔNG TRÙNG LẶP -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
@@ -95,37 +97,32 @@ tbody tr:hover{
 </head>
 
 <body class="p-5">
-
 <div id="loginSection" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4">
   <div class="card p-8 max-w-md w-full text-center space-y-5 border-violet-500/30">
     <div class="w-14 h-14 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-xl">🔐</div>
     <h2 class="text-xl font-bold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400">ĐĂNG NHẬP HỆ THỐNG</h2>
-    <p class="text-slate-400 text-sm">Vui lòng nhập tài khoản bộ phận được cấp quyền</p>
+    <p class="text-slate-400 text-sm">Hệ thống xác thực bảo mật đám mây Firebase</p>
     
     <div class="text-left space-y-3">
       <div>
-        <label class="text-xs text-slate-400 pl-1">Tài khoản:</label>
-        <input type="text" id="userInput" placeholder="Nhập tài khoản (ví dụ: hiepquandoc)..." class="input mt-1 text-sm py-2.5" />
+        <label class="text-xs text-slate-400 pl-1">Email đăng nhập:</label>
+        <input type="email" id="userInput" placeholder="Ví dụ: hiepquandoc@gmail.com..." class="input mt-1 text-sm py-2.5" />
       </div>
       <div>
-        <label class="text-xs text-slate-400 pl-1">Mật khẩu:</label>
+        <label class="text-xs text-slate-400 pl-1">Mật khẩu bảo mật:</label>
         <input type="password" id="passInput" placeholder="Nhập mật khẩu..." class="input mt-1 text-sm py-2.5" />
       </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 pt-2">
-      <button onclick="handleLogin('production')" class="btn bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700 text-sm">
-        🏭 Xưởng Sản Xuất
-      </button>
-      <button onclick="handleLogin('admin')" class="btn bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
-        💻 Máy Chủ Văn Phòng
+    <div class="pt-2">
+      <button onclick="handleLogin()" class="btn w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white text-sm">
+        🚀 Đăng Nhập Hệ Thống
       </button>
     </div>
     
     <div id="loginAlert" class="text-red-400 text-sm font-semibold mt-1"></div>
   </div>
 </div>
-
 <div class="max-w-[1900px] mx-auto space-y-5">
 
   <div class="card p-6">
@@ -588,8 +585,27 @@ tbody tr:hover{
 
 </div>
 
+<!-- THẺ MỞ SCRIPT ĐẶT ĐÚNG VỊ TRÍ CHUẨN HTML -->
 <script>
-// Cấu hình kết nối cơ sở dữ liệu Firebase
+// =========================================================================
+// SỬA LỖI 2: KHAI BÁO LẠI ĐỐI TƯỢNG TRẠNG THÁI HỆ THỐNG BIẾN TOÀN CỤC APPSTATE
+// =========================================================================
+const appState = {
+  orders: [],
+  details: [],
+  production: [],
+  confirmedTomorrow: [],
+  bbRules: [],
+  stockMap: new Map(),
+  bbMap: new Map(),
+  productionView: { tomorrow: true, ready: false, production: false, detail: false },
+  latestNotice: null,
+  exportPreview: []
+};
+
+// =========================================================================
+// 1. CẤU HÌNH KẾT NỐI FIREBASE (GIỮ NGUYÊN CỦA BẠN)
+// =========================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyAm7swcw9lvWJuBfJHQenhhzWpk_EABz4Y",
   authDomain: "thanhpham-3dab0.firebaseapp.com",
@@ -601,72 +617,85 @@ const firebaseConfig = {
   measurementId: "G-55HBQSX9YF"
 };
 
-try {
+// Khởi tạo Firebase (Giữ nguyên)
+if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
-  var database = firebase.database();
-} catch (e) {
-  console.error("Lỗi khởi tạo Firebase mạng:", e);
 }
+const database = firebase.database();
 
-// Khởi tạo trạng thái ứng dụng toàn cục
-const appState = {
-  orders: [],
-  details: [],
-  production: [],
-  confirmedTomorrow: [],
-  exportPreview: [],
-  bbRules: [],
-  stockMap: new Map(),
-  bbMap: new Map(),
-  productionView: {
-    tomorrow: true,
-    ready: false,
-    production: false,
-    detail: false
-  },
-  latestNotice: null
+
+// =========================================================================
+// 2. BẢN ĐỒ PHÂN QUYỀN TRÊN CLOUD (THAY THẾ CHO KHAI BÁO TÀI KHOẢN CŨ)
+// =========================================================================
+const USER_ROLES = {
+  "admin@congty.com": { role: "admin", fullName: "Chủ quản văn phòng" },
+  "hiepquandoc@congty.com": { role: "production", fullName: "Hiệp Quản đốc" },
+  "dungquandoc@congty.com": { role: "production", fullName: "Dũng Quản đốc" }
 };
 
-// DANH SÁCH TÀI KHOẢN BẢO MẬT HỆ THỐNG
-const SECURITY_ACC = "omotobike"; 
-const SECURITY_PSW = "hoilamchi"; 
 
-// Danh sách tài khoản Quản Đốc Sản Xuất
-const WORKSHOP_USERS = {
-  "hiepquandoc": { password: "123", fullName: "Hiệp Quản đốc" },
-  "dungquandoc": { password: "456", fullName: "Dũng Quản đốc" }
-};
-
-// HÀM XỬ LÝ ĐĂNG NHẬP MỚI KIỂM TRA TÀI KHOẢN MẬT KHẨU
-function handleLogin(role) {
-  const user = document.getElementById('userInput').value.trim();
+// =========================================================================
+// 3. HÀM XỬ LÝ ĐĂNG NHẬP BẰNG FIREBASE AUTH BẢO MẬT (THAY THẾ HÀM handleLogin CŨ)
+// =========================================================================
+function handleLogin() {
+  const email = document.getElementById('userInput').value.trim();
   const pass = document.getElementById('passInput').value.trim();
   const alertEl = document.getElementById('loginAlert');
 
-  if (!user || !pass) {
-    alertEl.textContent = "❌ Vui lòng nhập đầy đủ Tài khoản và Mật khẩu!";
+  if (!email || !pass) {
+    alertEl.textContent = "❌ Vui lòng nhập đầy đủ Email và Mật khẩu!";
     return;
   }
 
-  if (role === 'admin') {
-    if (user === SECURITY_ACC && pass === SECURITY_PSW) {
-      localStorage.setItem('tp_user_role', 'admin');
-      localStorage.setItem('tp_user_fullname', 'Chủ quản văn phòng');
-      applyRoleView('admin');
-    } else {
-      alertEl.textContent = "❌ Sai tài khoản hoặc mật khẩu máy chủ văn phòng!";
-    }
-  } else if (role === 'production') {
-    if (WORKSHOP_USERS[user] && WORKSHOP_USERS[user].password === pass) {
-      localStorage.setItem('tp_user_role', 'production');
-      localStorage.setItem('tp_user_fullname', WORKSHOP_USERS[user].fullName);
-      applyRoleView('production');
-    } else {
-      alertEl.textContent = "❌ Tài khoản hoặc Mật khẩu Quản đốc không chính xác!";
-    }
-  }
-}
+  alertEl.textContent = "🔄 Đang xác thực với máy chủ Google...";
+  alertEl.className = "text-yellow-400 text-sm font-semibold mt-1";
 
+  // Gọi cổng bảo mật Firebase Auth
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      const userEmail = user.email.toLowerCase();
+
+      // Kiểm tra quyền dựa trên Email đăng nhập thành công
+      if (USER_ROLES[userEmail]) {
+        const userInfo = USER_ROLES[userEmail];
+        
+        // Lưu phiên làm việc tạm thời vào máy
+        localStorage.setItem('tp_user_role', userInfo.role);
+        localStorage.setItem('tp_user_fullname', userInfo.fullName);
+        
+        alertEl.textContent = "✅ Xác thực thành công! Đang tải dữ liệu...";
+        alertEl.className = "text-green-400 text-sm font-semibold mt-1";
+        
+        setTimeout(() => {
+          applyRoleView(userInfo.role);
+          // Ghi nhật ký bảo mật lên database (nếu hệ thống của bạn có hàm này)
+          if (typeof writeAuditLog === "function") {
+            writeAuditLog("Đăng nhập", `Tài khoản ${userInfo.fullName} đã kết nối.`);
+          }
+        }, 800);
+      } else {
+        alertEl.textContent = "❌ Email đã xác thực nhưng chưa được cấp quyền trên hệ thống!";
+        alertEl.className = "text-red-400 text-sm font-semibold mt-1";
+        firebase.auth().signOut();
+      }
+    })
+    .catch((error) => {
+      console.error("Lỗi Auth:", error);
+      alertEl.className = "text-red-400 text-sm font-semibold mt-1";
+      
+      // Trả lỗi bảo mật thông minh của Google
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        alertEl.textContent = "❌ Tài khoản hoặc Mật khẩu không chính xác!";
+      } else if (error.code === "auth/invalid-email") {
+        alertEl.textContent = "❌ Định dạng Email không đúng!";
+      } else if (error.code === "auth/too-many-requests") {
+        alertEl.textContent = "❌ Nhập sai quá nhiều lần! Tài khoản tạm thời bị khóa.";
+      } else {
+        alertEl.textContent = "❌ Lỗi bảo mật: " + error.message;
+      }
+    });
+}
 // HÀM GHI NHẬT KÝ LỊCH SỬ THAO TÁC TRUY VẾT LỖI (AUDIT LOG)
 function writeAuditLog(action, targetDetails) {
   if (!database) return;
@@ -808,6 +837,8 @@ function applyRoleView(role) {
 }
 
 function switchRole() {
+  // LỆNH BẢO MẬT: Đăng xuất tài khoản khỏi hệ thống Firebase của Google
+  firebase.auth().signOut();
   localStorage.removeItem('tp_user_role');
   localStorage.removeItem('tp_user_fullname');
   location.reload();
@@ -1409,6 +1440,7 @@ function buildSlots(startHour, startMinute, count){
   return slots;
 }
 
+// KHAI BÁO CÁC HÀM PHÂN BỔ VÀ HIỂN THỊ
 function assignPlanTimes(rows){
   const manualSlots = [ { period:'morning', hour:6, minute:15 }, { period:'morning', hour:6, minute:15 }, { period:'morning', hour:7, minute:0 }, { period:'morning', hour:7, minute:30 }, { period:'morning', hour:8, minute:0 }, ...buildSlots(13, 0, 40).map((s)=>({ ...s, period:'afternoon' })) ];
   const otherSlots = buildSlots(13, 0, 60).map((s)=>({ ...s, period:'afternoon' })); let mIdx = 0; let oIdx = 0;
@@ -1502,7 +1534,7 @@ function refreshAll(){
     <tr class="flash">
       <td class="font-bold text-yellow-500">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.maBao)}</td>
       <td class="text-yellow-400 font-semibold">${formatNumber(item.shortage, 1)}T</td><td>${escapeHtml(item.ngay)}</td>
-      <td>${statusBadge('MAI CÓ THỂ XUẤT')}</td>
+      <td>${statusBadge('MAI CÓ THỂ XUẤX')}</td>
       <td><button data-remove-tomorrow="${item.id}" class="bg-red-500/20 hover:bg-red-500 text-red-300 px-3 py-1 rounded-lg text-xs font-semibold">❌ Hủy</button></td>
     </tr>`).join('');
   setTable(tomorrowCard, ['Đơn hàng', 'Tên đơn hàng', 'Thiếu', 'Ngày giao', 'Trạng thái', 'Hành động'], confHtml, 1);
