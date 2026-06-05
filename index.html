@@ -354,11 +354,13 @@ tbody tr:hover{
             <th>SL đơn</th>
             <th>Tồn TP</th>
             <th>Thiếu</th>
+            <th class="text-orange-400">Tồn Bao Bì</th>
+            <th class="text-orange-400">Thiếu Bao Bì</th>
             <th>Ngày giao</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="8" class="text-center text-slate-500 py-8">Chưa có dữ liệu đám mây</td></tr>
+          <tr><td colspan="10" class="text-center text-slate-500 py-8">Chưa có dữ liệu đám mây</td></tr>
         </tbody>
       </table>
     </div>
@@ -1486,11 +1488,15 @@ function refreshAll(){
     <tr>
       <td><input type="checkbox" data-candidate-id="${item.id}" class="w-5 h-5 accent-yellow-500 cursor-pointer"/></td>
       <td class="font-bold text-yellow-400">${escapeHtml(item.donHang)}</td><td>${escapeHtml(item.tenDonHang)}</td>
-      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td><td>${formatNumber(item.needTon, 1)}T</td>
-      <td>${formatNumber(item.stockBefore, 1)}T</td><td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="max-w-[300px] truncate">${escapeHtml(item.maBao)}</td>
+      <td>${formatNumber(item.needTon, 1)}T</td>
+      <td>${formatNumber(item.stockBefore, 1)}T</td>
+      <td class="text-red-400 font-semibold">${formatNumber(item.shortage, 1)}T</td>
+      <td class="text-orange-300 font-medium">${formatNumber(item.bbStockBefore, 0)}</td>
+      <td class="${item.bbShortage > 0 ? 'text-amber-500 font-bold' : 'text-green-400'}">${formatNumber(item.bbShortage, 0)}</td>
       <td>${escapeHtml(item.ngay)}</td>
     </tr>`).join('');
-  setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu', 'Ngày giao'], candHtml, 0);
+  setTable(tomorrowCard, ['Chọn', 'Đơn hàng', 'Khách hàng', 'Tên đơn hàng', 'SL đơn', 'Tồn TP', 'Thiếu TP', 'Tồn Bao Bì', 'Thiếu Bao Bì', 'Ngày giao'], candHtml, 0);
 
   const confHtml = appState.confirmedTomorrow.map((item)=>`
     <tr class="flash">
